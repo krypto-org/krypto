@@ -1,0 +1,72 @@
+cmake_minimum_required(VERSION 3.10)
+
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake")
+
+set(GCC_VERSION 8.2)
+
+add_compile_options(
+        -std=gnu++17
+        -Wall
+)
+
+set(CMAKE_CXX_FLAGS_RELEASE "-O3")
+
+message(STATUS "Checking/installing dependencies")
+file(COPY conanfile.txt DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+file(COPY build.profile DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+execute_process(
+        COMMAND conan install .
+        -g cmake -g virtualenv
+        -s compiler=gcc -s compiler.version=${GCC_VERSION}
+        -s build_type=Release
+        --profile build.profile
+        RESULT_VARIABLE CONAN_EXIT_CODE)
+
+include(${CMAKE_CURRENT_BINARY_DIR}/conanbuildinfo.cmake)
+
+set(CMAKE_C_COMPILER ${CONAN_BIN_DIRS_GCC}/gcc)
+set(CMAKE_CXX_COMPILER ${CONAN_BIN_DIRS_GCC}/g++)
+
+project(krypto C CXX)
+
+conan_check_compiler()
+conan_define_targets()
+
+message(STATUS "Updating RPATH settings")
+
+set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
+foreach (x IN LISTS CONAN_LIB_DIRS)
+    message(STATUS "ADDING ${x}")
+    SET(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
+    set(DV_RPATH_OPTIONS "-Wl,--enable-new-dtags -Wl,-rpath,${x}")
+
+    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS}    ${DV_RPATH_OPTIONS}")
+    set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} ${DV_RPATH_OPTIONS}")
+    set(CMAKE_MODULE_LINKER_FLAGS "${CMAKE_MODULE_LINKER_FLAGS} ${DV_RPATH_OPTIONS}")
+    message(STATUS "DONE ADDING ${x}")
+endforeach (x)
+
+set(THREADS_PREFER_PTHREAD_FLAG ON)
+find_package(Threads REQUIRED)
+set(CMAKE_VERBOSE_MAKEFILE true)
+
+include_directories(include)
+include_directories(${CONAN_INCLUDE_DIRS})
+
+add_library(krypto STATIC
+        include/krypto/logger.h
+        src/krypto/logger.cpp
+        include/krypto/mktdata/coinbase/ws.h
+        src/krypto/mktdata/coinbase/ws.cpp
+        include/krypto/mktdata/coinbase/book_builder.h
+        include/krypto/mktdata/book.h src/krypto/mktdata/coinbase/book_builder.cpp)
+target_link_libraries(krypto Threads::Threads)
+
+add_library(crypto STATIC IMPORTED include/krypto/mktdata/coinbase/book_builder.h)
+set_target_properties(crypto PROPERTIES IMPORTED_LOCATION ${CONAN_LIB_DIRS_OPENSSL}/libcrypto.a)
+
+add_library(ssl STATIC IMPORTED)
+set_target_properties(ssl PROPERTIES IMPORTED_LOCATION ${CONAN_LIB_DIRS_OPENSSL}/libssl.a)
+
+add_executable(krypto-coinbase-mktdata src/apps/coinbase/mktdata.cpp)
+target_link_libraries(krypto-coinbase-mktdata krypto CONAN_PKG::boost ssl crypto dl CONAN_PKG::bzip2 CONAN_PKG::zlib CONAN_PKG::tbb Threads::Threads)

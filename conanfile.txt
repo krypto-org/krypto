@@ -1,0 +1,13 @@
+[requires]
+gcc/8.2@kapilsh/release
+spdlog/1.2.1@kapilsh/release
+json/2.1.0@kapilsh/release
+boost/1.68.0@kapilsh/release
+openssl/1.1.1@kapilsh/release
+bzip2/1.0.6@kapilsh/release
+zlib/1.2.11@kapilsh/release
+tbb/2018_U6@kapilsh/release
+websocketpp/0.8.1@kapilsh/release
+
+[generators]
+cmake
