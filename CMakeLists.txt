@@ -70,3 +70,10 @@ set_target_properties(ssl PROPERTIES IMPORTED_LOCATION ${CONAN_LIB_DIRS_OPENSSL}
 
 add_executable(krypto-coinbase-mktdata src/apps/coinbase/mktdata.cpp)
 target_link_libraries(krypto-coinbase-mktdata krypto CONAN_PKG::boost ssl crypto dl CONAN_PKG::bzip2 CONAN_PKG::zlib CONAN_PKG::tbb Threads::Threads)
+
+set(CMAKE_LIBRARY_PATH "${CMAKE_LIBRARY_PATH}:")
+
+find_library(GL GL /usr/lib/x86_64-linux-gnu)
+
+add_executable(krypto-ui src/apps/ui/main.cpp src/apps/ui/imgui_impl_glfw.cpp src/apps/ui/imgui_impl_opengl3.cpp)
+target_link_libraries(krypto-ui krypto CONAN_PKG::boost ssl crypto dl CONAN_PKG::bzip2 CONAN_PKG::zlib CONAN_PKG::tbb CONAN_PKG::glfw CONAN_PKG::glad CONAN_PKG::imgui Threads::Threads)

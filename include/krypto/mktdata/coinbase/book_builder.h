@@ -39,5 +39,7 @@ namespace krypto::mktdata::coinbase {
         void handle_snap(nlohmann::json snapshot);
 
         void handle_trade(nlohmann::json trade);
+
+        const OrderBook& book() const;
     };
 }

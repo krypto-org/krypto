@@ -142,3 +142,7 @@ krypto::mktdata::coinbase::BookBuilder::~BookBuilder() {
     incr_queue_.clear();
     incr_queue_.abort();
 }
+
+const krypto::mktdata::OrderBook& krypto::mktdata::coinbase::BookBuilder::book() const {
+    return book_;
+}

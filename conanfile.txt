@@ -8,6 +8,9 @@ bzip2/1.0.6@kapilsh/release
 zlib/1.2.11@kapilsh/release
 tbb/2018_U6@kapilsh/release
 websocketpp/0.8.1@kapilsh/release
+imgui/1.66b@kapilsh/release
+glfw/3.2.1@kapilsh/release
+glad/0.1.28@kapilsh/release
 
 [generators]
 cmake
