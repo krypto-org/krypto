@@ -1,0 +1,53 @@
+namespace krypto.serialization;
+
+enum Side: byte {UNKNOWN = 0, BUY = 1, SELL = 2}
+
+enum OrderSide: byte {UNKNOWN = 0, BID = 1, ASK = 2}
+
+// market data
+
+table Quote {
+  timestamp: long;
+  security_id: long;
+  bid: long;
+  ask: long;
+  last: long;
+  bid_quantity: long;
+  ask_quantity: long;
+  last_quantity: long;
+}
+
+struct SnapshotPriceLevel {
+  price: long;
+  quantity: long;
+}
+
+table Snapshot {
+  timestamp: long;
+  security_id: long;
+  bids: [SnapshotPriceLevel];
+  asks: [SnapshotPriceLevel];
+}
+
+struct IncrementalPriceLevel {
+  price: long;
+  quantity: long;
+  side: long;
+}
+
+table Incremental {
+  timestamp: long;
+  security_id: long;
+  updates: [IncrementalPriceLevel];
+}
+
+table Trade {
+  timestamp: long;
+  security_id: long;
+  price: long;
+  quantity: long;
+  side: Side;
+  order_id: string;
+}
+
+
