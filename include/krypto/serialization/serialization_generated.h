@@ -9,6 +9,8 @@
 namespace krypto {
 namespace serialization {
 
+struct SequenceNumber;
+
 struct Quote;
 
 struct SnapshotPriceLevel;
@@ -133,6 +135,46 @@ MANUALLY_ALIGNED_STRUCT(8) IncrementalPriceLevel FLATBUFFERS_FINAL_CLASS {
   }
 };
 STRUCT_END(IncrementalPriceLevel, 24);
+
+struct SequenceNumber FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+  enum {
+    VT_VALUE = 4
+  };
+  int64_t value() const {
+    return GetField<int64_t>(VT_VALUE, 0);
+  }
+  bool Verify(flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyField<int64_t>(verifier, VT_VALUE) &&
+           verifier.EndTable();
+  }
+};
+
+struct SequenceNumberBuilder {
+  flatbuffers::FlatBufferBuilder &fbb_;
+  flatbuffers::uoffset_t start_;
+  void add_value(int64_t value) {
+    fbb_.AddElement<int64_t>(SequenceNumber::VT_VALUE, value, 0);
+  }
+  explicit SequenceNumberBuilder(flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  SequenceNumberBuilder &operator=(const SequenceNumberBuilder &);
+  flatbuffers::Offset<SequenceNumber> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = flatbuffers::Offset<SequenceNumber>(end);
+    return o;
+  }
+};
+
+inline flatbuffers::Offset<SequenceNumber> CreateSequenceNumber(
+    flatbuffers::FlatBufferBuilder &_fbb,
+    int64_t value = 0) {
+  SequenceNumberBuilder builder_(_fbb);
+  builder_.add_value(value);
+  return builder_.Finish();
+}
 
 struct Quote FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   enum {

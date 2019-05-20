@@ -1,8 +1,14 @@
 namespace krypto.serialization;
 
+// general
+
 enum Side: byte {UNKNOWN = 0, BUY = 1, SELL = 2}
 
 enum OrderSide: byte {UNKNOWN = 0, BID = 1, ASK = 2}
+
+table SequenceNumber {
+  value: long;
+}
 
 // market data
 

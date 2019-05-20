@@ -54,12 +54,14 @@ include_directories(include)
 include_directories(${CONAN_INCLUDE_DIRS})
 
 add_library(krypto STATIC
+        include/krypto/types.h
         include/krypto/serialization/serialization_generated.h
         include/krypto/logger.h
         include/krypto/mktdata/coinbase/ws.h
         include/krypto/mktdata/coinbase/book_builder.h
         include/krypto/mktdata/book.h
         include/krypto/network/publisher.h
+        include/krypto/network/subscriber.h
         src/krypto/logger.cpp
         src/krypto/mktdata/coinbase/ws.cpp
         src/krypto/mktdata/coinbase/book_builder.cpp)

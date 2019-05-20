@@ -11,6 +11,8 @@ imgui/1.66b@kapilsh/release
 glfw/3.2.1@kapilsh/release
 glad/0.1.28@kapilsh/release
 flatbuffers/1.9.0@kapilsh/release
+zmq/4.2.5@kapilsh/release
+cppzmq/4.3.0@kapilsh/release
 
 [generators]
 cmake
