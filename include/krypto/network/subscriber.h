@@ -21,7 +21,7 @@ namespace krypto::network {
         bool connected_;
         const std::function<void(int64_t, MsgType)> callback_;
     public:
-        SubscriberBase(zmq::context_t &context, std::string, std::function<void(int64_t, MsgType)> f);
+        SubscriberBase(zmq::context_t &, std::string, std::function<void(int64_t, MsgType)>);
 
         SubscriberBase(const SubscriberBase &other) = delete;
 
@@ -95,7 +95,6 @@ namespace krypto::network {
             seq_no = sn->value();
         }
 
-        // Receive 2/3
         zmq::message_t payload_msg;
         sock_.recv(&payload_msg);
 

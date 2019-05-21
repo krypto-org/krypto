@@ -20,7 +20,7 @@ namespace krypto::network {
     protected:
         flatbuffers::FlatBufferBuilder fb_builder_;
     public:
-        PublisherBase(zmq::context_t &contexDerived, std::string);
+        PublisherBase(zmq::context_t &, std::string);
 
         PublisherBase(const PublisherBase &other) = delete;
 

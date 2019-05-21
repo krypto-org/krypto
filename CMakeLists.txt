@@ -59,12 +59,24 @@ add_library(krypto STATIC
         include/krypto/logger.h
         include/krypto/mktdata/coinbase/ws.h
         include/krypto/mktdata/coinbase/book_builder.h
+        include/krypto/mktdata/convert.h
         include/krypto/mktdata/book.h
         include/krypto/network/publisher.h
         include/krypto/network/subscriber.h
+        include/krypto/network/proxy.h
+        include/krypto/network/mktdata/incr.h
+        include/krypto/network/mktdata/snap.h
+        include/krypto/network/mktdata/quote.h
+        include/krypto/network/mktdata/trade.h
         src/krypto/logger.cpp
         src/krypto/mktdata/coinbase/ws.cpp
-        src/krypto/mktdata/coinbase/book_builder.cpp)
+        src/krypto/mktdata/coinbase/book_builder.cpp
+        src/krypto/network/proxy.cpp
+        src/krypto/network/mktdata/incr.cpp
+        src/krypto/network/mktdata/snap.cpp
+        src/krypto/network/mktdata/quote.cpp
+        src/krypto/network/mktdata/trade.cpp
+        )
 target_link_libraries(krypto Threads::Threads)
 
 add_library(crypto STATIC IMPORTED include/krypto/mktdata/coinbase/book_builder.h)
