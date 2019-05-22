@@ -15,7 +15,6 @@ void krypto::network::mktdata::QuotePublisher::generate_buffer(
     quote_builder.add_last_quantity(krypto::mktdata::convert_quantity(quote.last_qty));
 
     auto q = quote_builder.Finish();
-
     fb_builder_.Finish(q);
 }
 

@@ -8,6 +8,10 @@ namespace krypto::mktdata {
         BID = 1, ASK = 2, UNKNOWN = 0
     };
 
+    enum class Side : int8_t {
+        BUY = 1, SELL = 2, UNKNOWN = 0
+    };
+
     struct Quote {
         int64_t timestamp;
         int64_t security_id;
@@ -17,6 +21,15 @@ namespace krypto::mktdata {
         double_t ask_qty;
         double_t last;
         double_t last_qty;
+    };
+
+    struct Trade {
+        int64_t timestamp;
+        int64_t security_id;
+        int64_t price;
+        int64_t quantity;
+        Side side; // Aggressor Side
+        std::string order_id;
     };
 
     struct OrderBook {
