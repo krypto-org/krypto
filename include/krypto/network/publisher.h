@@ -7,10 +7,11 @@
 
 #include <krypto/serialization/serialization_generated.h>
 #include <krypto/types.h>
+#include <krypto/logger.h>
 
 namespace krypto::network {
 
-    template<typename Derived, typename... Args>
+    template<typename Derived>
     class PublisherBase {
     private:
         const zmq::context_t &context_;
@@ -35,29 +36,28 @@ namespace krypto::network {
         template<bool WithProxy>
         void start();
 
+        template<typename... Args>
         bool send(const std::string &topic, Args... args);
-
-        bool send(const std::string &topic, int64_t sequence, Args... args);
     };
 
-    template<typename Derived, typename... Args>
-    PublisherBase<Derived, Args...>::PublisherBase(zmq::context_t &context,
-                                                         std::string endpoint) : context_(context),
-                                                                                 sock_(context, ZMQ_PUB),
-                                                                                 endpoint_(std::move(endpoint)),
-                                                                                 connected_(false),
-                                                                                 fb_builder_(1024) {
+    template<typename Derived>
+    PublisherBase<Derived>::PublisherBase(zmq::context_t &context,
+                                          std::string endpoint) : context_(context),
+                                                                  sock_(context, ZMQ_PUB),
+                                                                  endpoint_(std::move(endpoint)),
+                                                                  connected_(false),
+                                                                  fb_builder_(1024) {
     }
 
-    template<typename Derived, typename... Args>
-    PublisherBase<Derived, Args...>::~PublisherBase() {
+    template<typename Derived>
+    PublisherBase<Derived>::~PublisherBase() {
         connected_ = false;
         sock_.close();
     }
 
-    template<typename Derived, typename... Args>
+    template<typename Derived>
     template<bool WithProxy>
-    void PublisherBase<Derived, Args...>::start() {
+    void PublisherBase<Derived>::start() {
         if constexpr (WithProxy) {
             sock_.connect(endpoint_);
         } else {
@@ -67,8 +67,9 @@ namespace krypto::network {
         connected_ = true;
     }
 
-    template<typename Derived, typename... Args>
-    bool PublisherBase<Derived, Args...>::send(const std::string &topic, Args... args) {
+    template<typename Derived>
+    template<typename... Args>
+    bool PublisherBase<Derived>::send(const std::string &topic, Args... args) {
         std::bitset<2> status;
 
         zmq::message_t topic_nsg(topic.size());
@@ -76,45 +77,13 @@ namespace krypto::network {
 
         status.set(0, sock_.send(topic_nsg, ZMQ_SNDMORE));
 
-        zmq::message_t payload_msg;
         auto &derived = static_cast<Derived &>(*this);
-        derived.generate_buffer(args...);
+        derived.serialize(args...);
+
+        zmq::message_t payload_msg(fb_builder_.GetSize());
         std::memcpy(payload_msg.data(), fb_builder_.GetBufferPointer(), fb_builder_.GetSize());
 
         status.set(1, sock_.send(payload_msg));
-
-        return status.all();
-    }
-
-    template<typename Derived, typename... Args>
-    bool
-    PublisherBase<Derived, Args...>::send(const std::string &topic, const krypto::SequenceNumber sequence,
-                                             Args... args) {
-        std::bitset<3> status;
-
-        // Send Topic
-        zmq::message_t topic_nsg(topic.size());
-        std::memcpy(topic_nsg.data(), topic.data(), topic.size());
-        status.set(0, sock_.send(topic_nsg, ZMQ_SNDMORE));
-
-        // Create Sequence Message
-        fb_builder_.Clear();
-        krypto::serialization::SequenceNumberBuilder sn_builder(fb_builder_);
-        sn_builder.add_value(sequence);
-        auto sn = sn_builder.Finish();
-        fb_builder_.Finish(sn);
-
-        // Send Sequence Message
-        zmq::message_t sn_msg(fb_builder_.GetBufferPointer(), fb_builder_.GetSize());
-        status.set(1, sock_.send(sn_msg, ZMQ_SNDMORE));
-
-        // Send Sequence Message
-
-        fb_builder_.Clear();
-        auto &derived = static_cast<Derived &>(*this);
-        derived.generate_buffer(args...);
-        zmq::message_t payload_msg(fb_builder_.GetBufferPointer(), fb_builder_.GetSize());
-        status.set(2, sock_.send(payload_msg));
 
         return status.all();
     }

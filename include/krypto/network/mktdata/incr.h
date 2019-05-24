@@ -11,24 +11,14 @@
 namespace krypto::network::mktdata {
 
     class IncrementalPublisher final
-            : public krypto::network::PublisherBase<
-                    IncrementalPublisher,
-                    krypto::SecurityId,
-                    krypto::Timestamp,
-                    std::vector<std::tuple<krypto::Price, krypto::Quantity, krypto::serialization::OrderSide>>> {
+            : public krypto::network::PublisherBase<IncrementalPublisher> {
 
     public:
-        using krypto::network::PublisherBase<IncrementalPublisher,
-                krypto::SecurityId,
-                krypto::Timestamp,
-                std::vector<std::tuple<krypto::Price, krypto::Quantity, krypto::serialization::OrderSide>>>::PublisherBase;
+        using krypto::network::PublisherBase<IncrementalPublisher>::PublisherBase;
 
-        using krypto::network::PublisherBase<IncrementalPublisher,
-                krypto::SecurityId,
-                krypto::Timestamp,
-                std::vector<std::tuple<krypto::Price, krypto::Quantity, krypto::serialization::OrderSide>>>::send;
+        using krypto::network::PublisherBase<IncrementalPublisher>::send;
 
-        void generate_buffer(krypto::SecurityId id, krypto::Timestamp timestamp,
+        void serialize(krypto::SecurityId id, krypto::Timestamp timestamp,
                              const std::vector<std::tuple<Price, krypto::Quantity, krypto::serialization::OrderSide>> &);
     };
 

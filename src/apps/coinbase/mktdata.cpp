@@ -16,7 +16,13 @@ std::function<void(int)> shutdown_handler;
 void signal_handler(int signal) { shutdown_handler(signal); }
 
 int main() {
-    coinbase::BookBuilder bb;
+
+    zmq::context_t context(1);
+
+    krypto::network::mktdata::TopOfBookPublisher publisher{context, "tcp://127.0.0.1:23400"};
+    publisher.start<false>();
+
+    coinbase::BookBuilder<krypto::network::mktdata::TopOfBookPublisher> bb{publisher};
 
     coinbase::WsConnection ws{"wss://ws-feed.pro.coinbase.com", [&bb](nlohmann::json &&msg) {
         auto type = msg["type"].get<std::string>();

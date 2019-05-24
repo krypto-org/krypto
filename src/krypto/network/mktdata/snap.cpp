@@ -1,7 +1,7 @@
 #include <krypto/network/mktdata/snap.h>
 
 namespace krypto::network::mktdata {
-    void SnapshotPublisher::generate_buffer(
+    void SnapshotPublisher::serialize(
             krypto::SecurityId id, krypto::Timestamp timestamp,
             const std::vector<std::tuple<krypto::Price, krypto::Quantity >> &bids,
             const std::vector<std::tuple<krypto::Price, krypto::Quantity >> &asks) {
