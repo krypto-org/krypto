@@ -6,6 +6,7 @@
 #include <tbb/concurrent_queue.h>
 #include <nlohmann/json.hpp>
 #include <krypto/network/mktdata/top_of_book.h>
+#include <krypto/mktdata/convert.h>
 
 namespace krypto::mktdata::coinbase {
     template <typename Socket>
@@ -18,10 +19,7 @@ namespace krypto::mktdata::coinbase {
         tbb::concurrent_bounded_queue<nlohmann::json> incr_queue_;
         OrderBook book_;
 
-        void apply_incremental(
-                double_t price,
-                double_t qty,
-                OrderSide side);
+        void apply_incremental(int64_t price, int64_t qty, OrderSide side);
 
     public:
         explicit BookBuilder(Socket& socket);
@@ -54,7 +52,7 @@ namespace krypto::mktdata::coinbase {
         book_.quote.bid = 0;
         book_.quote.bid_qty = 0;
 
-        book_.quote.ask = std::numeric_limits<double_t>::infinity();
+        book_.quote.ask = std::numeric_limits<int64_t >::max();
         book_.quote.ask_qty = 0;
 
         book_.quote.last = 0;
@@ -69,8 +67,8 @@ namespace krypto::mktdata::coinbase {
 
             for (auto &incr: incrs) {
                 OrderSide side = incr[0] == "buy" ? OrderSide::BID : OrderSide::ASK;
-                auto price = std::stod(incr[1]);
-                auto qty = std::stod(incr[2]);
+                auto price = krypto::mktdata::convert_price(std::stod(incr[1]));
+                auto qty = krypto::mktdata::convert_quantity(std::stod(incr[2]));
 
                 apply_incremental(price, qty, side);
             }
@@ -114,8 +112,7 @@ namespace krypto::mktdata::coinbase {
     }
 
     template <typename Socket>
-    void BookBuilder<Socket>::apply_incremental(double_t price, double_t qty,
-                                                                           krypto::mktdata::OrderSide side) {
+    void BookBuilder<Socket>::apply_incremental(int64_t price, int64_t qty, krypto::mktdata::OrderSide side) {
         if (side == OrderSide::BID) {
             if (qty == 0) {
                 book_.bids.erase(price);
@@ -145,16 +142,16 @@ namespace krypto::mktdata::coinbase {
 
             for (auto &bid: bids) {
 
-                auto price = std::stod(bid[0]);
-                auto qty = std::stod(bid[1]);
+                auto price = krypto::mktdata::convert_price(std::stod(bid[0]));
+                auto qty = krypto::mktdata::convert_quantity(std::stod(bid[1]));
 
                 apply_incremental(price, qty, OrderSide::BID);
             }
 
             for (auto &ask: asks) {
 
-                auto price = std::stod(ask[0]);
-                auto qty = std::stod(ask[1]);
+                auto price = krypto::mktdata::convert_price(std::stod(ask[0]));
+                auto qty = krypto::mktdata::convert_quantity(std::stod(ask[1]));
 
                 apply_incremental(price, qty, OrderSide::ASK);
             }
@@ -167,8 +164,8 @@ namespace krypto::mktdata::coinbase {
 
                 for (auto &incr: incrs) {
                     OrderSide side = incr[0] == "buy" ? OrderSide::BID : OrderSide::ASK;
-                    auto price = std::stod(incr[1]);
-                    auto qty = std::stod(incr[2]);
+                    auto price = krypto::mktdata::convert_price(std::stod(incr[1]));
+                    auto qty = krypto::mktdata::convert_quantity(std::stod(incr[2]));
 
                     apply_incremental(price, qty, side);
                 }
@@ -183,14 +180,22 @@ namespace krypto::mktdata::coinbase {
 
     template <typename Socket>
     void BookBuilder<Socket>::handle_trade(nlohmann::json trade) {
-        auto price = std::stod(trade.at("price").get<std::string>());
-        auto qty = std::stod(trade.at("size").get<std::string>());
+
+        auto price = krypto::mktdata::convert_price(
+                std::stod(trade.at("price").get<std::string>()));
+        auto qty = krypto::mktdata::convert_quantity(
+                std::stod(trade.at("size").get<std::string>()));
 
         book_.quote.last = price;
         book_.quote.last_qty = qty;
 
+        auto side = trade.at("side").get<std::string>() == "sell"?
+                Side::BUY : Side::SELL;
+
+        auto trade_id = trade.at("trade_id").get<int64_t>();
+
         krypto::mktdata::Trade to_send{
-            book_.timestamp, 0, price, qty, Side::BUY, "id"};
+            book_.timestamp, 0, price, qty, side, std::to_string(trade_id)};
 
         socket_.send("TRADE", to_send);
     }

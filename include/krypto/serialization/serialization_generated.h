@@ -452,7 +452,7 @@ struct Trade FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
     VT_PRICE = 8,
     VT_QUANTITY = 10,
     VT_SIDE = 12,
-    VT_ORDER_ID = 14
+    VT_TRADE_ID = 14
   };
   int64_t timestamp() const {
     return GetField<int64_t>(VT_TIMESTAMP, 0);
@@ -469,8 +469,8 @@ struct Trade FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   Side side() const {
     return static_cast<Side>(GetField<int8_t>(VT_SIDE, 0));
   }
-  const flatbuffers::String *order_id() const {
-    return GetPointer<const flatbuffers::String *>(VT_ORDER_ID);
+  const flatbuffers::String *trade_id() const {
+    return GetPointer<const flatbuffers::String *>(VT_TRADE_ID);
   }
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
@@ -479,8 +479,8 @@ struct Trade FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
            VerifyField<int64_t>(verifier, VT_PRICE) &&
            VerifyField<int64_t>(verifier, VT_QUANTITY) &&
            VerifyField<int8_t>(verifier, VT_SIDE) &&
-           VerifyOffset(verifier, VT_ORDER_ID) &&
-           verifier.Verify(order_id()) &&
+           VerifyOffset(verifier, VT_TRADE_ID) &&
+           verifier.Verify(trade_id()) &&
            verifier.EndTable();
   }
 };
@@ -503,8 +503,8 @@ struct TradeBuilder {
   void add_side(Side side) {
     fbb_.AddElement<int8_t>(Trade::VT_SIDE, static_cast<int8_t>(side), 0);
   }
-  void add_order_id(flatbuffers::Offset<flatbuffers::String> order_id) {
-    fbb_.AddOffset(Trade::VT_ORDER_ID, order_id);
+  void add_trade_id(flatbuffers::Offset<flatbuffers::String> trade_id) {
+    fbb_.AddOffset(Trade::VT_TRADE_ID, trade_id);
   }
   explicit TradeBuilder(flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
@@ -525,13 +525,13 @@ inline flatbuffers::Offset<Trade> CreateTrade(
     int64_t price = 0,
     int64_t quantity = 0,
     Side side = Side_UNKNOWN,
-    flatbuffers::Offset<flatbuffers::String> order_id = 0) {
+    flatbuffers::Offset<flatbuffers::String> trade_id = 0) {
   TradeBuilder builder_(_fbb);
   builder_.add_quantity(quantity);
   builder_.add_price(price);
   builder_.add_security_id(security_id);
   builder_.add_timestamp(timestamp);
-  builder_.add_order_id(order_id);
+  builder_.add_trade_id(trade_id);
   builder_.add_side(side);
   return builder_.Finish();
 }
@@ -543,7 +543,7 @@ inline flatbuffers::Offset<Trade> CreateTradeDirect(
     int64_t price = 0,
     int64_t quantity = 0,
     Side side = Side_UNKNOWN,
-    const char *order_id = nullptr) {
+    const char *trade_id = nullptr) {
   return krypto::serialization::CreateTrade(
       _fbb,
       timestamp,
@@ -551,7 +551,7 @@ inline flatbuffers::Offset<Trade> CreateTradeDirect(
       price,
       quantity,
       side,
-      order_id ? _fbb.CreateString(order_id) : 0);
+      trade_id ? _fbb.CreateString(trade_id) : 0);
 }
 
 }  // namespace serialization

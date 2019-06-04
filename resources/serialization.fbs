@@ -53,7 +53,7 @@ table Trade {
   price: long;
   quantity: long;
   side: Side;
-  order_id: string;
+  trade_id: string;
 }
 
 

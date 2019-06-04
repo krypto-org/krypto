@@ -3,7 +3,7 @@
 #include <cmath>
 
 namespace krypto::mktdata {
-    constexpr int64_t PRICE_CONVERSION = 10000000000;
+    constexpr int64_t PRICE_CONVERSION = 1000000;
 
     constexpr int64_t QUANTITY_CONVERSION = 10000000000;
 
