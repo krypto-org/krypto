@@ -11,6 +11,8 @@ namespace serialization {
 
 struct SequenceNumber;
 
+struct Instrument;
+
 struct Quote;
 
 struct SnapshotPriceLevel;
@@ -85,6 +87,47 @@ inline const char * const *EnumNamesOrderSide() {
 inline const char *EnumNameOrderSide(OrderSide e) {
   const size_t index = static_cast<int>(e);
   return EnumNamesOrderSide()[index];
+}
+
+enum InstrumentType {
+  InstrumentType_UNKNOWN = 0,
+  InstrumentType_STOCK = 1,
+  InstrumentType_FUTURE = 2,
+  InstrumentType_OPTION = 3,
+  InstrumentType_FOREX = 4,
+  InstrumentType_CRYPTO = 5,
+  InstrumentType_MIN = InstrumentType_UNKNOWN,
+  InstrumentType_MAX = InstrumentType_CRYPTO
+};
+
+inline const InstrumentType (&EnumValuesInstrumentType())[6] {
+  static const InstrumentType values[] = {
+    InstrumentType_UNKNOWN,
+    InstrumentType_STOCK,
+    InstrumentType_FUTURE,
+    InstrumentType_OPTION,
+    InstrumentType_FOREX,
+    InstrumentType_CRYPTO
+  };
+  return values;
+}
+
+inline const char * const *EnumNamesInstrumentType() {
+  static const char * const names[] = {
+    "UNKNOWN",
+    "STOCK",
+    "FUTURE",
+    "OPTION",
+    "FOREX",
+    "CRYPTO",
+    nullptr
+  };
+  return names;
+}
+
+inline const char *EnumNameInstrumentType(InstrumentType e) {
+  const size_t index = static_cast<int>(e);
+  return EnumNamesInstrumentType()[index];
 }
 
 MANUALLY_ALIGNED_STRUCT(8) SnapshotPriceLevel FLATBUFFERS_FINAL_CLASS {
@@ -174,6 +217,143 @@ inline flatbuffers::Offset<SequenceNumber> CreateSequenceNumber(
   SequenceNumberBuilder builder_(_fbb);
   builder_.add_value(value);
   return builder_.Finish();
+}
+
+struct Instrument FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+  enum {
+    VT_ID = 4,
+    VT_TYPE = 6,
+    VT_SYMBOL = 8,
+    VT_EXCHANGE = 10,
+    VT_EXCHANGE_SYMBOL = 12,
+    VT_TICK_SIZE = 14,
+    VT_CRYPTO_BASE = 16,
+    VT_CRYPTO_QUOTE = 18
+  };
+  int64_t id() const {
+    return GetField<int64_t>(VT_ID, 0);
+  }
+  InstrumentType type() const {
+    return static_cast<InstrumentType>(GetField<int8_t>(VT_TYPE, 0));
+  }
+  const flatbuffers::String *symbol() const {
+    return GetPointer<const flatbuffers::String *>(VT_SYMBOL);
+  }
+  const flatbuffers::String *exchange() const {
+    return GetPointer<const flatbuffers::String *>(VT_EXCHANGE);
+  }
+  const flatbuffers::String *exchange_symbol() const {
+    return GetPointer<const flatbuffers::String *>(VT_EXCHANGE_SYMBOL);
+  }
+  int64_t tick_size() const {
+    return GetField<int64_t>(VT_TICK_SIZE, 0);
+  }
+  const flatbuffers::String *crypto_base() const {
+    return GetPointer<const flatbuffers::String *>(VT_CRYPTO_BASE);
+  }
+  const flatbuffers::String *crypto_quote() const {
+    return GetPointer<const flatbuffers::String *>(VT_CRYPTO_QUOTE);
+  }
+  bool Verify(flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyField<int64_t>(verifier, VT_ID) &&
+           VerifyField<int8_t>(verifier, VT_TYPE) &&
+           VerifyOffset(verifier, VT_SYMBOL) &&
+           verifier.Verify(symbol()) &&
+           VerifyOffset(verifier, VT_EXCHANGE) &&
+           verifier.Verify(exchange()) &&
+           VerifyOffset(verifier, VT_EXCHANGE_SYMBOL) &&
+           verifier.Verify(exchange_symbol()) &&
+           VerifyField<int64_t>(verifier, VT_TICK_SIZE) &&
+           VerifyOffset(verifier, VT_CRYPTO_BASE) &&
+           verifier.Verify(crypto_base()) &&
+           VerifyOffset(verifier, VT_CRYPTO_QUOTE) &&
+           verifier.Verify(crypto_quote()) &&
+           verifier.EndTable();
+  }
+};
+
+struct InstrumentBuilder {
+  flatbuffers::FlatBufferBuilder &fbb_;
+  flatbuffers::uoffset_t start_;
+  void add_id(int64_t id) {
+    fbb_.AddElement<int64_t>(Instrument::VT_ID, id, 0);
+  }
+  void add_type(InstrumentType type) {
+    fbb_.AddElement<int8_t>(Instrument::VT_TYPE, static_cast<int8_t>(type), 0);
+  }
+  void add_symbol(flatbuffers::Offset<flatbuffers::String> symbol) {
+    fbb_.AddOffset(Instrument::VT_SYMBOL, symbol);
+  }
+  void add_exchange(flatbuffers::Offset<flatbuffers::String> exchange) {
+    fbb_.AddOffset(Instrument::VT_EXCHANGE, exchange);
+  }
+  void add_exchange_symbol(flatbuffers::Offset<flatbuffers::String> exchange_symbol) {
+    fbb_.AddOffset(Instrument::VT_EXCHANGE_SYMBOL, exchange_symbol);
+  }
+  void add_tick_size(int64_t tick_size) {
+    fbb_.AddElement<int64_t>(Instrument::VT_TICK_SIZE, tick_size, 0);
+  }
+  void add_crypto_base(flatbuffers::Offset<flatbuffers::String> crypto_base) {
+    fbb_.AddOffset(Instrument::VT_CRYPTO_BASE, crypto_base);
+  }
+  void add_crypto_quote(flatbuffers::Offset<flatbuffers::String> crypto_quote) {
+    fbb_.AddOffset(Instrument::VT_CRYPTO_QUOTE, crypto_quote);
+  }
+  explicit InstrumentBuilder(flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  InstrumentBuilder &operator=(const InstrumentBuilder &);
+  flatbuffers::Offset<Instrument> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = flatbuffers::Offset<Instrument>(end);
+    return o;
+  }
+};
+
+inline flatbuffers::Offset<Instrument> CreateInstrument(
+    flatbuffers::FlatBufferBuilder &_fbb,
+    int64_t id = 0,
+    InstrumentType type = InstrumentType_UNKNOWN,
+    flatbuffers::Offset<flatbuffers::String> symbol = 0,
+    flatbuffers::Offset<flatbuffers::String> exchange = 0,
+    flatbuffers::Offset<flatbuffers::String> exchange_symbol = 0,
+    int64_t tick_size = 0,
+    flatbuffers::Offset<flatbuffers::String> crypto_base = 0,
+    flatbuffers::Offset<flatbuffers::String> crypto_quote = 0) {
+  InstrumentBuilder builder_(_fbb);
+  builder_.add_tick_size(tick_size);
+  builder_.add_id(id);
+  builder_.add_crypto_quote(crypto_quote);
+  builder_.add_crypto_base(crypto_base);
+  builder_.add_exchange_symbol(exchange_symbol);
+  builder_.add_exchange(exchange);
+  builder_.add_symbol(symbol);
+  builder_.add_type(type);
+  return builder_.Finish();
+}
+
+inline flatbuffers::Offset<Instrument> CreateInstrumentDirect(
+    flatbuffers::FlatBufferBuilder &_fbb,
+    int64_t id = 0,
+    InstrumentType type = InstrumentType_UNKNOWN,
+    const char *symbol = nullptr,
+    const char *exchange = nullptr,
+    const char *exchange_symbol = nullptr,
+    int64_t tick_size = 0,
+    const char *crypto_base = nullptr,
+    const char *crypto_quote = nullptr) {
+  return krypto::serialization::CreateInstrument(
+      _fbb,
+      id,
+      type,
+      symbol ? _fbb.CreateString(symbol) : 0,
+      exchange ? _fbb.CreateString(exchange) : 0,
+      exchange_symbol ? _fbb.CreateString(exchange_symbol) : 0,
+      tick_size,
+      crypto_base ? _fbb.CreateString(crypto_base) : 0,
+      crypto_quote ? _fbb.CreateString(crypto_quote) : 0);
 }
 
 struct Quote FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
