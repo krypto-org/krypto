@@ -10,6 +10,21 @@ table SequenceNumber {
   value: long;
 }
 
+// instruments
+
+enum InstrumentType: byte {UNKNOWN = 0, STOCK = 1, FUTURE = 2, OPTION = 3, FOREX = 4, CRYPTO = 5}
+
+table Instrument {
+  id: long;
+  type: InstrumentType;
+  symbol: string;
+  exchange: string;
+  exchange_symbol: string;
+  tick_size: long;
+  crypto_base: string;
+  crypto_quote: string;
+}
+
 // market data
 
 table Quote {
