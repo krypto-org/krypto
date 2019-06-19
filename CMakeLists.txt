@@ -73,7 +73,7 @@ add_library(krypto STATIC
         src/krypto/network/mktdata/incr.cpp
         src/krypto/network/mktdata/snap.cpp
         src/krypto/network/mktdata/top_of_book.cpp
-        )
+        include/krypto/http.h src/krypto/http.cpp)
 target_link_libraries(krypto Threads::Threads)
 
 add_library(crypto STATIC IMPORTED include/krypto/mktdata/coinbase/book_builder.h)
@@ -82,7 +82,7 @@ set_target_properties(crypto PROPERTIES IMPORTED_LOCATION ${CONAN_LIB_DIRS_OPENS
 add_library(ssl STATIC IMPORTED)
 set_target_properties(ssl PROPERTIES IMPORTED_LOCATION ${CONAN_LIB_DIRS_OPENSSL}/libssl.a)
 
-add_executable(krypto-coinbase-mktdata src/apps/coinbase/mktdata.cpp)
+add_executable(krypto-coinbase-mktdata src/apps/mktdata/coinbase/mktdata.cpp)
 target_link_libraries(krypto-coinbase-mktdata krypto CONAN_PKG::boost ssl crypto dl CONAN_PKG::bzip2 CONAN_PKG::zlib CONAN_PKG::tbb CONAN_PKG::zmq CONAN_PKG::cppzmq Threads::Threads)
 
 set(CMAKE_LIBRARY_PATH "${CMAKE_LIBRARY_PATH}:")
@@ -91,3 +91,6 @@ find_library(GL GL /usr/lib/x86_64-linux-gnu)
 
 add_executable(krypto-ui src/apps/ui/main.cpp src/apps/ui/imgui_impl_glfw.cpp src/apps/ui/imgui_impl_opengl3.cpp)
 target_link_libraries(krypto-ui krypto CONAN_PKG::boost ssl crypto dl CONAN_PKG::bzip2 CONAN_PKG::zlib CONAN_PKG::tbb CONAN_PKG::zmq CONAN_PKG::cppzmq CONAN_PKG::glfw CONAN_PKG::glad CONAN_PKG::imgui Threads::Threads)
+
+add_executable(krypto-instruments src/apps/instruments/main.cpp include/krypto/root_certificates.h)
+target_link_libraries(krypto-instruments krypto CONAN_PKG::boost ssl crypto dl CONAN_PKG::bzip2 CONAN_PKG::zlib CONAN_PKG::tbb CONAN_PKG::zmq CONAN_PKG::cppzmq CONAN_PKG::glfw CONAN_PKG::glad CONAN_PKG::imgui Threads::Threads)
