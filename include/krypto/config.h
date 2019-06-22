@@ -13,6 +13,18 @@ namespace krypto {
     public:
         explicit Config(std::string&&);
 
+        Config(const Config &) = default;
+
+        Config(Config &&) = default;
+
+        Config &operator=(const Config &other) = default;
+
+        Config &operator=(Config &&other) = default;
+
+        ~Config() = default;
+
+        const nlohmann::json &get() const;
+
         template <typename T>
         const T at(std::string&&);
     };
@@ -28,5 +40,9 @@ namespace krypto {
     template<typename T>
     const T Config::at(std::string &&path) {
         return root_.at(path).get<T>();
+    }
+
+    const nlohmann::json &Config::get() const {
+        return root_;
     }
 }
