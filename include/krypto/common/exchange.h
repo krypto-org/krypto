@@ -9,8 +9,6 @@ namespace krypto::common {
 
     enum struct ExchangeType : uint8_t {
         COINBASE,
-        BINANCE,
-        GEMINI,
         SIZE
     };
 
@@ -25,7 +23,7 @@ namespace krypto::utils {
     template <>
     std::array<std::string, enum_size<krypto::common::ExchangeType>()> enum_names<krypto::common::ExchangeType>() {
         std::array<std::string, enum_size<krypto::common::ExchangeType>()> names =
-                {"COINBASE", "BINANCE", "GEMINI"};
+                {"COINBASE"};
         return names;
     }
 }

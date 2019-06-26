@@ -1,23 +1,22 @@
 #pragma once
 
-#include <iostream>
-#include <memory>
-#include <unordered_map>
-
 #include <krypto/logger.h>
+#include <krypto/common/exchange.h>
+#include <krypto/exchanges/base.h>
+#include <krypto/exchanges/coinbase.h>
 
-namespace krypto::common {
+namespace krypto::exchanges {
 
-    template <typename Base, typename... Args>
-    class Factory {
+    class ExchangeFactory {
     public:
-        template <typename T>
-        static std::unique_ptr<Base> make(Args... args) {
-            static_assert(std::is_base_of<Base, T>());
-            return std::make_unique<T>(std::forward<Args...>(args...));
+        template <typename... Args>
+        static auto make(const common::ExchangeType et, Args... args) {
+            if (et == Coinbase::key) {
+                return Coinbase(args...);
+            } else {
+                throw;
+            }
         }
-
-        friend Base;
     };
 
 }

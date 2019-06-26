@@ -1,8 +1,13 @@
-//
-// Created by ksharma on 6/25/19.
-//
+#pragma once
 
-#ifndef KRYPTO_STARTUP_H
-#define KRYPTO_STARTUP_H
+#include "instrument.h"
 
-#endif //KRYPTO_STARTUP_H
+namespace krypto::common {
+    struct Startup {
+        static void init() {
+            ExchangeTypeEnum::init();
+            InstrumentTypeEnum::init();
+            CurrencyEnum::init();
+        }
+    };
+}
