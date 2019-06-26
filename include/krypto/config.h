@@ -11,7 +11,7 @@ namespace krypto {
     private:
         nlohmann::json root_;
     public:
-        explicit Config(std::string&&);
+        explicit Config(std::string &&);
 
         Config(const Config &) = default;
 
@@ -25,8 +25,8 @@ namespace krypto {
 
         const nlohmann::json &get() const;
 
-        template <typename T>
-        const T at(std::string&&);
+        template<typename T>
+        const T at(std::string &&) const;
     };
 
     Config::Config(std::string &&file_path) : root_{} {
@@ -34,11 +34,11 @@ namespace krypto {
         root_ << file;
         root_ = root_.flatten();
 
-        KRYP_LOG(info, root_.dump());
+        KRYP_LOG(info, root_.dump(4));
     }
 
     template<typename T>
-    const T Config::at(std::string &&path) {
+    const T Config::at(std::string &&path) const {
         return root_.at(path).get<T>();
     }
 

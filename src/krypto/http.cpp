@@ -16,11 +16,12 @@ using tcp = boost::asio::ip::tcp;
 namespace ssl = boost::asio::ssl;
 namespace http = boost::beast::http;
 
-krypto::HttpClient::HttpClient(std::string &&host, const int16_t port) :
-        host_{std::move(host)}, port_{port} {
+krypto::HttpClient::HttpClient(std::string host) : host_{std::move(host)}, port_{443} {
 }
 
-std::optional<std::string> krypto::HttpClient::get(std::string &&endpoint) {
+std::optional<std::string> krypto::HttpClient::get(const std::string &endpoint) {
+
+    KRYP_LOG(info, "Requesting {}:{}/{}", host_, port_, endpoint);
 
     boost::asio::io_context ioc;
     ssl::context ctx{ssl::context::sslv23_client};
@@ -70,7 +71,7 @@ std::optional<std::string> krypto::HttpClient::get(std::string &&endpoint) {
     return std::optional<std::string>{boost::beast::buffers_to_string(res.body().data())};
 }
 
-std::optional<std::string> krypto::HttpClient::post(std::string &&, std::string &&) {
+std::optional<std::string> krypto::HttpClient::post(const std::string&, const std::string&) {
     return std::optional<std::string>();
 }
 

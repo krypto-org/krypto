@@ -8,7 +8,7 @@ exchanges = {
     id = 101
 
     rest = {
-      base_url = "https://api.pro.coinbase.com"
+      base_url = "api.pro.coinbase.com"
       channels = {
         instruments = products
         statistics = stats

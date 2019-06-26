@@ -130,6 +130,98 @@ inline const char *EnumNameInstrumentType(InstrumentType e) {
   return EnumNamesInstrumentType()[index];
 }
 
+enum Currency {
+  Currency_UNKNOWN = 0,
+  Currency_BAT = 1,
+  Currency_BCH = 2,
+  Currency_BTC = 3,
+  Currency_CVC = 4,
+  Currency_DAI = 5,
+  Currency_DNT = 6,
+  Currency_EOS = 7,
+  Currency_ETC = 8,
+  Currency_ETH = 9,
+  Currency_EUR = 10,
+  Currency_GBP = 11,
+  Currency_GNT = 12,
+  Currency_LOOM = 13,
+  Currency_LTC = 14,
+  Currency_MANA = 15,
+  Currency_REP = 16,
+  Currency_USD = 17,
+  Currency_USDC = 18,
+  Currency_XLM = 19,
+  Currency_XRP = 20,
+  Currency_ZEC = 21,
+  Currency_ZRX = 22,
+  Currency_MIN = Currency_UNKNOWN,
+  Currency_MAX = Currency_ZRX
+};
+
+inline const Currency (&EnumValuesCurrency())[23] {
+  static const Currency values[] = {
+    Currency_UNKNOWN,
+    Currency_BAT,
+    Currency_BCH,
+    Currency_BTC,
+    Currency_CVC,
+    Currency_DAI,
+    Currency_DNT,
+    Currency_EOS,
+    Currency_ETC,
+    Currency_ETH,
+    Currency_EUR,
+    Currency_GBP,
+    Currency_GNT,
+    Currency_LOOM,
+    Currency_LTC,
+    Currency_MANA,
+    Currency_REP,
+    Currency_USD,
+    Currency_USDC,
+    Currency_XLM,
+    Currency_XRP,
+    Currency_ZEC,
+    Currency_ZRX
+  };
+  return values;
+}
+
+inline const char * const *EnumNamesCurrency() {
+  static const char * const names[] = {
+    "UNKNOWN",
+    "BAT",
+    "BCH",
+    "BTC",
+    "CVC",
+    "DAI",
+    "DNT",
+    "EOS",
+    "ETC",
+    "ETH",
+    "EUR",
+    "GBP",
+    "GNT",
+    "LOOM",
+    "LTC",
+    "MANA",
+    "REP",
+    "USD",
+    "USDC",
+    "XLM",
+    "XRP",
+    "ZEC",
+    "ZRX",
+    nullptr
+  };
+  return names;
+}
+
+inline const char *EnumNameCurrency(Currency e) {
+  const size_t index = static_cast<int>(e);
+  return EnumNamesCurrency()[index];
+}
+
 MANUALLY_ALIGNED_STRUCT(8) SnapshotPriceLevel FLATBUFFERS_FINAL_CLASS {
  private:
   int64_t price_;
@@ -227,8 +319,10 @@ struct Instrument FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
     VT_EXCHANGE = 10,
     VT_EXCHANGE_SYMBOL = 12,
     VT_TICK_SIZE = 14,
-    VT_CRYPTO_BASE = 16,
-    VT_CRYPTO_QUOTE = 18
+    VT_MIN_SIZE = 16,
+    VT_MAX_SIZE = 18,
+    VT_CRYPTO_BASE = 20,
+    VT_CRYPTO_QUOTE = 22
   };
   int64_t id() const {
     return GetField<int64_t>(VT_ID, 0);
@@ -245,14 +339,20 @@ struct Instrument FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   const flatbuffers::String *exchange_symbol() const {
     return GetPointer<const flatbuffers::String *>(VT_EXCHANGE_SYMBOL);
   }
-  int64_t tick_size() const {
-    return GetField<int64_t>(VT_TICK_SIZE, 0);
+  double tick_size() const {
+    return GetField<double>(VT_TICK_SIZE, 0.0);
   }
-  const flatbuffers::String *crypto_base() const {
-    return GetPointer<const flatbuffers::String *>(VT_CRYPTO_BASE);
+  double min_size() const {
+    return GetField<double>(VT_MIN_SIZE, 0.0);
   }
-  const flatbuffers::String *crypto_quote() const {
-    return GetPointer<const flatbuffers::String *>(VT_CRYPTO_QUOTE);
+  double max_size() const {
+    return GetField<double>(VT_MAX_SIZE, 0.0);
+  }
+  Currency crypto_base() const {
+    return static_cast<Currency>(GetField<int8_t>(VT_CRYPTO_BASE, 0));
+  }
+  Currency crypto_quote() const {
+    return static_cast<Currency>(GetField<int8_t>(VT_CRYPTO_QUOTE, 0));
   }
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
@@ -264,11 +364,11 @@ struct Instrument FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
            verifier.Verify(exchange()) &&
            VerifyOffset(verifier, VT_EXCHANGE_SYMBOL) &&
            verifier.Verify(exchange_symbol()) &&
-           VerifyField<int64_t>(verifier, VT_TICK_SIZE) &&
-           VerifyOffset(verifier, VT_CRYPTO_BASE) &&
-           verifier.Verify(crypto_base()) &&
-           VerifyOffset(verifier, VT_CRYPTO_QUOTE) &&
-           verifier.Verify(crypto_quote()) &&
+           VerifyField<double>(verifier, VT_TICK_SIZE) &&
+           VerifyField<double>(verifier, VT_MIN_SIZE) &&
+           VerifyField<double>(verifier, VT_MAX_SIZE) &&
+           VerifyField<int8_t>(verifier, VT_CRYPTO_BASE) &&
+           VerifyField<int8_t>(verifier, VT_CRYPTO_QUOTE) &&
            verifier.EndTable();
   }
 };
@@ -291,14 +391,20 @@ struct InstrumentBuilder {
   void add_exchange_symbol(flatbuffers::Offset<flatbuffers::String> exchange_symbol) {
     fbb_.AddOffset(Instrument::VT_EXCHANGE_SYMBOL, exchange_symbol);
   }
-  void add_tick_size(int64_t tick_size) {
-    fbb_.AddElement<int64_t>(Instrument::VT_TICK_SIZE, tick_size, 0);
+  void add_tick_size(double tick_size) {
+    fbb_.AddElement<double>(Instrument::VT_TICK_SIZE, tick_size, 0.0);
   }
-  void add_crypto_base(flatbuffers::Offset<flatbuffers::String> crypto_base) {
-    fbb_.AddOffset(Instrument::VT_CRYPTO_BASE, crypto_base);
+  void add_min_size(double min_size) {
+    fbb_.AddElement<double>(Instrument::VT_MIN_SIZE, min_size, 0.0);
   }
-  void add_crypto_quote(flatbuffers::Offset<flatbuffers::String> crypto_quote) {
-    fbb_.AddOffset(Instrument::VT_CRYPTO_QUOTE, crypto_quote);
+  void add_max_size(double max_size) {
+    fbb_.AddElement<double>(Instrument::VT_MAX_SIZE, max_size, 0.0);
+  }
+  void add_crypto_base(Currency crypto_base) {
+    fbb_.AddElement<int8_t>(Instrument::VT_CRYPTO_BASE, static_cast<int8_t>(crypto_base), 0);
+  }
+  void add_crypto_quote(Currency crypto_quote) {
+    fbb_.AddElement<int8_t>(Instrument::VT_CRYPTO_QUOTE, static_cast<int8_t>(crypto_quote), 0);
   }
   explicit InstrumentBuilder(flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
@@ -319,17 +425,21 @@ inline flatbuffers::Offset<Instrument> CreateInstrument(
     flatbuffers::Offset<flatbuffers::String> symbol = 0,
     flatbuffers::Offset<flatbuffers::String> exchange = 0,
     flatbuffers::Offset<flatbuffers::String> exchange_symbol = 0,
-    int64_t tick_size = 0,
-    flatbuffers::Offset<flatbuffers::String> crypto_base = 0,
-    flatbuffers::Offset<flatbuffers::String> crypto_quote = 0) {
+    double tick_size = 0.0,
+    double min_size = 0.0,
+    double max_size = 0.0,
+    Currency crypto_base = Currency_UNKNOWN,
+    Currency crypto_quote = Currency_UNKNOWN) {
   InstrumentBuilder builder_(_fbb);
+  builder_.add_max_size(max_size);
+  builder_.add_min_size(min_size);
   builder_.add_tick_size(tick_size);
   builder_.add_id(id);
-  builder_.add_crypto_quote(crypto_quote);
-  builder_.add_crypto_base(crypto_base);
   builder_.add_exchange_symbol(exchange_symbol);
   builder_.add_exchange(exchange);
   builder_.add_symbol(symbol);
+  builder_.add_crypto_quote(crypto_quote);
+  builder_.add_crypto_base(crypto_base);
   builder_.add_type(type);
   return builder_.Finish();
 }
@@ -341,9 +451,11 @@ inline flatbuffers::Offset<Instrument> CreateInstrumentDirect(
     const char *symbol = nullptr,
     const char *exchange = nullptr,
     const char *exchange_symbol = nullptr,
-    int64_t tick_size = 0,
-    const char *crypto_base = nullptr,
-    const char *crypto_quote = nullptr) {
+    double tick_size = 0.0,
+    double min_size = 0.0,
+    double max_size = 0.0,
+    Currency crypto_base = Currency_UNKNOWN,
+    Currency crypto_quote = Currency_UNKNOWN) {
   return krypto::serialization::CreateInstrument(
       _fbb,
       id,
@@ -352,8 +464,10 @@ inline flatbuffers::Offset<Instrument> CreateInstrumentDirect(
       exchange ? _fbb.CreateString(exchange) : 0,
       exchange_symbol ? _fbb.CreateString(exchange_symbol) : 0,
       tick_size,
-      crypto_base ? _fbb.CreateString(crypto_base) : 0,
-      crypto_quote ? _fbb.CreateString(crypto_quote) : 0);
+      min_size,
+      max_size,
+      crypto_base,
+      crypto_quote);
 }
 
 struct Quote FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
