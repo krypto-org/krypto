@@ -10,11 +10,17 @@ namespace krypto {
     class HttpClient final {
     private:
         std::string host_;
-        int16_t port_;
+        uint16_t port_;
     public:
-        HttpClient(std::string&&, int16_t);
+        explicit HttpClient(std::string);
+
+        HttpClient(const HttpClient& rhs) = default;
+        HttpClient(HttpClient&& rhs) = default;
+        HttpClient& operator=(const HttpClient& rhs) = default;
+        HttpClient& operator=(HttpClient&& rhs) = default;
+
         ~HttpClient();
-        std::optional<std::string> get(std::string&&);
-        std::optional<std::string> post(std::string&&, std::string&&);
+        std::optional<std::string> get(const std::string&);
+        std::optional<std::string> post(const std::string&, const std::string&);
     };
 }

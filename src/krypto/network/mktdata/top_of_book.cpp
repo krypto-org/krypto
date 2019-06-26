@@ -23,22 +23,15 @@ void krypto::network::mktdata::TopOfBookPublisher::serialize(
 void krypto::network::mktdata::TopOfBookPublisher::serialize(const krypto::mktdata::Trade &trade) {
     krypto::serialization::TradeBuilder trade_builder{fb_builder_};
 
-//    KRYP_LOG(info, "ADDING TS");
     trade_builder.add_timestamp(trade.timestamp);
-//    KRYP_LOG(info, "ADDING SEC ID");
     trade_builder.add_security_id(trade.security_id);
-//    KRYP_LOG(info, "ADDING PRICE");
     trade_builder.add_price(trade.price);
-//    KRYP_LOG(info, "ADDING QUANTITY");
     trade_builder.add_quantity(trade.quantity);
-//    KRYP_LOG(info, "ADDING SIDE");
     trade_builder.add_side(
             krypto::serialization::EnumValuesSide()[
                     typename std::underlying_type<krypto::mktdata::Side>::type(
                             trade.side)]);
-//    KRYP_LOG(info, "FINISH");
     auto t = trade_builder.Finish();
-//    KRYP_LOG(info, "SEND");
     fb_builder_.Finish(t);
 }
 
