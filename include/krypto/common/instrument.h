@@ -34,6 +34,7 @@ namespace krypto::common {
         EUR,
         GBP,
         GNT,
+        LINK,
         LOOM,
         LTC,
         MANA,
@@ -75,55 +76,5 @@ namespace krypto::common {
                static_cast<uint64_t>(quote);
     }
 
-    const auto instrument_symbol(const std::string& base, const std::string& quote) {
-        return fmt::format("{0}_{1}", base, quote);
-    }
-}
-
-
-namespace krypto::utils {
-    template<>
-    std::array<std::string, enum_size<krypto::common::InstrumentType>()> enum_names<krypto::common::InstrumentType>() {
-        std::array<std::string, enum_size<krypto::common::InstrumentType>()> names =
-                {
-                        "UNKNOWN",
-                        "STOCK",
-                        "FUTURE",
-                        "OPTION",
-                        "FOREX",
-                        "CRYPTO"
-                };
-        return names;
-    }
-
-    template<>
-    std::array<std::string, enum_size<krypto::common::Currency>()> enum_names<krypto::common::Currency>() {
-        std::array<std::string, enum_size<krypto::common::Currency>()> names =
-                {
-                        "UNKNOWN",
-                        "BAT",
-                        "BCH",
-                        "BTC",
-                        "CVC",
-                        "DAI",
-                        "DNT",
-                        "EOS",
-                        "ETC",
-                        "ETH",
-                        "EUR",
-                        "GBP",
-                        "GNT",
-                        "LOOM",
-                        "LTC",
-                        "MANA",
-                        "REP",
-                        "USD",
-                        "USDC",
-                        "XLM",
-                        "XRP",
-                        "ZEC",
-                        "ZRX"
-                };
-        return names;
-    }
+    const std::string instrument_symbol(const std::string& base, const std::string& quote);
 }

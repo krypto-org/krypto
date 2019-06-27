@@ -29,20 +29,9 @@ namespace krypto {
         const T at(std::string &&) const;
     };
 
-    Config::Config(std::string &&file_path) : root_{} {
-        std::ifstream file(file_path);
-        root_ << file;
-        root_ = root_.flatten();
-
-        KRYP_LOG(info, root_.dump(4));
-    }
-
     template<typename T>
     const T Config::at(std::string &&path) const {
         return root_.at(path).get<T>();
     }
 
-    const nlohmann::json &Config::get() const {
-        return root_;
-    }
 }

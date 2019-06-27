@@ -18,12 +18,3 @@ namespace krypto::common {
         return static_cast<uint64_t>(et) + exchange_base + 1;
     }
 }
-
-namespace krypto::utils {
-    template <>
-    std::array<std::string, enum_size<krypto::common::ExchangeType>()> enum_names<krypto::common::ExchangeType>() {
-        std::array<std::string, enum_size<krypto::common::ExchangeType>()> names =
-                {"COINBASE"};
-        return names;
-    }
-}

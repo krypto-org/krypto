@@ -1,6 +1,6 @@
 #pragma once
 
-#include "instrument.h"
+#include <krypto/common/instrument.h>
 
 namespace krypto::common {
     struct Startup {

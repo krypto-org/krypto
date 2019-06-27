@@ -36,6 +36,7 @@ namespace krypto::utils {
                         "EUR",
                         "GBP",
                         "GNT",
+                        "LINK",
                         "LOOM",
                         "LTC",
                         "MANA",
