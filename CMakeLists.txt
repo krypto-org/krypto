@@ -76,7 +76,7 @@ add_library(krypto STATIC
         include/krypto/http.h src/krypto/http.cpp
         include/krypto/config.h
         include/krypto/exchanges/factory.h
-        include/krypto/exchanges/base.h include/krypto/common/instrument.h include/krypto/utils/enum.h include/krypto/common/startup.h include/krypto/instruments/store.h src/krypto/instruments/store.cpp src/krypto/config.cpp src/krypto/common/exchange.cpp)
+        include/krypto/exchanges/base.h include/krypto/common/instrument.h include/krypto/utils/enum.h include/krypto/common/startup.h include/krypto/instruments/store.h src/krypto/instruments/store.cpp src/krypto/config.cpp src/krypto/common/exchange.cpp include/krypto/network/rpc/client.h src/krypto/network/helper.cpp include/krypto/network/helper.h include/krypto/network/rpc/worker.h include/krypto/network/rpc/broker.h src/krypto/network/rpc/broker.cpp)
 target_link_libraries(krypto Threads::Threads)
 
 add_library(crypto STATIC IMPORTED include/krypto/mktdata/coinbase/book_builder.h)

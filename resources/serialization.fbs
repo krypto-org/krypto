@@ -99,5 +99,3 @@ table Trade {
   side: Side;
   trade_id: string;
 }
-
-
