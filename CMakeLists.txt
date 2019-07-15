@@ -9,7 +9,7 @@ add_compile_options(
         -Wall
 )
 
-set(CMAKE_CXX_FLAGS_RELEASE "-O3")
+set(CMAKE_CXX_FLAGS_RELEASE "-O2")
 
 message(STATUS "Checking/installing dependencies")
 file(COPY conanfile.txt DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
@@ -100,3 +100,6 @@ target_link_libraries(krypto-instruments krypto CONAN_PKG::boost ssl crypto dl C
 
 add_executable(config-loader src/apps/config_loader_main.cpp include/krypto/exchanges/coinbase.h include/krypto/common/exchange.h)
 target_link_libraries(config-loader krypto)
+
+add_executable(krypto-broker src/apps/network/broker_main.cpp)
+target_link_libraries(krypto-broker krypto CONAN_PKG::boost ssl crypto dl CONAN_PKG::bzip2 CONAN_PKG::zlib CONAN_PKG::tbb CONAN_PKG::zmq CONAN_PKG::cppzmq Threads::Threads)

@@ -21,6 +21,7 @@ namespace krypto::network::rpc {
     public:
         Broker(zmq::context_t &, std::string, std::string);
         void start();
+        void stop();
     };
 
 }

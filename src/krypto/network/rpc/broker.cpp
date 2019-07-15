@@ -11,9 +11,9 @@ krypto::network::rpc::Broker::Broker(zmq::context_t & context,
 
 void krypto::network::rpc::Broker::start() {
 
-    bool bound = bind();
+    running_ = bind();
 
-    while (running_ && bound) {
+    while (running_) {
         zmq::pollitem_t items[] = {
                 //  Always poll for worker activity on backend
                 { *backend_, 0, ZMQ_POLLIN, 0 },
@@ -22,9 +22,12 @@ void krypto::network::rpc::Broker::start() {
         };
 
         if (!workers_.empty())
-            zmq::poll(&items[0], 2, -1);
+            zmq::poll(&items[0], 2, 1);
         else
-            zmq::poll(&items[0], 1, -1);
+            zmq::poll(&items[0], 1, 1);
+
+        KRYP_LOG(info, "POLLING [0] -- {} {} {}", items[0].revents, items[0].fd, items[0].events);
+        KRYP_LOG(info, "POLLING [1] -- {} {} {}", items[1].revents, items[1].fd, items[1].events);
 
         if (items[0].revents && ZMQ_POLLIN) {
             auto address = recv_string(*backend_);
@@ -76,7 +79,7 @@ void krypto::network::rpc::Broker::start() {
 bool krypto::network::rpc::Broker::bind() {
     bool bound = false;
 
-    KRYP_LOG(info, "BINDING FRONT-EMD TO {}", frontend_address_);
+    KRYP_LOG(info, "BINDING FRONTEND TO {}", frontend_address_);
     try {
         frontend_->bind(frontend_address_);
         bound = true;
@@ -85,7 +88,7 @@ bool krypto::network::rpc::Broker::bind() {
         KRYP_LOG(error, "Binding Failed With {}", e.what());
     }
 
-    KRYP_LOG(info, "BINDING BACK-END TO {}", backend_address_);
+    KRYP_LOG(info, "BINDING BACKEND TO {}", backend_address_);
     try {
         backend_->bind(backend_address_);
         bound = true;
@@ -98,4 +101,8 @@ bool krypto::network::rpc::Broker::bind() {
     }
 
     return bound;
+}
+
+void krypto::network::rpc::Broker::stop() {
+    running_ = false;
 }
