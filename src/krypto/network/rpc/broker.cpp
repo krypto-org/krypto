@@ -21,10 +21,10 @@ void krypto::network::rpc::Broker::start() {
                 { *frontend_, 0, ZMQ_POLLIN, 0 }
         };
 
-        if (!workers_.empty())
-            zmq::poll(&items[0], 2, 1);
-        else
-            zmq::poll(&items[0], 1, 1);
+//        if (!workers_.empty())
+            zmq::poll(&items[0], 2, 1000);
+//        else
+//            zmq::poll(&items[0], 1, 1000);
 
         KRYP_LOG(info, "POLLING [0] -- {} {} {}", items[0].revents, items[0].fd, items[0].events);
         KRYP_LOG(info, "POLLING [1] -- {} {} {}", items[1].revents, items[1].fd, items[1].events);
@@ -55,10 +55,17 @@ void krypto::network::rpc::Broker::start() {
         }
 
         if (items[1].revents && ZMQ_POLLIN) {
+            KRYP_LOG(info, "Received Client Message");
+
             auto client_addr = recv_string(*frontend_);
+
+            KRYP_LOG(info, "Address: {}", client_addr);
+
             recv_empty_frame(*frontend_);
 
             auto service = recv_string(*frontend_);
+
+            KRYP_LOG(info, "Service: {}", service);
 
             zmq::message_t request_payload;
             frontend_->recv(&request_payload);

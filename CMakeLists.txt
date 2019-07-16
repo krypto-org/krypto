@@ -76,7 +76,7 @@ add_library(krypto STATIC
         include/krypto/http.h src/krypto/http.cpp
         include/krypto/config.h
         include/krypto/exchanges/factory.h
-        include/krypto/exchanges/base.h include/krypto/common/instrument.h include/krypto/utils/enum.h include/krypto/common/startup.h include/krypto/instruments/store.h src/krypto/instruments/store.cpp src/krypto/config.cpp src/krypto/common/exchange.cpp include/krypto/network/rpc/client.h src/krypto/network/helper.cpp include/krypto/network/helper.h include/krypto/network/rpc/worker.h include/krypto/network/rpc/broker.h src/krypto/network/rpc/broker.cpp)
+        include/krypto/exchanges/base.h include/krypto/common/instrument.h include/krypto/utils/enum.h include/krypto/common/startup.h include/krypto/instruments/store.h src/krypto/instruments/store.cpp src/krypto/config.cpp src/krypto/common/exchange.cpp include/krypto/network/rpc/client.h src/krypto/network/helper.cpp include/krypto/network/helper.h include/krypto/network/rpc/worker.h include/krypto/network/rpc/broker.h src/krypto/network/rpc/broker.cpp src/krypto/instruments/client.cpp include/krypto/instruments/client.h)
 target_link_libraries(krypto Threads::Threads)
 
 add_library(crypto STATIC IMPORTED include/krypto/mktdata/coinbase/book_builder.h)
@@ -103,3 +103,6 @@ target_link_libraries(config-loader krypto)
 
 add_executable(krypto-broker src/apps/network/broker_main.cpp)
 target_link_libraries(krypto-broker krypto CONAN_PKG::boost ssl crypto dl CONAN_PKG::bzip2 CONAN_PKG::zlib CONAN_PKG::tbb CONAN_PKG::zmq CONAN_PKG::cppzmq Threads::Threads)
+
+add_executable(query-instruments src/examples/query_instruments_main.cpp)
+target_link_libraries(query-instruments krypto CONAN_PKG::boost ssl crypto dl CONAN_PKG::bzip2 CONAN_PKG::zlib CONAN_PKG::tbb CONAN_PKG::zmq CONAN_PKG::cppzmq Threads::Threads)

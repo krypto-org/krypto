@@ -25,6 +25,10 @@ struct Incremental;
 
 struct Trade;
 
+struct InstrumentRequest;
+
+struct InstrumentResponse;
+
 enum Side {
   Side_UNKNOWN = 0,
   Side_BUY = 1,
@@ -223,6 +227,44 @@ inline const char * const *EnumNamesCurrency() {
 inline const char *EnumNameCurrency(Currency e) {
   const size_t index = static_cast<int>(e);
   return EnumNamesCurrency()[index];
+}
+
+enum RequestType {
+  RequestType_INVALID = 0,
+  RequestType_ALL = 1,
+  RequestType_ID = 2,
+  RequestType_EXCHANGE = 3,
+  RequestType_PRODUCT = 4,
+  RequestType_MIN = RequestType_INVALID,
+  RequestType_MAX = RequestType_PRODUCT
+};
+
+inline const RequestType (&EnumValuesRequestType())[5] {
+  static const RequestType values[] = {
+    RequestType_INVALID,
+    RequestType_ALL,
+    RequestType_ID,
+    RequestType_EXCHANGE,
+    RequestType_PRODUCT
+  };
+  return values;
+}
+
+inline const char * const *EnumNamesRequestType() {
+  static const char * const names[] = {
+    "INVALID",
+    "ALL",
+    "ID",
+    "EXCHANGE",
+    "PRODUCT",
+    nullptr
+  };
+  return names;
+}
+
+inline const char *EnumNameRequestType(RequestType e) {
+  const size_t index = static_cast<int>(e);
+  return EnumNamesRequestType()[index];
 }
 
 MANUALLY_ALIGNED_STRUCT(8) SnapshotPriceLevel FLATBUFFERS_FINAL_CLASS {
@@ -849,6 +891,96 @@ inline flatbuffers::Offset<Trade> CreateTradeDirect(
       quantity,
       side,
       trade_id ? _fbb.CreateString(trade_id) : 0);
+}
+
+struct InstrumentRequest FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+  enum {
+    VT_TYPE = 4
+  };
+  RequestType type() const {
+    return static_cast<RequestType>(GetField<int8_t>(VT_TYPE, 0));
+  }
+  bool Verify(flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyField<int8_t>(verifier, VT_TYPE) &&
+           verifier.EndTable();
+  }
+};
+
+struct InstrumentRequestBuilder {
+  flatbuffers::FlatBufferBuilder &fbb_;
+  flatbuffers::uoffset_t start_;
+  void add_type(RequestType type) {
+    fbb_.AddElement<int8_t>(InstrumentRequest::VT_TYPE, static_cast<int8_t>(type), 0);
+  }
+  explicit InstrumentRequestBuilder(flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  InstrumentRequestBuilder &operator=(const InstrumentRequestBuilder &);
+  flatbuffers::Offset<InstrumentRequest> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = flatbuffers::Offset<InstrumentRequest>(end);
+    return o;
+  }
+};
+
+inline flatbuffers::Offset<InstrumentRequest> CreateInstrumentRequest(
+    flatbuffers::FlatBufferBuilder &_fbb,
+    RequestType type = RequestType_INVALID) {
+  InstrumentRequestBuilder builder_(_fbb);
+  builder_.add_type(type);
+  return builder_.Finish();
+}
+
+struct InstrumentResponse FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+  enum {
+    VT_INSTRUMENTS = 4
+  };
+  const flatbuffers::Vector<flatbuffers::Offset<Instrument>> *instruments() const {
+    return GetPointer<const flatbuffers::Vector<flatbuffers::Offset<Instrument>> *>(VT_INSTRUMENTS);
+  }
+  bool Verify(flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyOffset(verifier, VT_INSTRUMENTS) &&
+           verifier.Verify(instruments()) &&
+           verifier.VerifyVectorOfTables(instruments()) &&
+           verifier.EndTable();
+  }
+};
+
+struct InstrumentResponseBuilder {
+  flatbuffers::FlatBufferBuilder &fbb_;
+  flatbuffers::uoffset_t start_;
+  void add_instruments(flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<Instrument>>> instruments) {
+    fbb_.AddOffset(InstrumentResponse::VT_INSTRUMENTS, instruments);
+  }
+  explicit InstrumentResponseBuilder(flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  InstrumentResponseBuilder &operator=(const InstrumentResponseBuilder &);
+  flatbuffers::Offset<InstrumentResponse> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = flatbuffers::Offset<InstrumentResponse>(end);
+    return o;
+  }
+};
+
+inline flatbuffers::Offset<InstrumentResponse> CreateInstrumentResponse(
+    flatbuffers::FlatBufferBuilder &_fbb,
+    flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<Instrument>>> instruments = 0) {
+  InstrumentResponseBuilder builder_(_fbb);
+  builder_.add_instruments(instruments);
+  return builder_.Finish();
+}
+
+inline flatbuffers::Offset<InstrumentResponse> CreateInstrumentResponseDirect(
+    flatbuffers::FlatBufferBuilder &_fbb,
+    const std::vector<flatbuffers::Offset<Instrument>> *instruments = nullptr) {
+  return krypto::serialization::CreateInstrumentResponse(
+      _fbb,
+      instruments ? _fbb.CreateVector<flatbuffers::Offset<Instrument>>(*instruments) : 0);
 }
 
 }  // namespace serialization

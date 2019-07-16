@@ -41,6 +41,8 @@ enum Currency : byte {
     ZRX
 }
 
+enum RequestType: byte {INVALID, ALL, ID, EXCHANGE, PRODUCT}
+
 table Instrument {
   id: long;
   type: InstrumentType;
@@ -98,4 +100,12 @@ table Trade {
   quantity: long;
   side: Side;
   trade_id: string;
+}
+
+table InstrumentRequest {
+  type: RequestType;
+}
+
+table InstrumentResponse {
+  instruments: [Instrument];
 }
