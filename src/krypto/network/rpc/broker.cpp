@@ -34,22 +34,26 @@ void krypto::network::rpc::Broker::start() {
             recv_empty_frame(*backend_);
 
             auto status = recv_status(*backend_);
+            auto service_name = recv_string(*backend_);
+
+            KRYP_LOG(info, "Received Update from {}", service_name);
 
             if (status == SocketStatus::READY) {
-                auto service_name = recv_string(*backend_);
+                KRYP_LOG(info, "{} : READY", service_name);
                 workers_[service_name] = address;
             } else if (status == SocketStatus::DISCONNECT) {
-                auto service_name = recv_string(*backend_);
+                KRYP_LOG(info, "{} : DISCONNECT", service_name);
                 workers_.erase(service_name);
             } else if (status == SocketStatus::REPLY) {
+                KRYP_LOG(info, "{} : REPLY", service_name);
                 auto client_addr = recv_string(*backend_);
                 recv_empty_frame(*backend_);
 
                 zmq::message_t payload;
                 backend_->recv(&payload);
-
                 send_string(*frontend_,client_addr, ZMQ_SNDMORE);
                 send_empty_frame(*frontend_, ZMQ_SNDMORE);
+                send_string(*frontend_, service_name, ZMQ_SNDMORE);
                 frontend_->send(payload);
             }
         }
@@ -70,6 +74,8 @@ void krypto::network::rpc::Broker::start() {
             zmq::message_t request_payload;
             frontend_->recv(&request_payload);
 
+            KRYP_LOG(info, "Payload with size {}", request_payload.size());
+
             if (workers_.find(service) != std::end(workers_)) {
                 auto worker_addr = workers_.at(service);
                 send_string(*backend_, worker_addr, ZMQ_SNDMORE);
@@ -78,6 +84,12 @@ void krypto::network::rpc::Broker::start() {
                 send_empty_frame(*backend_, ZMQ_SNDMORE);
 
                 backend_->send(request_payload);
+            } else {
+                KRYP_LOG(info, "Service Not Available");
+
+                send_string(*frontend_,client_addr, ZMQ_SNDMORE);
+                send_empty_frame(*frontend_, ZMQ_SNDMORE);
+                send_string(*frontend_, service);
             }
         }
     }

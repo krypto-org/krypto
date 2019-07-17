@@ -144,6 +144,11 @@ namespace krypto::network::rpc {
             return std::nullptr_t {};
         }
 
+        if (!service_msg.more()) {
+            KRYP_LOG(error, "No Data Received");
+            return nullptr;
+        }
+
         zmq::message_t payload_msg;
         socket_.recv(&payload_msg);
 

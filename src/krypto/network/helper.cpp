@@ -10,39 +10,39 @@ namespace krypto::network {
         return std::to_string(nanoseconds.count());
     }
 
-    void send_string(zmq::socket_t &socket, std::string &&value, int flags_ = 0) {
+    void send_string(zmq::socket_t &socket, std::string &&value, int flags_) {
         zmq::message_t message(value.size());
         std::memcpy(message.data(), value.data(), value.size());
         socket.send(message, flags_);
     }
 
-    void send_string(zmq::socket_t &socket, const std::string &value, int flags_ = 0) {
+    void send_string(zmq::socket_t &socket, const std::string &value, int flags_) {
         zmq::message_t message(value.size());
         std::memcpy(message.data(), value.data(), value.size());
         socket.send(message, flags_);
     }
 
-    void send_empty_frame(zmq::socket_t &socket, int flags_ = 0) {
+    void send_empty_frame(zmq::socket_t &socket, int flags_) {
         std::string empty;
         zmq::message_t empty_msq(empty.size());
         std::memcpy(empty_msq.data(), empty.data(), empty.size());
         socket.send(empty_msq, flags_);
     }
 
-    void send_status(zmq::socket_t &socket, SocketStatus &&status, int flags_ = 0) {
+    void send_status(zmq::socket_t &socket, SocketStatus &&status, int flags_) {
         zmq::message_t message(1);
         std::memcpy(message.data(), &status, 1);
         socket.send(message, flags_);
     }
 
-    std::string recv_string(zmq::socket_t& socket) {
+    std::string recv_string(zmq::socket_t &socket) {
         zmq::message_t msg;
         socket.recv(&msg);
         auto result = std::string(static_cast<char *>(msg.data()), msg.size());
         return result;
     }
 
-    void recv_empty_frame(zmq::socket_t& socket) {
+    void recv_empty_frame(zmq::socket_t &socket) {
         zmq::message_t empty_msq;
         socket.recv(&empty_msq);
 
@@ -56,10 +56,10 @@ namespace krypto::network {
         assert(is_empty);
     }
 
-    SocketStatus recv_status(zmq::socket_t& socket) {
+    SocketStatus recv_status(zmq::socket_t &socket) {
         zmq::message_t msg;
         socket.recv(&msg);
-        auto result = static_cast<SocketStatus*>(msg.data());
+        auto result = static_cast<SocketStatus *>(msg.data());
         return *result;
     }
 }
