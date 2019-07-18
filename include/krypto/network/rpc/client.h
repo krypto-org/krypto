@@ -77,8 +77,8 @@ namespace krypto::network::rpc {
             KRYP_LOG(info, "Connecting to Broker @ {}", broker_);
         }
 
-//        socket_.setsockopt(ZMQ_LINGER, nullptr, sizeof(int));
-        KRYP_LOG(info, "Lingered");
+        int linger = 0;
+        socket_.setsockopt(ZMQ_LINGER, &linger, sizeof(linger));
         auto identity = generate_id();
         socket_.setsockopt(ZMQ_IDENTITY, identity.c_str(), identity.size());
         socket_.connect(broker_.c_str());

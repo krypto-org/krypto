@@ -6,6 +6,7 @@
 #include <krypto/common/exchange.h>
 #include <spdlog/fmt/fmt.h>
 #include <ostream>
+#include <krypto/serialization/serialization_generated.h>
 
 namespace krypto::common {
     enum class InstrumentType : uint8_t {

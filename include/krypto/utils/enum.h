@@ -45,4 +45,8 @@ namespace krypto::utils {
     template <typename T>
     std::array<T, Enum<T>::N> Enum<T>::values;
 
+    template <typename From, typename To>
+    constexpr To convert_compatible_enum(const From from) {
+        return static_cast<To>(static_cast<uint8_t>(from));
+    };
 }

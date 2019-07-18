@@ -18,11 +18,16 @@ std::function<void(int)> shutdown_handler;
 
 void signal_handler(int signal) { shutdown_handler(signal); }
 
-int main() {
+int main(int argc, char ** argv) {
     krypto::common::Startup::init();
+    const krypto::Config config(argv[1]);
+    krypto::instruments::InstrumentStore store{config};
+    auto v = store.load();
+    KRYP_LOG(info, "Loaded {} Instruments", v.size());
 
     zmq::context_t context(1);
-    krypto::instruments::Server server{context, "tcp://127.0.0.1:5556", "instruments", true};
+    krypto::instruments::Server server{
+        context, "tcp://127.0.0.1:5556", "instruments", true, config};
 
     std::thread broker_thread(std::bind(&krypto::instruments::Server::start, &server));
 

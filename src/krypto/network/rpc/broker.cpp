@@ -15,19 +15,11 @@ void krypto::network::rpc::Broker::start() {
 
     while (running_) {
         zmq::pollitem_t items[] = {
-                //  Always poll for worker activity on backend
                 { *backend_, 0, ZMQ_POLLIN, 0 },
-                //  Poll front-end only if we have available workers
                 { *frontend_, 0, ZMQ_POLLIN, 0 }
         };
 
-//        if (!workers_.empty())
-            zmq::poll(&items[0], 2, 1000);
-//        else
-//            zmq::poll(&items[0], 1, 1000);
-
-        KRYP_LOG(info, "POLLING [0] -- {} {} {}", items[0].revents, items[0].fd, items[0].events);
-        KRYP_LOG(info, "POLLING [1] -- {} {} {}", items[1].revents, items[1].fd, items[1].events);
+        zmq::poll(&items[0], 2, 0);
 
         if (items[0].revents && ZMQ_POLLIN) {
             auto address = recv_string(*backend_);
@@ -39,51 +31,56 @@ void krypto::network::rpc::Broker::start() {
             KRYP_LOG(info, "Received Update from {}", service_name);
 
             if (status == SocketStatus::READY) {
-                KRYP_LOG(info, "{} : READY", service_name);
+                KRYP_LOG(info, "{} : READY with address {}", service_name, address);
                 workers_[service_name] = address;
             } else if (status == SocketStatus::DISCONNECT) {
                 KRYP_LOG(info, "{} : DISCONNECT", service_name);
                 workers_.erase(service_name);
             } else if (status == SocketStatus::REPLY) {
-                KRYP_LOG(info, "{} : REPLY", service_name);
                 auto client_addr = recv_string(*backend_);
                 recv_empty_frame(*backend_);
 
                 zmq::message_t payload;
                 backend_->recv(&payload);
+
                 send_string(*frontend_,client_addr, ZMQ_SNDMORE);
                 send_empty_frame(*frontend_, ZMQ_SNDMORE);
                 send_string(*frontend_, service_name, ZMQ_SNDMORE);
+
+                KRYP_LOG(info, "{} : REPLY Payload with size {}", service_name, payload.size());
+
                 frontend_->send(payload);
             }
         }
 
         if (items[1].revents && ZMQ_POLLIN) {
-            KRYP_LOG(info, "Received Client Message");
 
             auto client_addr = recv_string(*frontend_);
 
-            KRYP_LOG(info, "Address: {}", client_addr);
+//            KRYP_LOG(info, "Address: {}", client_addr);
 
             recv_empty_frame(*frontend_);
 
             auto service = recv_string(*frontend_);
-
-            KRYP_LOG(info, "Service: {}", service);
+//
+//            KRYP_LOG(info, "Service: {}", service);
 
             zmq::message_t request_payload;
             frontend_->recv(&request_payload);
 
-            KRYP_LOG(info, "Payload with size {}", request_payload.size());
+//            KRYP_LOG(info, "Payload with size {}", request_payload.size());
 
             if (workers_.find(service) != std::end(workers_)) {
                 auto worker_addr = workers_.at(service);
+
+//                KRYP_LOG(info, "Sending request to service {} @ {}", service, worker_addr);
+
                 send_string(*backend_, worker_addr, ZMQ_SNDMORE);
                 send_empty_frame(*backend_, ZMQ_SNDMORE);
                 send_string(*backend_, client_addr, ZMQ_SNDMORE);
                 send_empty_frame(*backend_, ZMQ_SNDMORE);
-
                 backend_->send(request_payload);
+//                KRYP_LOG(info, "Sent!");
             } else {
                 KRYP_LOG(info, "Service Not Available");
 

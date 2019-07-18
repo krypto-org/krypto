@@ -51,9 +51,10 @@ namespace krypto::network::rpc {
 
     template<typename Derived, typename ReceiveType, typename SendType>
     void WorkerBase<Derived, ReceiveType, SendType>::connect() {
-//        socket_.setsockopt(ZMQ_LINGER, nullptr, sizeof(int));
+        int linger = 0;
+        socket_.setsockopt(ZMQ_LINGER, &linger, sizeof(linger));
 
-        auto identity = generate_id();
+        auto identity = "worker-" + generate_id();
 
         if (verbose_) {
             KRYP_LOG(info, "Connecting to Broker @ {} with identity {}", broker_, identity);
@@ -93,9 +94,13 @@ namespace krypto::network::rpc {
 
         while (running_) {
             zmq::pollitem_t poller = { socket_,  0, ZMQ_POLLIN, 0 };
+            zmq::poll(&poller, 1, 1);
+
             if (poller.revents && ZMQ_POLLIN) {
+
                 recv_empty_frame(socket_);
                 auto address = recv_string(socket_);
+
                 recv_empty_frame(socket_);
 
                 zmq::message_t payload_msg;
@@ -108,6 +113,8 @@ namespace krypto::network::rpc {
 
                 zmq::message_t result_msg(fb_builder_.GetSize());
                 std::memcpy(result_msg.data(), fb_builder_.GetBufferPointer(), fb_builder_.GetSize());
+
+                KRYP_LOG(info, "Result Payload: {} Bytes", result_msg.size());
 
                 send_empty_frame(socket_, ZMQ_SNDMORE);
                 send_status(socket_, SocketStatus::REPLY, ZMQ_SNDMORE);
