@@ -21,8 +21,9 @@ void krypto::network::mktdata::TopOfBookPublisher::serialize(
 }
 
 void krypto::network::mktdata::TopOfBookPublisher::serialize(const krypto::mktdata::Trade &trade) {
-    krypto::serialization::TradeBuilder trade_builder{fb_builder_};
 
+
+    krypto::serialization::TradeBuilder trade_builder{fb_builder_};
     trade_builder.add_timestamp(trade.timestamp);
     trade_builder.add_security_id(trade.security_id);
     trade_builder.add_price(trade.price);

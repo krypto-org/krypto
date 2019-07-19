@@ -9,7 +9,7 @@ add_compile_options(
         -Wall
 )
 
-set(CMAKE_CXX_FLAGS_RELEASE "-O3")
+set(CMAKE_CXX_FLAGS_RELEASE "-O2")
 
 message(STATUS "Checking/installing dependencies")
 file(COPY conanfile.txt DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
@@ -76,7 +76,24 @@ add_library(krypto STATIC
         include/krypto/http.h src/krypto/http.cpp
         include/krypto/config.h
         include/krypto/exchanges/factory.h
-        include/krypto/exchanges/base.h include/krypto/common/instrument.h include/krypto/utils/enum.h include/krypto/common/startup.h)
+        include/krypto/exchanges/base.h
+        include/krypto/utils/enum.h
+        include/krypto/instruments/loader.h
+        src/krypto/instruments/loader.cpp
+        src/krypto/config.cpp
+        include/krypto/network/rpc/client.h
+        src/krypto/network/helper.cpp
+        include/krypto/network/helper.h
+        include/krypto/network/rpc/worker.h
+        include/krypto/network/rpc/broker.h
+        src/krypto/network/rpc/broker.cpp
+        src/krypto/instruments/client.cpp
+        include/krypto/instruments/client.h
+        include/krypto/instruments/server.h
+        src/krypto/instruments/server.cpp
+        include/krypto/utils/common.h
+        src/krypto/utils/common.cpp
+        include/krypto/exchanges/coinbase.h)
 target_link_libraries(krypto Threads::Threads)
 
 add_library(crypto STATIC IMPORTED include/krypto/mktdata/coinbase/book_builder.h)
@@ -95,8 +112,14 @@ find_library(GL GL /usr/lib/x86_64-linux-gnu)
 add_executable(krypto-ui src/apps/ui/main.cpp src/apps/ui/imgui_impl_glfw.cpp src/apps/ui/imgui_impl_opengl3.cpp)
 target_link_libraries(krypto-ui krypto CONAN_PKG::boost ssl crypto dl CONAN_PKG::bzip2 CONAN_PKG::zlib CONAN_PKG::tbb CONAN_PKG::zmq CONAN_PKG::cppzmq CONAN_PKG::glfw CONAN_PKG::glad CONAN_PKG::imgui Threads::Threads)
 
-add_executable(krypto-instruments src/apps/instruments/main.cpp include/krypto/root_certificates.h)
-target_link_libraries(krypto-instruments krypto CONAN_PKG::boost ssl crypto dl CONAN_PKG::bzip2 CONAN_PKG::zlib CONAN_PKG::tbb CONAN_PKG::zmq CONAN_PKG::cppzmq CONAN_PKG::glfw CONAN_PKG::glad CONAN_PKG::imgui Threads::Threads)
+add_executable(krypto-instruments-server src/apps/instruments/server_main.cpp include/krypto/root_certificates.h src/krypto/utils/common.cpp)
+target_link_libraries(krypto-instruments-server krypto CONAN_PKG::boost ssl crypto dl CONAN_PKG::bzip2 CONAN_PKG::zlib CONAN_PKG::tbb CONAN_PKG::zmq CONAN_PKG::cppzmq CONAN_PKG::glfw CONAN_PKG::glad CONAN_PKG::imgui Threads::Threads)
 
-add_executable(config-loader src/apps/config_loader_main.cpp include/krypto/exchanges/coinbase.h include/krypto/common/exchange.h)
+add_executable(config-loader src/apps/config_loader_main.cpp)
 target_link_libraries(config-loader krypto)
+
+add_executable(krypto-broker src/apps/network/broker_main.cpp)
+target_link_libraries(krypto-broker krypto CONAN_PKG::boost ssl crypto dl CONAN_PKG::bzip2 CONAN_PKG::zlib CONAN_PKG::tbb CONAN_PKG::zmq CONAN_PKG::cppzmq Threads::Threads)
+
+add_executable(query-instruments src/examples/query_instruments_main.cpp)
+target_link_libraries(query-instruments krypto CONAN_PKG::boost ssl crypto dl CONAN_PKG::bzip2 CONAN_PKG::zlib CONAN_PKG::tbb CONAN_PKG::zmq CONAN_PKG::cppzmq Threads::Threads)

@@ -2,9 +2,9 @@ namespace krypto.serialization;
 
 // general
 
-enum Side: byte {UNKNOWN = 0, BUY = 1, SELL = 2}
+enum Side: byte {UNKNOWN, BUY, SELL}
 
-enum OrderSide: byte {UNKNOWN = 0, BID = 1, ASK = 2}
+enum OrderSide: byte {UNKNOWN, BID, ASK}
 
 table SequenceNumber {
   value: long;
@@ -12,33 +12,36 @@ table SequenceNumber {
 
 // instruments
 
-enum InstrumentType: byte {UNKNOWN = 0, STOCK = 1, FUTURE = 2, OPTION = 3, FOREX = 4, CRYPTO = 5}
+enum InstrumentType: byte {UNKNOWN, STOCK, FUTURE, OPTION, FOREX, CRYPTO}
 
 enum Currency : byte {
-    UNKNOWN = 0,
-    BAT = 1,
-    BCH = 2,
-    BTC = 3,
-    CVC = 4,
-    DAI = 5,
-    DNT = 6,
-    EOS = 7,
-    ETC = 8,
-    ETH = 9,
-    EUR = 10,
-    GBP = 11,
-    GNT = 12,
-    LOOM = 13,
-    LTC = 14,
-    MANA = 15,
-    REP = 16,
-    USD = 17,
-    USDC = 18,
-    XLM = 19,
-    XRP = 20,
-    ZEC = 21,
-    ZRX = 22
+    UNKNOWN,
+    BAT,
+    BCH,
+    BTC,
+    CVC,
+    DAI,
+    DNT,
+    EOS,
+    ETC,
+    ETH,
+    EUR,
+    GBP,
+    GNT,
+    LINK,
+    LOOM,
+    LTC,
+    MANA,
+    REP,
+    USD,
+    USDC,
+    XLM,
+    XRP,
+    ZEC,
+    ZRX
 }
+
+enum RequestType: byte {INVALID, ALL, ID, EXCHANGE, PRODUCT}
 
 table Instrument {
   id: long;
@@ -99,4 +102,10 @@ table Trade {
   trade_id: string;
 }
 
+table InstrumentRequest {
+  type: RequestType;
+}
 
+table InstrumentResponse {
+  instruments: [Instrument];
+}
