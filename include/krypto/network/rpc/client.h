@@ -152,7 +152,6 @@ namespace krypto::network::rpc {
         zmq::message_t payload_msg;
         socket_.recv(&payload_msg);
 
-        auto &derived = static_cast<Derived &>(*this);
         auto payload = flatbuffers::GetRoot<ReceiveType>(payload_msg.data());
 
         if (payload_msg.more()) {

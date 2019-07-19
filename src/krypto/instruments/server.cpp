@@ -4,10 +4,10 @@
 
 namespace {
     const auto convert_inst_type = krypto::utils::convert_compatible_enum<
-            krypto::common::InstrumentType, krypto::serialization::InstrumentType>;
+            krypto::utils::InstrumentType, krypto::serialization::InstrumentType>;
 
     const auto convert_currency = krypto::utils::convert_compatible_enum<
-            krypto::common::Currency , krypto::serialization::Currency>;
+            krypto::utils::Currency , krypto::serialization::Currency>;
 }
 
 void krypto::instruments::Server::process(const krypto::serialization::InstrumentRequest *) {
@@ -19,7 +19,7 @@ void krypto::instruments::Server::process(const krypto::serialization::Instrumen
                 ::convert_inst_type(inst.inst_type),
                 fb_builder_.CreateString(inst.symbol),
                 fb_builder_.CreateString(
-                        krypto::common::ExchangeTypeEnum::enum_to_names.at(inst.exchange)),
+                        krypto::utils::ExchangeTypeEnum::enum_to_names.at(inst.exchange)),
                 fb_builder_.CreateString(inst.exchange_symbol),
                 inst.tick_size,
                 inst.min_size,

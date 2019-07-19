@@ -4,9 +4,9 @@
 
 #include <krypto/network/rpc/broker.h>
 #include <krypto/config.h>
-#include <krypto/instruments/store.h>
+#include <krypto/instruments/loader.h>
 #include <krypto/logger.h>
-#include <krypto/common/startup.h>
+#include <krypto/utils/common.h>
 #include <krypto/instruments/server.h>
 
 
@@ -19,9 +19,9 @@ std::function<void(int)> shutdown_handler;
 void signal_handler(int signal) { shutdown_handler(signal); }
 
 int main(int argc, char ** argv) {
-    krypto::common::Startup::init();
+    krypto::utils::Startup::init();
     const krypto::Config config(argv[1]);
-    krypto::instruments::InstrumentStore store{config};
+    krypto::instruments::InstrumentLoader store{config};
     auto v = store.load();
     KRYP_LOG(info, "Loaded {} Instruments", v.size());
 

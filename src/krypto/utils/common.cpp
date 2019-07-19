@@ -1,13 +1,20 @@
-#include <krypto/common/instrument.h>
-
-const std::string krypto::common::instrument_symbol(const std::string& base, const std::string& quote) {
-    return fmt::format("{0}_{1}", base, quote);
-}
+#include <krypto/utils/common.h>
 
 namespace krypto::utils {
+    const std::string instrument_symbol(const std::string &base, const std::string &quote) {
+        return fmt::format("{0}_{1}", base, quote);
+    }
+
     template<>
-    std::array<std::string, enum_size<krypto::common::InstrumentType>()> enum_names<krypto::common::InstrumentType>() {
-        std::array<std::string, enum_size<krypto::common::InstrumentType>()> names =
+    std::array<std::string, enum_size<ExchangeType>()> enum_names<ExchangeType>() {
+        std::array<std::string, enum_size<ExchangeType>()> names =
+                {"COINBASE"};
+        return names;
+    }
+
+    template<>
+    std::array<std::string, enum_size<InstrumentType>()> enum_names<InstrumentType>() {
+        std::array<std::string, enum_size<InstrumentType>()> names =
                 {
                         "UNKNOWN",
                         "STOCK",
@@ -20,8 +27,8 @@ namespace krypto::utils {
     }
 
     template<>
-    std::array<std::string, enum_size<krypto::common::Currency>()> enum_names<krypto::common::Currency>() {
-        std::array<std::string, enum_size<krypto::common::Currency>()> names =
+    std::array<std::string, enum_size<Currency>()> enum_names<Currency>() {
+        std::array<std::string, enum_size<Currency>()> names =
                 {
                         "UNKNOWN",
                         "BAT",
@@ -49,5 +56,11 @@ namespace krypto::utils {
                         "ZRX"
                 };
         return names;
+    }
+
+    void Startup::init() {
+        ExchangeTypeEnum::init();
+        InstrumentTypeEnum::init();
+        CurrencyEnum::init();
     }
 }

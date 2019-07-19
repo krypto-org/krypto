@@ -1,14 +1,28 @@
 #pragma once
 
-#include <string>
 #include <cstdint>
+#include <unordered_map>
+#include <krypto/utils/enum.h>
+#include <string>
 #include <cmath>
-#include <krypto/common/exchange.h>
 #include <spdlog/fmt/fmt.h>
 #include <ostream>
 #include <krypto/serialization/serialization_generated.h>
 
-namespace krypto::common {
+namespace krypto::utils {
+    constexpr const uint64_t exchange_base = 100;
+
+    enum struct ExchangeType : uint8_t {
+        COINBASE,
+        SIZE
+    };
+
+    using ExchangeTypeEnum = krypto::utils::Enum<ExchangeType>;
+
+    constexpr auto exchange_id(const ExchangeType et) {
+        return static_cast<uint64_t>(et) + exchange_base + 1;
+    }
+
     enum class InstrumentType : uint8_t {
         UNKNOWN,
         STOCK,
@@ -19,7 +33,7 @@ namespace krypto::common {
         SIZE
     };
 
-    using InstrumentTypeEnum = krypto::utils::Enum<InstrumentType>;
+    using InstrumentTypeEnum = Enum<InstrumentType>;
 
     enum class Currency : uint8_t {
         UNKNOWN,
@@ -49,7 +63,7 @@ namespace krypto::common {
         SIZE
     };
 
-    using CurrencyEnum = krypto::utils::Enum<Currency>;
+    using CurrencyEnum = Enum<Currency>;
 
     struct Instrument {
         uint64_t id;
@@ -65,7 +79,7 @@ namespace krypto::common {
 
         friend std::ostream &operator<<(std::ostream &os, const Instrument &instrument) {
             os << "id: " << instrument.id  << " symbol: " << instrument.symbol
-            << " exchange_symbol: " << instrument.exchange_symbol
+               << " exchange_symbol: " << instrument.exchange_symbol
                << " tick_size: " << instrument.tick_size << " min_size: " << instrument.min_size << " max_size: "
                << instrument.max_size;
             return os;
@@ -78,4 +92,8 @@ namespace krypto::common {
     }
 
     const std::string instrument_symbol(const std::string& base, const std::string& quote);
+
+    struct Startup {
+        static void init();
+    };
 }
