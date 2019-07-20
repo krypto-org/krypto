@@ -106,11 +106,13 @@ namespace krypto::network::rpc {
                     send_empty_frame(*backend_, ZMQ_SNDMORE);
                     send_string(*backend_, client_addr, ZMQ_SNDMORE);
                     send_empty_frame(*backend_, ZMQ_SNDMORE);
-                    backend_->send(request_payload);
+
                     if constexpr (Verbose) {
-                        KRYP_LOG(info, "{} sent request to {}@@{} with payload size {}",
+                        KRYP_LOG(info, "{} sending request to {}@{} with payload size {}",
                                  client_addr, service, worker_addr, request_payload.size());
                     }
+
+                    backend_->send(request_payload);
                 } else {
                     KRYP_LOG(info, "Service not available");
                     send_string(*frontend_, client_addr, ZMQ_SNDMORE);

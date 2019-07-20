@@ -8,18 +8,15 @@
 
 namespace krypto::instruments {
     class Server final : public krypto::network::rpc::WorkerBase<Server, krypto::serialization::InstrumentRequest,
-            krypto::serialization::InstrumentResponse> {
+            krypto::serialization::InstrumentResponse, true> {
     private:
         InstrumentLoader store_;
         std::vector<krypto::utils::Instrument> cache_;
     public:
-        Server(zmq::context_t &context,
-                               std::string broker,
-                               std::string service,
-                               bool verbose, const krypto::Config& config);
+        Server(const krypto::Config& config, std::string service);
 
         using krypto::network::rpc::WorkerBase<Server, krypto::serialization::InstrumentRequest,
-                krypto::serialization::InstrumentResponse>::start;
+                krypto::serialization::InstrumentResponse, true>::start;
 
         void process(const krypto::serialization::InstrumentRequest *);
     };

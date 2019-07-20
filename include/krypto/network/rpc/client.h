@@ -79,7 +79,7 @@ namespace krypto::network::rpc {
 
         int linger = 0;
         socket_.setsockopt(ZMQ_LINGER, &linger, sizeof(linger));
-        auto identity = generate_id();
+        auto identity = "client-" + generate_id();
         socket_.setsockopt(ZMQ_IDENTITY, identity.c_str(), identity.size());
         socket_.connect(broker_.c_str());
     }
