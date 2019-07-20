@@ -115,7 +115,7 @@ target_link_libraries(krypto-ui krypto CONAN_PKG::boost ssl crypto dl CONAN_PKG:
 add_executable(krypto-instruments-server src/apps/instruments/server_main.cpp include/krypto/root_certificates.h src/krypto/utils/common.cpp)
 target_link_libraries(krypto-instruments-server krypto CONAN_PKG::boost ssl crypto dl CONAN_PKG::bzip2 CONAN_PKG::zlib CONAN_PKG::tbb CONAN_PKG::zmq CONAN_PKG::cppzmq CONAN_PKG::glfw CONAN_PKG::glad CONAN_PKG::imgui Threads::Threads)
 
-add_executable(config-loader src/apps/config_loader_main.cpp)
+add_executable(config-loader src/examples/config_loader_main.cpp)
 target_link_libraries(config-loader krypto)
 
 add_executable(krypto-broker src/apps/network/broker_main.cpp)

@@ -18,7 +18,7 @@ std::vector<krypto::utils::Instrument> krypto::instruments::InstrumentClient::qu
 
     if (response) {
         auto insts = response->instruments();
-        KRYP_LOG(info, "Received {} Instruments", insts->Length());
+        KRYP_LOG(info, "Received {} instruments", insts->Length());
         for (size_t i = 0; i < insts->Length(); ++i) {
             auto inst = insts->Get(i);
             krypto::utils::Instrument to_insert{
@@ -33,8 +33,6 @@ std::vector<krypto::utils::Instrument> krypto::instruments::InstrumentClient::qu
                 convert_currency(inst->crypto_base()),
                 convert_currency(inst->crypto_quote())
                 };
-
-            KRYP_LOG(info, "{}", to_insert);
             result.push_back(to_insert);
         }
 
