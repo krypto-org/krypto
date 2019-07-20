@@ -25,8 +25,6 @@ int main(int argc, char ** argv) {
     krypto::network::rpc::Broker<true> broker{config};
     auto done = std::async(std::launch::async, [&broker] () {broker.start();});
 
-    KRYP_LOG(info, "Shutdown Handler");
-
     shutdown_handler = [&broker](int signal) {
         SIGNAL_STATUS = signal;
         broker.stop();

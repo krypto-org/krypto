@@ -1,6 +1,6 @@
 #include <iostream>
 #include <csignal>
-#include <thread>
+#include <future>
 
 #include <krypto/network/rpc/broker.h>
 #include <krypto/config.h>
@@ -19,25 +19,25 @@ std::function<void(int)> shutdown_handler;
 void signal_handler(int signal) { shutdown_handler(signal); }
 
 int main(int argc, char ** argv) {
+    if (argc <  2) {
+        KRYP_LOG(error, "Provide config file as parameter: {} <config>", argv[0]);
+        return 1;
+    }
+
     krypto::utils::Startup::init();
     const krypto::Config config(argv[1]);
-    krypto::instruments::InstrumentLoader store{config};
-    auto v = store.load();
-    KRYP_LOG(info, "Loaded {} Instruments", v.size());
 
-    zmq::context_t context(1);
-    krypto::instruments::Server server{
-        context, "tcp://127.0.0.1:8687", "instruments", true, config};
-
-    std::thread broker_thread(std::bind(&krypto::instruments::Server::start, &server));
+    krypto::instruments::Server server{config, config.at<std::string>("/services/rpc/instruments/name")};
+    auto done = std::async(std::launch::async, [&server] () {server.start();});
 
     shutdown_handler = [&server](int signal) {
         SIGNAL_STATUS = signal;
         server.stop();
     };
+
     std::signal(SIGINT, signal_handler);
 
-    broker_thread.join();
+    done.wait();
 
     KRYP_LOG(info, "Shutdown Server");
     return 0;
