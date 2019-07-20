@@ -27,7 +27,7 @@ int main(int argc, char ** argv) {
 
     zmq::context_t context(1);
     krypto::instruments::Server server{
-        context, "tcp://127.0.0.1:5556", "instruments", true, config};
+        context, "tcp://127.0.0.1:8687", "instruments", true, config};
 
     std::thread broker_thread(std::bind(&krypto::instruments::Server::start, &server));
 
