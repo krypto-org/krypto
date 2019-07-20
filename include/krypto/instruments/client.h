@@ -5,10 +5,10 @@
 #include <krypto/serialization/serialization_generated.h>
 
 namespace krypto::instruments {
-    class InstrumentClient final : public krypto::network::rpc::ClientBase<InstrumentClient> {
+    class InstrumentClient final : public krypto::network::rpc::ClientBase<InstrumentClient, true> {
     public:
-        using krypto::network::rpc::ClientBase<InstrumentClient>::ClientBase;
-        using krypto::network::rpc::ClientBase<InstrumentClient>::connect;
+        using krypto::network::rpc::ClientBase<InstrumentClient, true>::ClientBase;
+        using krypto::network::rpc::ClientBase<InstrumentClient, true>::connect;
 
         std::vector<krypto::utils::Instrument> query_all();
 
