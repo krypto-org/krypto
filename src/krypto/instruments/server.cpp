@@ -1,4 +1,6 @@
 #include <utility>
+
+#include <utility>
 #include <krypto/instruments/server.h>
 #include <krypto/utils/enum.h>
 
@@ -7,16 +9,15 @@ namespace {
             krypto::utils::InstrumentType, krypto::serialization::InstrumentType>;
 
     const auto convert_currency = krypto::utils::convert_compatible_enum<
-            krypto::utils::Currency , krypto::serialization::Currency>;
+            krypto::utils::Currency, krypto::serialization::Currency>;
 }
 
 void krypto::instruments::Server::process(const krypto::serialization::InstrumentRequest *) {
     fb_builder_.Clear();
     std::vector<flatbuffers::Offset<krypto::serialization::Instrument>> instruments;
-    for (auto&& inst : cache_) {
-        auto inst_offset = krypto::serialization::CreateInstrument(fb_builder_,
-                inst.id,
-                ::convert_inst_type(inst.inst_type),
+    for (auto &&inst : cache_) {
+        auto inst_offset = krypto::serialization::CreateInstrument(
+                fb_builder_, inst.id, ::convert_inst_type(inst.inst_type),
                 fb_builder_.CreateString(inst.symbol),
                 fb_builder_.CreateString(
                         krypto::utils::ExchangeTypeEnum::enum_to_names.at(inst.exchange)),
@@ -35,16 +36,7 @@ void krypto::instruments::Server::process(const krypto::serialization::Instrumen
     fb_builder_.Finish(response);
 }
 
-krypto::instruments::Server::Server(
-        zmq::context_t &context,
-        std::string broker,
-        std::string service,
-        bool verbose,
-        const krypto::Config &config) :
-        krypto::network::rpc::WorkerBase<Server,
-                krypto::serialization::InstrumentRequest,
-                krypto::serialization::InstrumentResponse>::WorkerBase{
-                context, std::move(broker), std::move(service), verbose},
-        store_{config} {
+krypto::instruments::Server::Server(const krypto::Config &config, std::string service) :
+        WorkerBase(config, std::move(service)), store_{config} {
     cache_ = store_.load();
 }
