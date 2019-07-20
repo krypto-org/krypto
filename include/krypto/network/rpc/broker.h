@@ -139,7 +139,7 @@ namespace krypto::network::rpc {
             backend_->bind(backend_address_);
             bound = true;
         } catch (zmq::error_t &e) {
-            KRYP_LOG(error, "Binding failed With {}", e.what());
+            KRYP_LOG(error, "Binding failed with {}", e.what());
         }
 
         if (!bound) {
