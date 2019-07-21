@@ -1,12 +1,12 @@
 #pragma once
 
 #include <cstdint>
-#include "cmath"
+#include <cmath>
 
 namespace krypto {
-    using Price = int64_t ;
-    using Quantity = int64_t ;
-    using SecurityId = int64_t;
-    using Timestamp = int64_t;
-    using SequenceNumber = int64_t;
+    using price_t = int64_t;
+    using quantity_t = int64_t;
+    using secid_t = int64_t;
+    using timestamp_t = int64_t;
+    using seqnum_t = int64_t;
 }

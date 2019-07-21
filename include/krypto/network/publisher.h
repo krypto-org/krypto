@@ -8,20 +8,21 @@
 #include <krypto/serialization/serialization_generated.h>
 #include <krypto/types.h>
 #include <krypto/logger.h>
+#include <krypto/config.h>
 
 namespace krypto::network {
 
     template<typename Derived>
     class PublisherBase {
     private:
-        const zmq::context_t &context_;
-        zmq::socket_t sock_;
+        zmq::context_t context_;
+        std::unique_ptr<zmq::socket_t> socket_;
         const std::string endpoint_;
         bool connected_;
     protected:
         flatbuffers::FlatBufferBuilder fb_builder_;
     public:
-        PublisherBase(zmq::context_t &, std::string);
+        explicit PublisherBase(std::string endpoint);
 
         PublisherBase(const PublisherBase &other) = delete;
 
@@ -41,27 +42,26 @@ namespace krypto::network {
     };
 
     template<typename Derived>
-    PublisherBase<Derived>::PublisherBase(zmq::context_t &context,
-                                          std::string endpoint) : context_(context),
-                                                                  sock_(context, ZMQ_PUB),
-                                                                  endpoint_(std::move(endpoint)),
-                                                                  connected_(false),
-                                                                  fb_builder_(1024) {
+    PublisherBase<Derived>::PublisherBase(std::string endpoint) :
+            context_(1),
+            endpoint_(std::move(endpoint)),
+            connected_(false) {
+        socket_ = std::make_unique<zmq::socket_t>(context_, ZMQ_PUB);
     }
 
     template<typename Derived>
     PublisherBase<Derived>::~PublisherBase() {
         connected_ = false;
-        sock_.close();
+        socket_->close();
     }
 
     template<typename Derived>
     template<bool WithProxy>
     void PublisherBase<Derived>::start() {
         if constexpr (WithProxy) {
-            sock_.connect(endpoint_);
+            socket_->connect(endpoint_);
         } else {
-            sock_.bind(endpoint_);
+            socket_->bind(endpoint_);
         }
 
         connected_ = true;
@@ -75,7 +75,7 @@ namespace krypto::network {
         zmq::message_t topic_nsg(topic.size());
         std::memcpy(topic_nsg.data(), topic.data(), topic.size());
 
-        status.set(0, sock_.send(topic_nsg, ZMQ_SNDMORE));
+        status.set(0, socket_->send(topic_nsg, ZMQ_SNDMORE));
 
         auto &derived = static_cast<Derived &>(*this);
         derived.serialize(args...);
@@ -83,7 +83,7 @@ namespace krypto::network {
         zmq::message_t payload_msg(fb_builder_.GetSize());
         std::memcpy(payload_msg.data(), fb_builder_.GetBufferPointer(), fb_builder_.GetSize());
 
-        status.set(1, sock_.send(payload_msg));
+        status.set(1, socket_->send(payload_msg));
 
         return status.all();
     }

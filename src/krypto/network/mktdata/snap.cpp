@@ -2,9 +2,9 @@
 
 namespace krypto::network::mktdata {
     void SnapshotPublisher::serialize(
-            krypto::SecurityId id, krypto::Timestamp timestamp,
-            const std::vector<std::tuple<krypto::Price, krypto::Quantity >> &bids,
-            const std::vector<std::tuple<krypto::Price, krypto::Quantity >> &asks) {
+            krypto::secid_t id, krypto::timestamp_t timestamp,
+            const std::vector<std::tuple<krypto::price_t, krypto::quantity_t >> &bids,
+            const std::vector<std::tuple<krypto::price_t, krypto::quantity_t >> &asks) {
 
         std::vector<krypto::serialization::SnapshotPriceLevel> bid_levels;
         bid_levels.reserve(bids.size());

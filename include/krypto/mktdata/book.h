@@ -14,8 +14,8 @@ namespace krypto::mktdata {
     };
 
     struct Quote {
-        int64_t timestamp;
-        int64_t security_id;
+        uint64_t timestamp;
+        uint64_t security_id;
         int64_t bid;
         int64_t ask;
         int64_t bid_qty;
@@ -25,8 +25,8 @@ namespace krypto::mktdata {
     };
 
     struct Trade {
-        int64_t timestamp;
-        int64_t security_id;
+        uint64_t timestamp;
+        uint64_t security_id;
         int64_t price;
         int64_t quantity;
         Side side; // Taker Side
@@ -34,9 +34,9 @@ namespace krypto::mktdata {
     };
 
     struct OrderBook {
-        int64_t timestamp;
-        int64_t security_id;
-        std::map<int64_t, int64_t, std::greater<>> bids; // Decresing Order
+        uint64_t security_id;
+        uint64_t timestamp;
+        std::map<int64_t, int64_t, std::greater<>> bids; // Decreasing Order
         std::map<int64_t, int64_t> asks;
         Quote quote;
     };
