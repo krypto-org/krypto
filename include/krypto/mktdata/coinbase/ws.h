@@ -1,15 +1,20 @@
 #pragma once
 
+#include <vector>
+
+#include <boost/fiber/all.hpp>
 #include <websocketpp/config/asio_client.hpp>
 #include <websocketpp/client.hpp>
 #include <websocketpp/common/thread.hpp>
 #include <websocketpp/common/memory.hpp>
 #include <nlohmann/json.hpp>
 
+#include <krypto/config.h>
+#include <krypto/types.h>
+#include <krypto/utils/common.h>
+
 namespace wpp = websocketpp;
 namespace ip = boost::asio::ip;
-
-typedef websocketpp::client<websocketpp::config::asio_tls_client> ws_client_t;
 
 namespace krypto::mktdata::coinbase {
     enum class WsConnectionStatus : uint8_t {
@@ -18,8 +23,11 @@ namespace krypto::mktdata::coinbase {
 
     class WsConnection {
     public:
-        typedef websocketpp::lib::shared_ptr<WsConnection> ptr;
-        WsConnection(std::string, std::function<void(nlohmann::json)>, std::string );
+        using ws_client_t = websocketpp::client<websocketpp::config::asio_tls_client>;
+        using channel_t = boost::fibers::buffered_channel<nlohmann::json>;
+        using ptr = websocketpp::lib::shared_ptr<WsConnection>;
+
+        WsConnection(const krypto::Config& config, channel_t& update_channel);
 
         void on_open(websocketpp::connection_hdl hdl);
 
@@ -37,11 +45,13 @@ namespace krypto::mktdata::coinbase {
     private:
         std::string uri_;
         WsConnectionStatus status_;
-        std::function<void(nlohmann::json)> handler_;
-        std::string subscription_;
+        channel_t& update_channel_;
+        std::vector<krypto::utils::Instrument> instruments_;
 
         ws_client_t client_;
         websocketpp::connection_hdl hdl_;
         std::mutex connection_lock_;
+
+        std::string generate_subscription();
     };
 }

@@ -1,15 +1,23 @@
 #include <utility>
 
-#include <utility>
-
-#include <krypto/mktdata/coinbase/ws.h>
-#include <krypto/logger.h>
 #include <boost/asio/ssl/context.hpp>
 
+#include <krypto/instruments/client.h>
+#include <krypto/mktdata/coinbase/ws.h>
+#include <krypto/logger.h>
+
+
 krypto::mktdata::coinbase::WsConnection::WsConnection(
-        std::string uri, std::function<void(nlohmann::json)> handler, std::string subscription) : uri_(std::move(
-        uri)), status_(WsConnectionStatus::CLOSE), handler_(std::move(handler)), subscription_(
-        std::move(subscription)) {
+        const krypto::Config &config,
+        krypto::mktdata::coinbase::WsConnection::channel_t &update_channel) :
+        uri_{config.at<std::string>("/exchanges/coinbase/ws/base_url")},
+        status_{WsConnectionStatus::CLOSE},
+        update_channel_{update_channel} {
+
+    krypto::instruments::InstrumentClient client{config};
+    auto query = client.query_all();
+    instruments_.insert(instruments_.end(), std::begin(query), std::end(query));
+
     client_.init_asio();
     client_.set_open_handler(std::bind(&WsConnection::on_open, this, std::placeholders::_1));
     client_.set_close_handler(std::bind(&WsConnection::on_close, this, std::placeholders::_1));
@@ -23,12 +31,17 @@ krypto::mktdata::coinbase::WsConnection::WsConnection(
 
 }
 
+
 void krypto::mktdata::coinbase::WsConnection::on_open(wpp::connection_hdl hdl) {
     KRYP_LOG(info, "Opened Websocket Connection to {}", uri_);
     std::lock_guard<std::mutex> guard(connection_lock_);
     status_ = WsConnectionStatus::OPEN;
 
-    send(subscription_);
+    auto subscription = generate_subscription();
+
+    KRYP_LOG(info, "Sending subscription: {}", subscription);
+
+    send(subscription);
 }
 
 void krypto::mktdata::coinbase::WsConnection::on_close(wpp::connection_hdl hdl) {
@@ -45,7 +58,8 @@ void krypto::mktdata::coinbase::WsConnection::on_fail(wpp::connection_hdl hdl) {
 
 void krypto::mktdata::coinbase::WsConnection::on_message(wpp::connection_hdl, ws_client_t::message_ptr msg) {
     if (msg->get_opcode() == wpp::frame::opcode::text) {
-        handler_(nlohmann::json::parse(msg->get_payload()));
+        auto payload = nlohmann::json::parse(msg->get_payload());
+        update_channel_.push(payload);
     } else {
         KRYP_LOG(warn, "NON TEXT MESSGAE RECEIVED");
     }
@@ -75,4 +89,18 @@ void krypto::mktdata::coinbase::WsConnection::send(std::string message) {
 void krypto::mktdata::coinbase::WsConnection::stop() {
     std::lock_guard<std::mutex> guard(connection_lock_);
     client_.stop();
+}
+
+std::string krypto::mktdata::coinbase::WsConnection::generate_subscription() {
+    nlohmann::json subscription;
+    subscription["type"] = "subscribe";
+    subscription["channels"] = {"level2", "heartbeat", "matches"};
+    std::vector<std::string> symbols;
+
+    std::transform(instruments_.begin(), instruments_.end(), std::back_inserter(symbols), [] (auto&& inst) {
+        return inst.exchange_symbol;
+    });
+
+    subscription["product_ids"] = symbols;
+    return subscription.dump();
 }

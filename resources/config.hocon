@@ -33,10 +33,6 @@ exchanges = {
         }
       }
 
-      mktdata = {
-        ip = ${global.ip}
-        port = 7${exchanges.coinbase.id}
-      }
     }
   }
 }
@@ -59,6 +55,16 @@ services = {
 
         instruments = {
             name = "instruments"
+        }
+    }
+
+    publisher = {
+        mktdata = {
+            coinbase = {
+                port = 7${exchanges.coinbase.id}
+                server = "tcp://*:"${services.publisher.mktdata.coinbase.port}
+                client = "tcp://"${global.ip}":"${services.publisher.mktdata.coinbase.port}
+            }
         }
     }
 }

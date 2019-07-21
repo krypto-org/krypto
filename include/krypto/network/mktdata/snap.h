@@ -10,9 +10,9 @@ namespace krypto::network::mktdata {
     public:
         using krypto::network::PublisherBase<SnapshotPublisher>::PublisherBase;
 
-        void serialize(krypto::SecurityId id, krypto::Timestamp timestamp,
-                             const std::vector<std::tuple<krypto::Price, krypto::Quantity >> & bids,
-                             const std::vector<std::tuple<krypto::Price, krypto::Quantity >> & asks);
+        void serialize(krypto::secid_t id, krypto::timestamp_t timestamp,
+                             const std::vector<std::tuple<krypto::price_t, krypto::quantity_t >> & bids,
+                             const std::vector<std::tuple<krypto::price_t, krypto::quantity_t >> & asks);
     };
 }
 

@@ -1,67 +1,79 @@
 #pragma once
 
 #include <atomic>
+#include <queue>
 
 #include <krypto/mktdata/book.h>
 #include <tbb/concurrent_queue.h>
 #include <nlohmann/json.hpp>
 #include <krypto/network/mktdata/top_of_book.h>
 #include <krypto/mktdata/convert.h>
+#include <krypto/instruments/client.h>
+
 
 namespace krypto::mktdata::coinbase {
-    template <typename Socket>
+    template<bool Verbose = false>
     class BookBuilder final {
     private:
-        static constexpr int QUEUE_SIZE = 4096;
+        std::unordered_map<std::string, uint64_t> id_by_symbol_;
+        std::unordered_map<std::string, std::unique_ptr<OrderBook>> books;
+        std::unordered_map<std::string, std::queue<nlohmann::json>> incr_queue_;
+        std::unordered_map<std::string, bool> snapshot_received_;
 
-        Socket& socket_;
-        std::atomic_bool snapshot_received_;
-        tbb::concurrent_bounded_queue<nlohmann::json> incr_queue_;
-        OrderBook book_;
+        krypto::network::mktdata::TopOfBookPublisher publisher_;
 
-        void apply_incremental(int64_t price, int64_t qty, OrderSide side);
+        void apply_incremental(const std::string &symbol, int64_t price, int64_t qty, OrderSide side);
 
     public:
-        explicit BookBuilder(Socket& socket);
+        explicit BookBuilder(const krypto::Config &config);
 
         ~BookBuilder();
 
-        BookBuilder(const BookBuilder &other) = delete;
+        BookBuilder(const BookBuilder<Verbose> &other) = default;
 
-        BookBuilder(BookBuilder &&other) = delete;
+        BookBuilder(BookBuilder<Verbose> &&other) noexcept = default;
 
-        BookBuilder &operator=(const BookBuilder &other) = delete;
+        BookBuilder<Verbose> &operator=(const BookBuilder<Verbose> &other) = default;
 
-        BookBuilder &operator=(BookBuilder &&other) = delete;
+        BookBuilder<Verbose> &operator=(BookBuilder<Verbose> &&other) noexcept = default;
 
         void handle_incr(nlohmann::json incremental);
 
         void handle_snap(nlohmann::json snapshot);
 
         void handle_trade(nlohmann::json trade);
-
-        const OrderBook& book() const;
     };
 
-    template <typename Socket>
-    BookBuilder<Socket>::BookBuilder(Socket &socket) :
-            socket_(socket), snapshot_received_{false} {
+    template<bool Verbose>
+    BookBuilder<Verbose>::BookBuilder(const krypto::Config &config) :
+            publisher_{config.at<std::string>("/services/publisher/mktdata/coinbase/server")} {
 
-        incr_queue_.set_capacity(QUEUE_SIZE);
+        krypto::instruments::InstrumentClient client{config};
+        auto instruments = client.query_all();
 
-        book_.quote.bid = 0;
-        book_.quote.bid_qty = 0;
+        std::for_each(instruments.cbegin(), instruments.cend(), [=](auto &&instr) {
+            if (instr.exchange == krypto::utils::ExchangeType::COINBASE) {
+                id_by_symbol_[instr.exchange_symbol] = instr.id;
+                books[instr.exchange_symbol] = std::make_unique<OrderBook>();
+                books.at(instr.exchange_symbol)->security_id = instr.id;
+                books.at(instr.exchange_symbol)->quote = {0, instr.id, 0, std::numeric_limits<int64_t>::max(), 0, 0, 0,
+                                                          0};
 
-        book_.quote.ask = std::numeric_limits<int64_t >::max();
-        book_.quote.ask_qty = 0;
+                snapshot_received_[instr.exchange_symbol] = false;
 
-        book_.quote.last = 0;
-        book_.quote.last_qty = 0;
+                incr_queue_[instr.exchange_symbol] = {};
+            }
+        });
+
+        publisher_.start<false>();
+
     }
 
-    template <typename Socket>
-    void BookBuilder<Socket>::handle_incr(nlohmann::json incremental) {
-        if (snapshot_received_.load()) {
+    template<bool Verbose>
+    void BookBuilder<Verbose>::handle_incr(nlohmann::json incremental) {
+        auto symbol = incremental.at("product_id").get<std::string>();
+
+        if (snapshot_received_.at(symbol)) {
 
             auto incrs = incremental.at("changes").get<std::vector<std::vector<std::string>>>();
 
@@ -70,72 +82,82 @@ namespace krypto::mktdata::coinbase {
                 auto price = krypto::mktdata::convert_price(std::stod(incr[1]));
                 auto qty = krypto::mktdata::convert_quantity(std::stod(incr[2]));
 
-                apply_incremental(price, qty, side);
+                apply_incremental(symbol, price, qty, side);
             }
 
-            auto top_bid = std::begin(book_.bids);
-            auto top_ask = std::begin(book_.asks);
+            auto top_bid = std::begin(books.at(symbol)->bids);
+            auto top_ask = std::begin(books.at(symbol)->asks);
 
             bool send = false;
 
-            if (top_bid->first != book_.quote.bid) {
-                book_.quote.bid = top_bid->first;
+            if (top_bid->first != books.at(symbol)->quote.bid) {
+                books.at(symbol)->quote.bid = top_bid->first;
                 send = true;
             }
 
-            if (top_bid->second != book_.quote.bid_qty) {
-                book_.quote.bid_qty = top_bid->second;
+            if (top_bid->second != books.at(symbol)->quote.bid_qty) {
+                books.at(symbol)->quote.bid_qty = top_bid->second;
                 send = true;
             }
 
-            if (top_ask->first != book_.quote.ask) {
-                book_.quote.ask = top_ask->first;
+            if (top_ask->first != books.at(symbol)->quote.ask) {
+                books.at(symbol)->quote.ask = top_ask->first;
                 send = true;
             }
 
-            if (top_ask->second != book_.quote.ask_qty) {
-                book_.quote.ask_qty = top_ask->second;
+            if (top_ask->second != books.at(symbol)->quote.ask_qty) {
+                books.at(symbol)->quote.ask_qty = top_ask->second;
                 send = true;
             }
 
             if (send) {
                 KRYP_LOG(debug, "TOP OF BOOK: {} | {} ::: {} | {} :::: {} | {}", top_bid->second, top_bid->first,
                          top_ask->first,
-                         top_ask->second, book_.quote.last, book_.quote.last_qty);
-                socket_.template send<krypto::mktdata::Quote>("QUOTE", book_.quote);
+                         top_ask->second,
+                         books.at(symbol)->quote.last,
+                         books.at(symbol)->quote.last_qty);
+                publisher_.send<krypto::mktdata::Quote>("QUOTE", books.at(symbol)->quote);
             }
 
         } else {
             KRYP_LOG(debug, "Queueing Incremental");
-            incr_queue_.push(incremental);
+            incr_queue_.at(symbol).push(incremental);
         }
     }
 
-    template <typename Socket>
-    void BookBuilder<Socket>::apply_incremental(int64_t price, int64_t qty, krypto::mktdata::OrderSide side) {
+    template<bool Verbose>
+    void BookBuilder<Verbose>::apply_incremental(
+            const std::string &symbol,
+            int64_t price,
+            int64_t qty,
+            krypto::mktdata::OrderSide side) {
         if (side == OrderSide::BID) {
             if (qty == 0) {
-                book_.bids.erase(price);
+                books.at(symbol)->bids.erase(price);
             } else {
-                book_.bids[price] = qty;
+                books.at(symbol)->bids[price] = qty;
             }
         } else if (side == OrderSide::ASK) {
             if (qty == 0) {
-                book_.asks.erase(price);
+                books.at(symbol)->asks.erase(price);
             } else {
-                book_.asks[price] = qty;
+                books.at(symbol)->asks[price] = qty;
             }
         } else {
             KRYP_LOG(error, "Something is horribly wrong!!");
         }
     }
 
-    template <typename Socket>
-    void BookBuilder<Socket>::handle_snap(nlohmann::json snapshot) {
-        if (!snapshot_received_.load()) {
+    template<bool Verbose>
+    void BookBuilder<Verbose>::handle_snap(nlohmann::json snapshot) {
+        auto symbol = snapshot.at("product_id").get<std::string>();
 
-            book_.bids.clear();
-            book_.asks.clear();
+        if (!snapshot_received_.at(symbol)) {
+
+            books.at(symbol)->bids.clear();
+            books.at(symbol)->asks.clear();
+
+            KRYP_LOG(info, symbol);
 
             auto bids = snapshot.at("bids").get<std::vector<std::vector<std::string>>>();
             auto asks = snapshot.at("asks").get<std::vector<std::vector<std::string>>>();
@@ -145,7 +167,7 @@ namespace krypto::mktdata::coinbase {
                 auto price = krypto::mktdata::convert_price(std::stod(bid[0]));
                 auto qty = krypto::mktdata::convert_quantity(std::stod(bid[1]));
 
-                apply_incremental(price, qty, OrderSide::BID);
+                apply_incremental(symbol, price, qty, OrderSide::BID);
             }
 
             for (auto &ask: asks) {
@@ -153,12 +175,12 @@ namespace krypto::mktdata::coinbase {
                 auto price = krypto::mktdata::convert_price(std::stod(ask[0]));
                 auto qty = krypto::mktdata::convert_quantity(std::stod(ask[1]));
 
-                apply_incremental(price, qty, OrderSide::ASK);
+                apply_incremental(symbol, price, qty, OrderSide::ASK);
             }
 
-            while (!incr_queue_.empty()) {
-                nlohmann::json incremental;
-                incr_queue_.try_pop(incremental);
+            while (!incr_queue_.at(symbol).empty()) {
+                nlohmann::json incremental = incr_queue_.at(symbol).front();
+                incr_queue_.at(symbol).pop();
 
                 auto incrs = incremental.at("changes").get<std::vector<std::vector<std::string>>>();
 
@@ -167,50 +189,44 @@ namespace krypto::mktdata::coinbase {
                     auto price = krypto::mktdata::convert_price(std::stod(incr[1]));
                     auto qty = krypto::mktdata::convert_quantity(std::stod(incr[2]));
 
-                    apply_incremental(price, qty, side);
+                    apply_incremental(symbol, price, qty, side);
                 }
             }
 
-            snapshot_received_ = true;
+            snapshot_received_[symbol] = true;
 
         } else {
             // Ignore Update
         }
     }
 
-    template <typename Socket>
-    void BookBuilder<Socket>::handle_trade(nlohmann::json trade) {
+    template<bool Verbose>
+    void BookBuilder<Verbose>::handle_trade(nlohmann::json trade) {
+        auto symbol = trade.at("product_id").get<std::string>();
 
         auto price = krypto::mktdata::convert_price(
                 std::stod(trade.at("price").get<std::string>()));
         auto qty = krypto::mktdata::convert_quantity(
                 std::stod(trade.at("size").get<std::string>()));
 
-        book_.quote.last = price;
-        book_.quote.last_qty = qty;
+        books.at(symbol)->quote.last = price;
+        books.at(symbol)->quote.last_qty = qty;
 
-        auto side = trade.at("side").get<std::string>() == "sell"?
-                Side::BUY : Side::SELL;
+        auto side = trade.at("side").get<std::string>() == "sell" ?
+                    Side::BUY : Side::SELL;
 
         auto trade_id = trade.at("trade_id").get<int64_t>();
 
         krypto::mktdata::Trade to_send{
-            book_.timestamp, 0, price, qty, side, std::to_string(trade_id)};
+                books.at(symbol)->timestamp, 0, price, qty, side, std::to_string(trade_id)};
 
-        socket_.send("TRADE", to_send);
+        publisher_.send("TRADE", to_send);
     }
 
-    template <typename Socket>
-    BookBuilder<Socket>::~BookBuilder() {
+    template<bool Verbose>
+    BookBuilder<Verbose>::~BookBuilder() {
         incr_queue_.clear();
-        incr_queue_.abort();
     }
-
-    template <typename Socket>
-    const krypto::mktdata::OrderBook &BookBuilder<Socket>::book() const {
-        return book_;
-    }
-
 }
 
 

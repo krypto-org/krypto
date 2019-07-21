@@ -18,8 +18,8 @@ namespace krypto::network::mktdata {
 
         using krypto::network::PublisherBase<IncrementalPublisher>::send;
 
-        void serialize(krypto::SecurityId id, krypto::Timestamp timestamp,
-                             const std::vector<std::tuple<Price, krypto::Quantity, krypto::serialization::OrderSide>> &);
+        void serialize(krypto::secid_t id, krypto::timestamp_t timestamp,
+                             const std::vector<std::tuple<price_t, krypto::quantity_t, krypto::serialization::OrderSide>> &);
     };
 
 }
