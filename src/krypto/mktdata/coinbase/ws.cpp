@@ -38,6 +38,9 @@ void krypto::mktdata::coinbase::WsConnection::on_open(wpp::connection_hdl hdl) {
     status_ = WsConnectionStatus::OPEN;
 
     auto subscription = generate_subscription();
+
+    KRYP_LOG(info, "Sending subscription: {}", subscription);
+
     send(subscription);
 }
 
@@ -89,5 +92,15 @@ void krypto::mktdata::coinbase::WsConnection::stop() {
 }
 
 std::string krypto::mktdata::coinbase::WsConnection::generate_subscription() {
-    return R"({ "type": "subscribe", "product_ids": ["BTC-USD"], "channels": ["level2", "heartbeat", "matches"]})";
+    nlohmann::json subscription;
+    subscription["type"] = "subscribe";
+    subscription["channels"] = {"level2", "heartbeat", "matches"};
+    std::vector<std::string> symbols;
+
+    std::transform(instruments_.begin(), instruments_.end(), std::back_inserter(symbols), [] (auto&& inst) {
+        return inst.exchange_symbol;
+    });
+
+    subscription["product_ids"] = symbols;
+    return subscription.dump();
 }
