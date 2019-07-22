@@ -13,95 +13,102 @@
 
 namespace krypto::network {
 
-    template<typename Derived, typename MsgType, bool Sequenced = false>
-    class SubscriberBase {
+    template<bool Verbose = false>
+    class Subscriber {
     private:
-        zmq::socket_t sock_;
-        const std::string endpoint_;
+        zmq::context_t context_;
+        std::string endpoint_;
         bool connected_;
-        const std::function<void(int64_t, MsgType)> callback_;
-    public:
-        SubscriberBase(zmq::context_t &, std::string, std::function<void(int64_t, MsgType)>);
-
-        SubscriberBase(const SubscriberBase &other) = delete;
-
-        SubscriberBase(SubscriberBase &&other) = delete;
-
-        SubscriberBase &operator=(const SubscriberBase &other) = delete;
-
-        SubscriberBase &operator=(SubscriberBase &&other) = delete;
-
-        ~SubscriberBase();
+        std::unique_ptr<zmq::socket_t> socket_;
 
         void connect();
 
         void disconnect();
 
-        void subscribe(const std::string &topic);
+    public:
+        explicit Subscriber(std::string);
 
-        void recv();
+        Subscriber(const Subscriber<Verbose> &other) = delete;
+
+        Subscriber(Subscriber<Verbose> &&other) = delete;
+
+        Subscriber<Verbose> &operator=(const Subscriber<Verbose> &) = delete;
+
+        Subscriber<Verbose> &operator=(Subscriber<Verbose> &&) = delete;
+
+        ~Subscriber();
+
+        void subscribe(const std::string &);
+
+        void subscribe(const std::vector<std::string> &);
+
+        template<typename MsgType>
+        const MsgType *recv();
     };
 
-    template<typename Derived, typename MsgType, bool Sequenced>
-    SubscriberBase<Derived, MsgType, Sequenced>::SubscriberBase(zmq::context_t &context, std::string endpoint,
-                                                                      std::function<void(int64_t, MsgType)> f) :
-            sock_(context, ZMQ_SUB), endpoint_(std::move(endpoint)), connected_(false),
-            callback_(std::move(f)) {}
+    template<bool Verbose>
+    Subscriber<Verbose>::Subscriber(std::string endpoint) :
+            context_{1},
+            endpoint_(std::move(endpoint)),
+            connected_(false) {
+        socket_ = std::make_unique<zmq::socket_t>(context_, ZMQ_SUB);
+        connect();
+    }
 
-    template<typename Derived, typename MsgType, bool Sequenced>
-    SubscriberBase<Derived, MsgType, Sequenced>::~SubscriberBase() {
+    template<bool Verbose>
+    Subscriber<Verbose>::~Subscriber() {
         disconnect();
     }
 
-    template<typename Derived, typename MsgType, bool Sequenced>
-    void SubscriberBase<Derived, MsgType, Sequenced>::subscribe(const std::string &topic) {
-        sock_.setsockopt(ZMQ_SUBSCRIBE, &topic[0], topic.length());
+    template<bool Verbose>
+    void Subscriber<Verbose>::subscribe(const std::string &topic) {
+        socket_->setsockopt(ZMQ_SUBSCRIBE, &topic[0], topic.length());
     }
 
-    template<typename Derived, typename MsgType, bool Sequenced>
-    void SubscriberBase<Derived, MsgType, Sequenced>::connect() {
+    template<bool Verbose>
+    void Subscriber<Verbose>::subscribe(const std::vector<std::string> &topics) {
+        std::for_each(topics.begin(), topics.end(), [this](auto &&topic) {
+            subscribe(topic);
+        });
+    }
+
+    template<bool Verbose>
+    void Subscriber<Verbose>::connect() {
         if (!connected_) {
-            sock_.connect(endpoint_);
+            socket_->connect(endpoint_);
             connected_ = true;
         }
     }
 
-    template<typename Derived, typename MsgType, bool Sequenced>
-    void SubscriberBase<Derived, MsgType, Sequenced>::disconnect() {
+    template<bool Verbose>
+    void Subscriber<Verbose>::disconnect() {
         if (connected_) {
             connected_ = false;
             KRYP_LOG(info, "Disconnecting from {} ... ", endpoint_);
-            sock_.disconnect(endpoint_);
-            sock_.close();
+            socket_->disconnect(endpoint_);
+            socket_->close();
             KRYP_LOG(info, "Disconnected!");
         }
     }
 
-    template<typename Derived, typename MsgType, bool Sequenced>
-    void SubscriberBase<Derived, MsgType, Sequenced>::recv() {
+    template<bool Verbose>
+    template<typename MsgType>
+    const MsgType *Subscriber<Verbose>::recv() {
 
         zmq::message_t topic_msg;
-        sock_.recv(&topic_msg);
+        socket_->recv(&topic_msg);
         auto topic = std::string(static_cast<char *>(topic_msg.data()), topic_msg.size());
 
-        int64_t seq_no = 0;
+        zmq::message_t payload_msg;
+        socket_->recv(&payload_msg);
 
-        if constexpr (Sequenced) {
-            // Receive 2
-            zmq::message_t sn_msg;
-            sock_.recv(&sn_msg);
-
-            auto sn = flatbuffers::GetRoot<krypto::serialization::SequenceNumber>(sn_msg.data());
-            seq_no = sn->value();
+        if constexpr (Verbose) {
+            KRYP_LOG(info, "Received data -- topic: {} | payload size: {}", topic, payload_msg.size());
         }
 
-        zmq::message_t payload_msg;
-        sock_.recv(&payload_msg);
+        auto payload = flatbuffers::GetRoot<MsgType>(payload_msg.data());
 
-        auto &derived = static_cast<Derived &>(*this);
-        MsgType payload = derived.parse(payload_msg.data());
-
-        callback_(seq_no, payload);
+        return payload;
     }
-};
+}
 
