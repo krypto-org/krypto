@@ -111,12 +111,9 @@ namespace krypto::mktdata::coinbase {
             }
 
             if (send) {
-                KRYP_LOG(debug, "TOP OF BOOK: {} | {} ::: {} | {} :::: {} | {}", top_bid->second, top_bid->first,
-                         top_ask->first,
-                         top_ask->second,
-                         books.at(symbol)->quote.last,
-                         books.at(symbol)->quote.last_qty);
-                publisher_.send<krypto::mktdata::Quote>("QUOTE", books.at(symbol)->quote);
+                auto id = id_by_symbol_.at(symbol);
+                auto topic = krypto::utils::create_topic(krypto::utils::MsgType::QUOTE, id);
+                publisher_.send<krypto::mktdata::Quote>(topic, books.at(symbol)->quote);
             }
 
         } else {
@@ -204,6 +201,8 @@ namespace krypto::mktdata::coinbase {
     void BookBuilder<Verbose>::handle_trade(nlohmann::json trade) {
         auto symbol = trade.at("product_id").get<std::string>();
 
+        auto id = id_by_symbol_.at(symbol);
+
         auto price = krypto::mktdata::convert_price(
                 std::stod(trade.at("price").get<std::string>()));
         auto qty = krypto::mktdata::convert_quantity(
@@ -218,9 +217,11 @@ namespace krypto::mktdata::coinbase {
         auto trade_id = trade.at("trade_id").get<int64_t>();
 
         krypto::mktdata::Trade to_send{
-                books.at(symbol)->timestamp, 0, price, qty, side, std::to_string(trade_id)};
+                books.at(symbol)->timestamp, id, price, qty, side, std::to_string(trade_id)};
 
-        publisher_.send("TRADE", to_send);
+        auto topic = krypto::utils::create_topic(krypto::utils::MsgType::TRADE, id);
+
+        publisher_.send(topic, to_send);
     }
 
     template<bool Verbose>

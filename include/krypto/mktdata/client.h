@@ -1,41 +1,27 @@
 #pragma once
 
-#include <boost/fiber/all.hpp>
-
 #include <krypto/network/subscriber.h>
 #include <krypto/config.h>
 #include <krypto/utils/common.h>
 #include <krypto/mktdata/book.h>
+#include <boost/algorithm/string.hpp>
 
 namespace krypto::mktdata {
 
-    template <krypto::utils::ExchangeType Ex>
-    class Client final {
+    template<krypto::utils::ExchangeType Ex, typename Consumer, bool Verbose = false>
+    class Client : public krypto::network::Subscriber<Consumer, Verbose> {
     public:
-        using quote_channel_t = boost::fibers::buffered_channel<Quote>;
-        using trade_channel_t = boost::fibers::buffered_channel<Trade>;
-    private:
-        krypto::network::Subscriber<false> subscriber_;
-    public:
-        explicit Client(const krypto::Config& config);
-        void start();
-        void stop();
+        explicit Client(const krypto::Config &config);
     };
 
-    template<utils::ExchangeType Ex>
-    Client<Ex>::Client(const krypto::Config &config) :
-    subscriber_{config.at<std::string>(
-            fmt::format("/services/mktdata/{0}/client",
-            krypto::utils::ExchangeTypeEnum::enum_to_names.at(Ex)))} {
+    template<krypto::utils::ExchangeType Ex, typename Consumer, bool Verbose>
+    Client<Ex, Consumer, Verbose>::Client(const krypto::Config &config) :
+            Client<Ex, Consumer, Verbose>::template Subscriber<Consumer, Verbose>{
+                    config.at<std::string>(
+                            fmt::format("/services/publisher/mktdata/{0}/client",
+                                        boost::algorithm::to_lower_copy(
+                                                krypto::utils::ExchangeTypeEnum::enum_to_names.at(Ex))))} {
+
     }
 
-    template<utils::ExchangeType Ex>
-    void Client<Ex>::start() {
-        // Send data on to a channel
-    }
-
-    template<utils::ExchangeType Ex>
-    void Client<Ex>::stop() {
-        // Close Channel
-    }
 }

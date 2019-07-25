@@ -65,6 +65,16 @@ namespace krypto::utils {
 
     using CurrencyEnum = Enum<Currency>;
 
+    enum class MsgType : uint8_t {
+        ALL,
+        QUOTE,
+        TRADE,
+        HEARTBEAT,
+        SIZE
+    };
+
+    using MsgTypeEnum = Enum<MsgType>;
+
     struct Instrument {
         uint64_t id;
         InstrumentType inst_type;
@@ -91,7 +101,9 @@ namespace krypto::utils {
                static_cast<uint64_t>(quote);
     }
 
-    const std::string instrument_symbol(const std::string& base, const std::string& quote);
+    std::string instrument_symbol(const std::string& base, const std::string& quote);
+
+    const std::string create_topic(MsgType msg_type, uint64_t id);
 
     struct Startup {
         static void init();
