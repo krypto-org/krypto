@@ -24,7 +24,6 @@ int main(int argc, char ** argv) {
     const krypto::Config config(argv[1]);
 
     krypto::mktdata::coinbase::Server<true> server{config};
-//    auto done = std::async(std::launch::async, [&server] () {server.start();});
 
     shutdown_handler = [&server](int signal) {
         SIGNAL_STATUS = signal;

@@ -1,7 +1,7 @@
 #include <krypto/utils/common.h>
 
 namespace krypto::utils {
-    const std::string instrument_symbol(const std::string &base, const std::string &quote) {
+    std::string instrument_symbol(const std::string &base, const std::string &quote) {
         return fmt::format("{0}_{1}", base, quote);
     }
 
@@ -58,9 +58,27 @@ namespace krypto::utils {
         return names;
     }
 
+    template<>
+    std::array<std::string, enum_size<MsgType>()> enum_names<MsgType>() {
+        std::array<std::string, enum_size<MsgType>()> names =
+                {
+                "",
+                        "Q",
+                        "T",
+                        "H"
+                };
+        return names;
+    }
+
     void Startup::init() {
         ExchangeTypeEnum::init();
         InstrumentTypeEnum::init();
         CurrencyEnum::init();
+        MsgTypeEnum::init();
+    }
+
+    const std::string create_topic(const MsgType msg_type, const uint64_t id) {
+        auto prefix = enum_names<MsgType>()[static_cast<uint8_t>(msg_type)];
+        return prefix + std::to_string(id);
     }
 }

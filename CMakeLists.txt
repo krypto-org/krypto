@@ -93,7 +93,7 @@ add_library(krypto STATIC
         src/krypto/instruments/server.cpp
         include/krypto/utils/common.h
         src/krypto/utils/common.cpp
-        include/krypto/exchanges/coinbase.h include/krypto/mktdata/coinbase/server.h)
+        include/krypto/exchanges/coinbase.h include/krypto/mktdata/coinbase/server.h include/krypto/mktdata/client.h src/examples/mktdata_printer_main.cpp)
 target_link_libraries(krypto Threads::Threads)
 
 add_library(crypto STATIC IMPORTED include/krypto/mktdata/coinbase/book_builder.h)
@@ -126,3 +126,6 @@ target_link_libraries(krypto-broker krypto CONAN_PKG::boost ssl crypto dl CONAN_
 
 add_executable(query-instruments src/examples/query_instruments_main.cpp)
 target_link_libraries(query-instruments krypto CONAN_PKG::boost ssl crypto dl CONAN_PKG::bzip2 CONAN_PKG::zlib CONAN_PKG::tbb CONAN_PKG::zmq CONAN_PKG::cppzmq Threads::Threads)
+
+add_executable(mktdata-printer src/examples/mktdata_printer_main.cpp)
+target_link_libraries(mktdata-printer krypto CONAN_PKG::boost ssl crypto dl CONAN_PKG::bzip2 CONAN_PKG::zlib CONAN_PKG::tbb CONAN_PKG::zmq CONAN_PKG::cppzmq Threads::Threads)
