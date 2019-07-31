@@ -6,6 +6,8 @@ enum Side: byte {UNKNOWN, BUY, SELL}
 
 enum OrderSide: byte {UNKNOWN, BID, ASK}
 
+enum OrderStatus: byte {IN_FLIGHT, NEW, ACCEPTED, CANCELLED, REJECTED, FILLED, PARTIALLY_FILLED}
+
 table SequenceNumber {
   value: long;
 }
@@ -108,4 +110,39 @@ table InstrumentRequest {
 
 table InstrumentResponse {
   instruments: [Instrument];
+}
+
+// orders
+
+table OrderRequest {
+  timestamp: long;
+  security_id: long;
+  price: long;
+  quantity: long;
+  side: Side;
+  order_id: string;
+}
+
+table OrderUpdate {
+  timestamp: long;
+  order_id: string;
+  status: OrderStatus;
+  filled_quantity: long;
+}
+
+table Order {
+  request: OrderRequest;
+  updates: [OrderUpdate];
+  fees: double;
+}
+
+struct Position {
+  security_id: long;
+  position: long;
+}
+
+table RiskSummary {
+  timestamp: long;
+  positions: [Position];
+  pnl: double;
 }
