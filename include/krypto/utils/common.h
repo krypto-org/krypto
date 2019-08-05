@@ -60,6 +60,7 @@ namespace krypto::utils {
         XRP,
         ZEC,
         ZRX,
+        XTZ,
         SIZE
     };
 
