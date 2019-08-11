@@ -93,7 +93,7 @@ add_library(krypto STATIC
         src/krypto/instruments/server.cpp
         include/krypto/utils/common.h
         src/krypto/utils/common.cpp
-        include/krypto/exchanges/coinbase.h include/krypto/mktdata/coinbase/server.h include/krypto/mktdata/client.h src/examples/mktdata_printer_main.cpp)
+        include/krypto/exchanges/coinbase.h include/krypto/mktdata/coinbase/server.h include/krypto/mktdata/client.h src/examples/mktdata_printer_main.cpp include/krypto/network/rpc/async_client.h)
 target_link_libraries(krypto Threads::Threads)
 
 add_library(crypto STATIC IMPORTED include/krypto/mktdata/coinbase/book_builder.h)
