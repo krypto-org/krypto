@@ -27,16 +27,17 @@ echo -e "${BLUE}FLATBUFFERS CONAN PACKAGE: ${FLAT_BUFFERS_BINARY_PACKAGE}${NC}"
 
 export PATH=${KRYPTO_DIR}/resources/bin/:${PATH}
 
-cd ${KRYPTO_DIR}/resources
+cd "${KRYPTO_DIR}"/resources || exit
 
-mkdir build && cd build
+mkdir build && cd build || exit
 conan install ${FLAT_BUFFERS_BINARY_PACKAGE} -g virtualenv
 source activate.sh
 cd ..
 
-echo -e "${BLUE}"Using $(flatc --version)"${NC}"
+echo -e "${BLUE}Using $(flatc --version)${NC}" || exit
 
 echo -e "${BLUE}"--- COMPILE C++ FLATBUFFERS SOURCES ---"${NC}"
-flatc --cpp -o ${KRYPTO_DIR}/include/krypto/serialization serialization.fbs
+flatc --cpp -o "${KRYPTO_DIR}"/include/krypto/serialization serialization.fbs || exit
+flatc --js -o "${KRYPTO_DIR}"/ui/src serialization.fbs || exit
 
 rm -r build
