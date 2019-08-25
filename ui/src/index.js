@@ -1,17 +1,20 @@
-// Libs
 import React from "react";
-import { render } from "react-dom";
-// Root
-import Root from "@/routes/Root";
-// Styles
+import ReactDOM from "react-dom";
+
+import { Provider } from "react-redux";
+import { createStore } from "redux";
+// import thunk from "redux-thunk";
+// import logger from "redux-logger";
+import rootReducer from "./reducers";
+import App from "App";
+
 import "@/themes/App.global.scss";
 
-const App = Root;
-render(<App />, document.getElementById("app"));
+const store = createStore(
+  rootReducer
+)
 
-if (module.hot) {
-  module.hot.accept("./routes/Root", () => {
-    require("@/routes/Root");
-    render(<App />, document.getElementById("app"));
-  });
-}
+ReactDOM.render(
+  <Provider store={store}><App /></Provider>,
+  document.getElementById("app")
+);

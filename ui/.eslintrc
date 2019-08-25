@@ -27,7 +27,10 @@
     "no-unused-vars": "warn",
     "no-extra-parens": 0,
     "no-constant-condition": "warn",
-    "react/prop-types": "warn"
+    "react/prop-types": "warn",
+    "react/display-name": [
+      2
+    ],
   },
   "settings": {
     "react": {
