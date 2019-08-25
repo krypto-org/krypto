@@ -2,13 +2,10 @@ import React, { Component } from "react";
 import styles from "./Instruments.scss"
 import { connect } from 'react-redux';
 import ReactTable from "react-table";
+import PropTypes from "prop-types"
 import "react-table/react-table.css";
 
 class Instruments extends Component {
-  componentDidMount() {
-    console.log(this.props);
-  }
-
   render() {
     return (
       <div className={styles.instruments}>
@@ -62,6 +59,10 @@ class Instruments extends Component {
         />
       </div>);
   }
+}
+
+Instruments.propTypes = {
+  instruments: PropTypes.array.isRequired
 }
 
 const mapStateToProps = (state, ownProps) => {
