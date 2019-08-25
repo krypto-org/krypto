@@ -1,6 +1,6 @@
 import { combineReducers } from 'redux';
-import instrumentReducer from './instrumentsReducer';
+import instruments from "./instrumentsReducer";
 
 export default combineReducers({
-  instruments: instrumentReducer
+  instruments: instruments
 });

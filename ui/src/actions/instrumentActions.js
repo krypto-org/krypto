@@ -19,19 +19,22 @@ export const fetchInstrumentsFailure = error => ({
   payload: { error }
 });
 
+
+
 export const fetchInstruments = () => {
   console.log("fetchInstruments")
-  return dispatch => {
-    dispatch(fetchInstrumentsBegin());
-    const request = createInstrumentsRequest();
-    const socket = requesterSocket();
-    socket.on("message", (service, payload) => {
-      console.log('got reply from ', service.toString(), ":", payload);
-      parseInstruments(payload).then(
-        instruments =>
-          dispatch(fetchInstrumentsSuccess(instruments)))
-        .catch(error => dispatch(fetchInstrumentsFailure(error)))
-    })
-    socket.send(["instruments", request.toString()])
-  }
+
+  // return dispatch => {
+  //   dispatch(fetchInstrumentsBegin());
+  //   const request = createInstrumentsRequest();
+  //   const socket = requesterSocket();
+  //   socket.on("message", (service, payload) => {
+  //     console.log('got reply from ', service.toString(), ":", payload);
+  //     parseInstruments(payload).then(
+  //       instruments =>
+  //         dispatch(fetchInstrumentsSuccess(instruments)))
+  //       .catch(error => dispatch(fetchInstrumentsFailure(error)))
+  //   })
+  //   socket.send(["instruments", request.toString()])
+  // }
 }
