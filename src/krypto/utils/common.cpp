@@ -54,7 +54,8 @@ namespace krypto::utils {
                         "XRP",
                         "ZEC",
                         "ZRX",
-                        "XTZ"
+                        "XTZ",
+                        "ALGO"
                 };
         return names;
     }

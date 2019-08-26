@@ -214,11 +214,12 @@ enum Currency {
   Currency_ZEC = 22,
   Currency_ZRX = 23,
   Currency_XTZ = 24,
+  Currency_ALGO = 25,
   Currency_MIN = Currency_UNKNOWN,
-  Currency_MAX = Currency_XTZ
+  Currency_MAX = Currency_ALGO
 };
 
-inline const Currency (&EnumValuesCurrency())[25] {
+inline const Currency (&EnumValuesCurrency())[26] {
   static const Currency values[] = {
     Currency_UNKNOWN,
     Currency_BAT,
@@ -244,7 +245,8 @@ inline const Currency (&EnumValuesCurrency())[25] {
     Currency_XRP,
     Currency_ZEC,
     Currency_ZRX,
-    Currency_XTZ
+    Currency_XTZ,
+    Currency_ALGO
   };
   return values;
 }
@@ -276,6 +278,7 @@ inline const char * const *EnumNamesCurrency() {
     "ZEC",
     "ZRX",
     "XTZ",
+    "ALGO",
     nullptr
   };
   return names;

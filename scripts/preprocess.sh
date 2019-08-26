@@ -38,6 +38,6 @@ echo -e "${BLUE}Using $(flatc --version)${NC}" || exit
 
 echo -e "${BLUE}"--- COMPILE C++ FLATBUFFERS SOURCES ---"${NC}"
 flatc --cpp -o "${KRYPTO_DIR}"/include/krypto/serialization serialization.fbs || exit
-flatc --js -o "${KRYPTO_DIR}"/ui/src serialization.fbs || exit
+flatc --js -o "${KRYPTO_DIR}"/ui/src/krypto serialization.fbs || exit
 
 rm -r build
