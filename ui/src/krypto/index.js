@@ -1,7 +1,7 @@
 import { flatbuffers } from "flatbuffers";
 import zeromq from "zeromq"
 import _ from "lodash"
-import krypto from "./serializaton_generated";
+import krypto from "./serialization_generated";
 
 export const createInstrumentRequest = () => {
   var builder = new flatbuffers.Builder(1024);

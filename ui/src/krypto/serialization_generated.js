@@ -101,7 +101,7 @@ krypto.serialization.RequestType = {
 /**
  * @constructor
  */
-krypto.serialization.SequenceNumber = function() {
+krypto.serialization.SequenceNumber = function () {
   /**
    * @type {flatbuffers.ByteBuffer}
    */
@@ -118,7 +118,7 @@ krypto.serialization.SequenceNumber = function() {
  * @param {flatbuffers.ByteBuffer} bb
  * @returns {krypto.serialization.SequenceNumber}
  */
-krypto.serialization.SequenceNumber.prototype.__init = function(i, bb) {
+krypto.serialization.SequenceNumber.prototype.__init = function (i, bb) {
   this.bb_pos = i;
   this.bb = bb;
   return this;
@@ -129,14 +129,14 @@ krypto.serialization.SequenceNumber.prototype.__init = function(i, bb) {
  * @param {krypto.serialization.SequenceNumber=} obj
  * @returns {krypto.serialization.SequenceNumber}
  */
-krypto.serialization.SequenceNumber.getRootAsSequenceNumber = function(bb, obj) {
+krypto.serialization.SequenceNumber.getRootAsSequenceNumber = function (bb, obj) {
   return (obj || new krypto.serialization.SequenceNumber).__init(bb.readInt32(bb.position()) + bb.position(), bb);
 };
 
 /**
  * @returns {flatbuffers.Long}
  */
-krypto.serialization.SequenceNumber.prototype.value = function() {
+krypto.serialization.SequenceNumber.prototype.value = function () {
   var offset = this.bb.__offset(this.bb_pos, 4);
   return offset ? this.bb.readInt64(this.bb_pos + offset) : this.bb.createLong(0, 0);
 };
@@ -144,7 +144,7 @@ krypto.serialization.SequenceNumber.prototype.value = function() {
 /**
  * @param {flatbuffers.Builder} builder
  */
-krypto.serialization.SequenceNumber.startSequenceNumber = function(builder) {
+krypto.serialization.SequenceNumber.startSequenceNumber = function (builder) {
   builder.startObject(1);
 };
 
@@ -152,7 +152,7 @@ krypto.serialization.SequenceNumber.startSequenceNumber = function(builder) {
  * @param {flatbuffers.Builder} builder
  * @param {flatbuffers.Long} value
  */
-krypto.serialization.SequenceNumber.addValue = function(builder, value) {
+krypto.serialization.SequenceNumber.addValue = function (builder, value) {
   builder.addFieldInt64(0, value, builder.createLong(0, 0));
 };
 
@@ -160,7 +160,7 @@ krypto.serialization.SequenceNumber.addValue = function(builder, value) {
  * @param {flatbuffers.Builder} builder
  * @returns {flatbuffers.Offset}
  */
-krypto.serialization.SequenceNumber.endSequenceNumber = function(builder) {
+krypto.serialization.SequenceNumber.endSequenceNumber = function (builder) {
   var offset = builder.endObject();
   return offset;
 };
@@ -168,7 +168,7 @@ krypto.serialization.SequenceNumber.endSequenceNumber = function(builder) {
 /**
  * @constructor
  */
-krypto.serialization.Instrument = function() {
+krypto.serialization.Instrument = function () {
   /**
    * @type {flatbuffers.ByteBuffer}
    */
@@ -185,7 +185,7 @@ krypto.serialization.Instrument = function() {
  * @param {flatbuffers.ByteBuffer} bb
  * @returns {krypto.serialization.Instrument}
  */
-krypto.serialization.Instrument.prototype.__init = function(i, bb) {
+krypto.serialization.Instrument.prototype.__init = function (i, bb) {
   this.bb_pos = i;
   this.bb = bb;
   return this;
@@ -196,14 +196,14 @@ krypto.serialization.Instrument.prototype.__init = function(i, bb) {
  * @param {krypto.serialization.Instrument=} obj
  * @returns {krypto.serialization.Instrument}
  */
-krypto.serialization.Instrument.getRootAsInstrument = function(bb, obj) {
+krypto.serialization.Instrument.getRootAsInstrument = function (bb, obj) {
   return (obj || new krypto.serialization.Instrument).__init(bb.readInt32(bb.position()) + bb.position(), bb);
 };
 
 /**
  * @returns {flatbuffers.Long}
  */
-krypto.serialization.Instrument.prototype.id = function() {
+krypto.serialization.Instrument.prototype.id = function () {
   var offset = this.bb.__offset(this.bb_pos, 4);
   return offset ? this.bb.readInt64(this.bb_pos + offset) : this.bb.createLong(0, 0);
 };
@@ -211,7 +211,7 @@ krypto.serialization.Instrument.prototype.id = function() {
 /**
  * @returns {krypto.serialization.InstrumentType}
  */
-krypto.serialization.Instrument.prototype.type = function() {
+krypto.serialization.Instrument.prototype.type = function () {
   var offset = this.bb.__offset(this.bb_pos, 6);
   return offset ? /** @type {krypto.serialization.InstrumentType} */ (this.bb.readInt8(this.bb_pos + offset)) : krypto.serialization.InstrumentType.UNKNOWN;
 };
@@ -220,7 +220,7 @@ krypto.serialization.Instrument.prototype.type = function() {
  * @param {flatbuffers.Encoding=} optionalEncoding
  * @returns {string|Uint8Array|null}
  */
-krypto.serialization.Instrument.prototype.symbol = function(optionalEncoding) {
+krypto.serialization.Instrument.prototype.symbol = function (optionalEncoding) {
   var offset = this.bb.__offset(this.bb_pos, 8);
   return offset ? this.bb.__string(this.bb_pos + offset, optionalEncoding) : null;
 };
@@ -229,7 +229,7 @@ krypto.serialization.Instrument.prototype.symbol = function(optionalEncoding) {
  * @param {flatbuffers.Encoding=} optionalEncoding
  * @returns {string|Uint8Array|null}
  */
-krypto.serialization.Instrument.prototype.exchange = function(optionalEncoding) {
+krypto.serialization.Instrument.prototype.exchange = function (optionalEncoding) {
   var offset = this.bb.__offset(this.bb_pos, 10);
   return offset ? this.bb.__string(this.bb_pos + offset, optionalEncoding) : null;
 };
@@ -238,7 +238,7 @@ krypto.serialization.Instrument.prototype.exchange = function(optionalEncoding) 
  * @param {flatbuffers.Encoding=} optionalEncoding
  * @returns {string|Uint8Array|null}
  */
-krypto.serialization.Instrument.prototype.exchangeSymbol = function(optionalEncoding) {
+krypto.serialization.Instrument.prototype.exchangeSymbol = function (optionalEncoding) {
   var offset = this.bb.__offset(this.bb_pos, 12);
   return offset ? this.bb.__string(this.bb_pos + offset, optionalEncoding) : null;
 };
@@ -246,7 +246,7 @@ krypto.serialization.Instrument.prototype.exchangeSymbol = function(optionalEnco
 /**
  * @returns {number}
  */
-krypto.serialization.Instrument.prototype.tickSize = function() {
+krypto.serialization.Instrument.prototype.tickSize = function () {
   var offset = this.bb.__offset(this.bb_pos, 14);
   return offset ? this.bb.readFloat64(this.bb_pos + offset) : 0.0;
 };
@@ -254,7 +254,7 @@ krypto.serialization.Instrument.prototype.tickSize = function() {
 /**
  * @returns {number}
  */
-krypto.serialization.Instrument.prototype.minSize = function() {
+krypto.serialization.Instrument.prototype.minSize = function () {
   var offset = this.bb.__offset(this.bb_pos, 16);
   return offset ? this.bb.readFloat64(this.bb_pos + offset) : 0.0;
 };
@@ -262,7 +262,7 @@ krypto.serialization.Instrument.prototype.minSize = function() {
 /**
  * @returns {number}
  */
-krypto.serialization.Instrument.prototype.maxSize = function() {
+krypto.serialization.Instrument.prototype.maxSize = function () {
   var offset = this.bb.__offset(this.bb_pos, 18);
   return offset ? this.bb.readFloat64(this.bb_pos + offset) : 0.0;
 };
@@ -270,7 +270,7 @@ krypto.serialization.Instrument.prototype.maxSize = function() {
 /**
  * @returns {krypto.serialization.Currency}
  */
-krypto.serialization.Instrument.prototype.cryptoBase = function() {
+krypto.serialization.Instrument.prototype.cryptoBase = function () {
   var offset = this.bb.__offset(this.bb_pos, 20);
   return offset ? /** @type {krypto.serialization.Currency} */ (this.bb.readInt8(this.bb_pos + offset)) : krypto.serialization.Currency.UNKNOWN;
 };
@@ -278,7 +278,7 @@ krypto.serialization.Instrument.prototype.cryptoBase = function() {
 /**
  * @returns {krypto.serialization.Currency}
  */
-krypto.serialization.Instrument.prototype.cryptoQuote = function() {
+krypto.serialization.Instrument.prototype.cryptoQuote = function () {
   var offset = this.bb.__offset(this.bb_pos, 22);
   return offset ? /** @type {krypto.serialization.Currency} */ (this.bb.readInt8(this.bb_pos + offset)) : krypto.serialization.Currency.UNKNOWN;
 };
@@ -286,7 +286,7 @@ krypto.serialization.Instrument.prototype.cryptoQuote = function() {
 /**
  * @param {flatbuffers.Builder} builder
  */
-krypto.serialization.Instrument.startInstrument = function(builder) {
+krypto.serialization.Instrument.startInstrument = function (builder) {
   builder.startObject(10);
 };
 
@@ -294,7 +294,7 @@ krypto.serialization.Instrument.startInstrument = function(builder) {
  * @param {flatbuffers.Builder} builder
  * @param {flatbuffers.Long} id
  */
-krypto.serialization.Instrument.addId = function(builder, id) {
+krypto.serialization.Instrument.addId = function (builder, id) {
   builder.addFieldInt64(0, id, builder.createLong(0, 0));
 };
 
@@ -302,7 +302,7 @@ krypto.serialization.Instrument.addId = function(builder, id) {
  * @param {flatbuffers.Builder} builder
  * @param {krypto.serialization.InstrumentType} type
  */
-krypto.serialization.Instrument.addType = function(builder, type) {
+krypto.serialization.Instrument.addType = function (builder, type) {
   builder.addFieldInt8(1, type, krypto.serialization.InstrumentType.UNKNOWN);
 };
 
@@ -310,7 +310,7 @@ krypto.serialization.Instrument.addType = function(builder, type) {
  * @param {flatbuffers.Builder} builder
  * @param {flatbuffers.Offset} symbolOffset
  */
-krypto.serialization.Instrument.addSymbol = function(builder, symbolOffset) {
+krypto.serialization.Instrument.addSymbol = function (builder, symbolOffset) {
   builder.addFieldOffset(2, symbolOffset, 0);
 };
 
@@ -318,7 +318,7 @@ krypto.serialization.Instrument.addSymbol = function(builder, symbolOffset) {
  * @param {flatbuffers.Builder} builder
  * @param {flatbuffers.Offset} exchangeOffset
  */
-krypto.serialization.Instrument.addExchange = function(builder, exchangeOffset) {
+krypto.serialization.Instrument.addExchange = function (builder, exchangeOffset) {
   builder.addFieldOffset(3, exchangeOffset, 0);
 };
 
@@ -326,7 +326,7 @@ krypto.serialization.Instrument.addExchange = function(builder, exchangeOffset) 
  * @param {flatbuffers.Builder} builder
  * @param {flatbuffers.Offset} exchangeSymbolOffset
  */
-krypto.serialization.Instrument.addExchangeSymbol = function(builder, exchangeSymbolOffset) {
+krypto.serialization.Instrument.addExchangeSymbol = function (builder, exchangeSymbolOffset) {
   builder.addFieldOffset(4, exchangeSymbolOffset, 0);
 };
 
@@ -334,7 +334,7 @@ krypto.serialization.Instrument.addExchangeSymbol = function(builder, exchangeSy
  * @param {flatbuffers.Builder} builder
  * @param {number} tickSize
  */
-krypto.serialization.Instrument.addTickSize = function(builder, tickSize) {
+krypto.serialization.Instrument.addTickSize = function (builder, tickSize) {
   builder.addFieldFloat64(5, tickSize, 0.0);
 };
 
@@ -342,7 +342,7 @@ krypto.serialization.Instrument.addTickSize = function(builder, tickSize) {
  * @param {flatbuffers.Builder} builder
  * @param {number} minSize
  */
-krypto.serialization.Instrument.addMinSize = function(builder, minSize) {
+krypto.serialization.Instrument.addMinSize = function (builder, minSize) {
   builder.addFieldFloat64(6, minSize, 0.0);
 };
 
@@ -350,7 +350,7 @@ krypto.serialization.Instrument.addMinSize = function(builder, minSize) {
  * @param {flatbuffers.Builder} builder
  * @param {number} maxSize
  */
-krypto.serialization.Instrument.addMaxSize = function(builder, maxSize) {
+krypto.serialization.Instrument.addMaxSize = function (builder, maxSize) {
   builder.addFieldFloat64(7, maxSize, 0.0);
 };
 
@@ -358,7 +358,7 @@ krypto.serialization.Instrument.addMaxSize = function(builder, maxSize) {
  * @param {flatbuffers.Builder} builder
  * @param {krypto.serialization.Currency} cryptoBase
  */
-krypto.serialization.Instrument.addCryptoBase = function(builder, cryptoBase) {
+krypto.serialization.Instrument.addCryptoBase = function (builder, cryptoBase) {
   builder.addFieldInt8(8, cryptoBase, krypto.serialization.Currency.UNKNOWN);
 };
 
@@ -366,7 +366,7 @@ krypto.serialization.Instrument.addCryptoBase = function(builder, cryptoBase) {
  * @param {flatbuffers.Builder} builder
  * @param {krypto.serialization.Currency} cryptoQuote
  */
-krypto.serialization.Instrument.addCryptoQuote = function(builder, cryptoQuote) {
+krypto.serialization.Instrument.addCryptoQuote = function (builder, cryptoQuote) {
   builder.addFieldInt8(9, cryptoQuote, krypto.serialization.Currency.UNKNOWN);
 };
 
@@ -374,7 +374,7 @@ krypto.serialization.Instrument.addCryptoQuote = function(builder, cryptoQuote) 
  * @param {flatbuffers.Builder} builder
  * @returns {flatbuffers.Offset}
  */
-krypto.serialization.Instrument.endInstrument = function(builder) {
+krypto.serialization.Instrument.endInstrument = function (builder) {
   var offset = builder.endObject();
   return offset;
 };
@@ -382,7 +382,7 @@ krypto.serialization.Instrument.endInstrument = function(builder) {
 /**
  * @constructor
  */
-krypto.serialization.Quote = function() {
+krypto.serialization.Quote = function () {
   /**
    * @type {flatbuffers.ByteBuffer}
    */
@@ -399,7 +399,7 @@ krypto.serialization.Quote = function() {
  * @param {flatbuffers.ByteBuffer} bb
  * @returns {krypto.serialization.Quote}
  */
-krypto.serialization.Quote.prototype.__init = function(i, bb) {
+krypto.serialization.Quote.prototype.__init = function (i, bb) {
   this.bb_pos = i;
   this.bb = bb;
   return this;
@@ -410,14 +410,14 @@ krypto.serialization.Quote.prototype.__init = function(i, bb) {
  * @param {krypto.serialization.Quote=} obj
  * @returns {krypto.serialization.Quote}
  */
-krypto.serialization.Quote.getRootAsQuote = function(bb, obj) {
+krypto.serialization.Quote.getRootAsQuote = function (bb, obj) {
   return (obj || new krypto.serialization.Quote).__init(bb.readInt32(bb.position()) + bb.position(), bb);
 };
 
 /**
  * @returns {flatbuffers.Long}
  */
-krypto.serialization.Quote.prototype.timestamp = function() {
+krypto.serialization.Quote.prototype.timestamp = function () {
   var offset = this.bb.__offset(this.bb_pos, 4);
   return offset ? this.bb.readInt64(this.bb_pos + offset) : this.bb.createLong(0, 0);
 };
@@ -425,7 +425,7 @@ krypto.serialization.Quote.prototype.timestamp = function() {
 /**
  * @returns {flatbuffers.Long}
  */
-krypto.serialization.Quote.prototype.securityId = function() {
+krypto.serialization.Quote.prototype.securityId = function () {
   var offset = this.bb.__offset(this.bb_pos, 6);
   return offset ? this.bb.readInt64(this.bb_pos + offset) : this.bb.createLong(0, 0);
 };
@@ -433,7 +433,7 @@ krypto.serialization.Quote.prototype.securityId = function() {
 /**
  * @returns {flatbuffers.Long}
  */
-krypto.serialization.Quote.prototype.bid = function() {
+krypto.serialization.Quote.prototype.bid = function () {
   var offset = this.bb.__offset(this.bb_pos, 8);
   return offset ? this.bb.readInt64(this.bb_pos + offset) : this.bb.createLong(0, 0);
 };
@@ -441,7 +441,7 @@ krypto.serialization.Quote.prototype.bid = function() {
 /**
  * @returns {flatbuffers.Long}
  */
-krypto.serialization.Quote.prototype.ask = function() {
+krypto.serialization.Quote.prototype.ask = function () {
   var offset = this.bb.__offset(this.bb_pos, 10);
   return offset ? this.bb.readInt64(this.bb_pos + offset) : this.bb.createLong(0, 0);
 };
@@ -449,7 +449,7 @@ krypto.serialization.Quote.prototype.ask = function() {
 /**
  * @returns {flatbuffers.Long}
  */
-krypto.serialization.Quote.prototype.last = function() {
+krypto.serialization.Quote.prototype.last = function () {
   var offset = this.bb.__offset(this.bb_pos, 12);
   return offset ? this.bb.readInt64(this.bb_pos + offset) : this.bb.createLong(0, 0);
 };
@@ -457,7 +457,7 @@ krypto.serialization.Quote.prototype.last = function() {
 /**
  * @returns {flatbuffers.Long}
  */
-krypto.serialization.Quote.prototype.bidQuantity = function() {
+krypto.serialization.Quote.prototype.bidQuantity = function () {
   var offset = this.bb.__offset(this.bb_pos, 14);
   return offset ? this.bb.readInt64(this.bb_pos + offset) : this.bb.createLong(0, 0);
 };
@@ -465,7 +465,7 @@ krypto.serialization.Quote.prototype.bidQuantity = function() {
 /**
  * @returns {flatbuffers.Long}
  */
-krypto.serialization.Quote.prototype.askQuantity = function() {
+krypto.serialization.Quote.prototype.askQuantity = function () {
   var offset = this.bb.__offset(this.bb_pos, 16);
   return offset ? this.bb.readInt64(this.bb_pos + offset) : this.bb.createLong(0, 0);
 };
@@ -473,7 +473,7 @@ krypto.serialization.Quote.prototype.askQuantity = function() {
 /**
  * @returns {flatbuffers.Long}
  */
-krypto.serialization.Quote.prototype.lastQuantity = function() {
+krypto.serialization.Quote.prototype.lastQuantity = function () {
   var offset = this.bb.__offset(this.bb_pos, 18);
   return offset ? this.bb.readInt64(this.bb_pos + offset) : this.bb.createLong(0, 0);
 };
@@ -481,7 +481,7 @@ krypto.serialization.Quote.prototype.lastQuantity = function() {
 /**
  * @param {flatbuffers.Builder} builder
  */
-krypto.serialization.Quote.startQuote = function(builder) {
+krypto.serialization.Quote.startQuote = function (builder) {
   builder.startObject(8);
 };
 
@@ -489,7 +489,7 @@ krypto.serialization.Quote.startQuote = function(builder) {
  * @param {flatbuffers.Builder} builder
  * @param {flatbuffers.Long} timestamp
  */
-krypto.serialization.Quote.addTimestamp = function(builder, timestamp) {
+krypto.serialization.Quote.addTimestamp = function (builder, timestamp) {
   builder.addFieldInt64(0, timestamp, builder.createLong(0, 0));
 };
 
@@ -497,7 +497,7 @@ krypto.serialization.Quote.addTimestamp = function(builder, timestamp) {
  * @param {flatbuffers.Builder} builder
  * @param {flatbuffers.Long} securityId
  */
-krypto.serialization.Quote.addSecurityId = function(builder, securityId) {
+krypto.serialization.Quote.addSecurityId = function (builder, securityId) {
   builder.addFieldInt64(1, securityId, builder.createLong(0, 0));
 };
 
@@ -505,7 +505,7 @@ krypto.serialization.Quote.addSecurityId = function(builder, securityId) {
  * @param {flatbuffers.Builder} builder
  * @param {flatbuffers.Long} bid
  */
-krypto.serialization.Quote.addBid = function(builder, bid) {
+krypto.serialization.Quote.addBid = function (builder, bid) {
   builder.addFieldInt64(2, bid, builder.createLong(0, 0));
 };
 
@@ -513,7 +513,7 @@ krypto.serialization.Quote.addBid = function(builder, bid) {
  * @param {flatbuffers.Builder} builder
  * @param {flatbuffers.Long} ask
  */
-krypto.serialization.Quote.addAsk = function(builder, ask) {
+krypto.serialization.Quote.addAsk = function (builder, ask) {
   builder.addFieldInt64(3, ask, builder.createLong(0, 0));
 };
 
@@ -521,7 +521,7 @@ krypto.serialization.Quote.addAsk = function(builder, ask) {
  * @param {flatbuffers.Builder} builder
  * @param {flatbuffers.Long} last
  */
-krypto.serialization.Quote.addLast = function(builder, last) {
+krypto.serialization.Quote.addLast = function (builder, last) {
   builder.addFieldInt64(4, last, builder.createLong(0, 0));
 };
 
@@ -529,7 +529,7 @@ krypto.serialization.Quote.addLast = function(builder, last) {
  * @param {flatbuffers.Builder} builder
  * @param {flatbuffers.Long} bidQuantity
  */
-krypto.serialization.Quote.addBidQuantity = function(builder, bidQuantity) {
+krypto.serialization.Quote.addBidQuantity = function (builder, bidQuantity) {
   builder.addFieldInt64(5, bidQuantity, builder.createLong(0, 0));
 };
 
@@ -537,7 +537,7 @@ krypto.serialization.Quote.addBidQuantity = function(builder, bidQuantity) {
  * @param {flatbuffers.Builder} builder
  * @param {flatbuffers.Long} askQuantity
  */
-krypto.serialization.Quote.addAskQuantity = function(builder, askQuantity) {
+krypto.serialization.Quote.addAskQuantity = function (builder, askQuantity) {
   builder.addFieldInt64(6, askQuantity, builder.createLong(0, 0));
 };
 
@@ -545,7 +545,7 @@ krypto.serialization.Quote.addAskQuantity = function(builder, askQuantity) {
  * @param {flatbuffers.Builder} builder
  * @param {flatbuffers.Long} lastQuantity
  */
-krypto.serialization.Quote.addLastQuantity = function(builder, lastQuantity) {
+krypto.serialization.Quote.addLastQuantity = function (builder, lastQuantity) {
   builder.addFieldInt64(7, lastQuantity, builder.createLong(0, 0));
 };
 
@@ -553,7 +553,7 @@ krypto.serialization.Quote.addLastQuantity = function(builder, lastQuantity) {
  * @param {flatbuffers.Builder} builder
  * @returns {flatbuffers.Offset}
  */
-krypto.serialization.Quote.endQuote = function(builder) {
+krypto.serialization.Quote.endQuote = function (builder) {
   var offset = builder.endObject();
   return offset;
 };
@@ -561,7 +561,7 @@ krypto.serialization.Quote.endQuote = function(builder) {
 /**
  * @constructor
  */
-krypto.serialization.SnapshotPriceLevel = function() {
+krypto.serialization.SnapshotPriceLevel = function () {
   /**
    * @type {flatbuffers.ByteBuffer}
    */
@@ -578,7 +578,7 @@ krypto.serialization.SnapshotPriceLevel = function() {
  * @param {flatbuffers.ByteBuffer} bb
  * @returns {krypto.serialization.SnapshotPriceLevel}
  */
-krypto.serialization.SnapshotPriceLevel.prototype.__init = function(i, bb) {
+krypto.serialization.SnapshotPriceLevel.prototype.__init = function (i, bb) {
   this.bb_pos = i;
   this.bb = bb;
   return this;
@@ -587,14 +587,14 @@ krypto.serialization.SnapshotPriceLevel.prototype.__init = function(i, bb) {
 /**
  * @returns {flatbuffers.Long}
  */
-krypto.serialization.SnapshotPriceLevel.prototype.price = function() {
+krypto.serialization.SnapshotPriceLevel.prototype.price = function () {
   return this.bb.readInt64(this.bb_pos);
 };
 
 /**
  * @returns {flatbuffers.Long}
  */
-krypto.serialization.SnapshotPriceLevel.prototype.quantity = function() {
+krypto.serialization.SnapshotPriceLevel.prototype.quantity = function () {
   return this.bb.readInt64(this.bb_pos + 8);
 };
 
@@ -604,7 +604,7 @@ krypto.serialization.SnapshotPriceLevel.prototype.quantity = function() {
  * @param {flatbuffers.Long} quantity
  * @returns {flatbuffers.Offset}
  */
-krypto.serialization.SnapshotPriceLevel.createSnapshotPriceLevel = function(builder, price, quantity) {
+krypto.serialization.SnapshotPriceLevel.createSnapshotPriceLevel = function (builder, price, quantity) {
   builder.prep(8, 16);
   builder.writeInt64(quantity);
   builder.writeInt64(price);
@@ -614,7 +614,7 @@ krypto.serialization.SnapshotPriceLevel.createSnapshotPriceLevel = function(buil
 /**
  * @constructor
  */
-krypto.serialization.Snapshot = function() {
+krypto.serialization.Snapshot = function () {
   /**
    * @type {flatbuffers.ByteBuffer}
    */
@@ -631,7 +631,7 @@ krypto.serialization.Snapshot = function() {
  * @param {flatbuffers.ByteBuffer} bb
  * @returns {krypto.serialization.Snapshot}
  */
-krypto.serialization.Snapshot.prototype.__init = function(i, bb) {
+krypto.serialization.Snapshot.prototype.__init = function (i, bb) {
   this.bb_pos = i;
   this.bb = bb;
   return this;
@@ -642,14 +642,14 @@ krypto.serialization.Snapshot.prototype.__init = function(i, bb) {
  * @param {krypto.serialization.Snapshot=} obj
  * @returns {krypto.serialization.Snapshot}
  */
-krypto.serialization.Snapshot.getRootAsSnapshot = function(bb, obj) {
+krypto.serialization.Snapshot.getRootAsSnapshot = function (bb, obj) {
   return (obj || new krypto.serialization.Snapshot).__init(bb.readInt32(bb.position()) + bb.position(), bb);
 };
 
 /**
  * @returns {flatbuffers.Long}
  */
-krypto.serialization.Snapshot.prototype.timestamp = function() {
+krypto.serialization.Snapshot.prototype.timestamp = function () {
   var offset = this.bb.__offset(this.bb_pos, 4);
   return offset ? this.bb.readInt64(this.bb_pos + offset) : this.bb.createLong(0, 0);
 };
@@ -657,7 +657,7 @@ krypto.serialization.Snapshot.prototype.timestamp = function() {
 /**
  * @returns {flatbuffers.Long}
  */
-krypto.serialization.Snapshot.prototype.securityId = function() {
+krypto.serialization.Snapshot.prototype.securityId = function () {
   var offset = this.bb.__offset(this.bb_pos, 6);
   return offset ? this.bb.readInt64(this.bb_pos + offset) : this.bb.createLong(0, 0);
 };
@@ -667,7 +667,7 @@ krypto.serialization.Snapshot.prototype.securityId = function() {
  * @param {krypto.serialization.SnapshotPriceLevel=} obj
  * @returns {krypto.serialization.SnapshotPriceLevel}
  */
-krypto.serialization.Snapshot.prototype.bids = function(index, obj) {
+krypto.serialization.Snapshot.prototype.bids = function (index, obj) {
   var offset = this.bb.__offset(this.bb_pos, 8);
   return offset ? (obj || new krypto.serialization.SnapshotPriceLevel).__init(this.bb.__vector(this.bb_pos + offset) + index * 16, this.bb) : null;
 };
@@ -675,7 +675,7 @@ krypto.serialization.Snapshot.prototype.bids = function(index, obj) {
 /**
  * @returns {number}
  */
-krypto.serialization.Snapshot.prototype.bidsLength = function() {
+krypto.serialization.Snapshot.prototype.bidsLength = function () {
   var offset = this.bb.__offset(this.bb_pos, 8);
   return offset ? this.bb.__vector_len(this.bb_pos + offset) : 0;
 };
@@ -685,7 +685,7 @@ krypto.serialization.Snapshot.prototype.bidsLength = function() {
  * @param {krypto.serialization.SnapshotPriceLevel=} obj
  * @returns {krypto.serialization.SnapshotPriceLevel}
  */
-krypto.serialization.Snapshot.prototype.asks = function(index, obj) {
+krypto.serialization.Snapshot.prototype.asks = function (index, obj) {
   var offset = this.bb.__offset(this.bb_pos, 10);
   return offset ? (obj || new krypto.serialization.SnapshotPriceLevel).__init(this.bb.__vector(this.bb_pos + offset) + index * 16, this.bb) : null;
 };
@@ -693,7 +693,7 @@ krypto.serialization.Snapshot.prototype.asks = function(index, obj) {
 /**
  * @returns {number}
  */
-krypto.serialization.Snapshot.prototype.asksLength = function() {
+krypto.serialization.Snapshot.prototype.asksLength = function () {
   var offset = this.bb.__offset(this.bb_pos, 10);
   return offset ? this.bb.__vector_len(this.bb_pos + offset) : 0;
 };
@@ -701,7 +701,7 @@ krypto.serialization.Snapshot.prototype.asksLength = function() {
 /**
  * @param {flatbuffers.Builder} builder
  */
-krypto.serialization.Snapshot.startSnapshot = function(builder) {
+krypto.serialization.Snapshot.startSnapshot = function (builder) {
   builder.startObject(4);
 };
 
@@ -709,7 +709,7 @@ krypto.serialization.Snapshot.startSnapshot = function(builder) {
  * @param {flatbuffers.Builder} builder
  * @param {flatbuffers.Long} timestamp
  */
-krypto.serialization.Snapshot.addTimestamp = function(builder, timestamp) {
+krypto.serialization.Snapshot.addTimestamp = function (builder, timestamp) {
   builder.addFieldInt64(0, timestamp, builder.createLong(0, 0));
 };
 
@@ -717,7 +717,7 @@ krypto.serialization.Snapshot.addTimestamp = function(builder, timestamp) {
  * @param {flatbuffers.Builder} builder
  * @param {flatbuffers.Long} securityId
  */
-krypto.serialization.Snapshot.addSecurityId = function(builder, securityId) {
+krypto.serialization.Snapshot.addSecurityId = function (builder, securityId) {
   builder.addFieldInt64(1, securityId, builder.createLong(0, 0));
 };
 
@@ -725,7 +725,7 @@ krypto.serialization.Snapshot.addSecurityId = function(builder, securityId) {
  * @param {flatbuffers.Builder} builder
  * @param {flatbuffers.Offset} bidsOffset
  */
-krypto.serialization.Snapshot.addBids = function(builder, bidsOffset) {
+krypto.serialization.Snapshot.addBids = function (builder, bidsOffset) {
   builder.addFieldOffset(2, bidsOffset, 0);
 };
 
@@ -733,7 +733,7 @@ krypto.serialization.Snapshot.addBids = function(builder, bidsOffset) {
  * @param {flatbuffers.Builder} builder
  * @param {number} numElems
  */
-krypto.serialization.Snapshot.startBidsVector = function(builder, numElems) {
+krypto.serialization.Snapshot.startBidsVector = function (builder, numElems) {
   builder.startVector(16, numElems, 8);
 };
 
@@ -741,7 +741,7 @@ krypto.serialization.Snapshot.startBidsVector = function(builder, numElems) {
  * @param {flatbuffers.Builder} builder
  * @param {flatbuffers.Offset} asksOffset
  */
-krypto.serialization.Snapshot.addAsks = function(builder, asksOffset) {
+krypto.serialization.Snapshot.addAsks = function (builder, asksOffset) {
   builder.addFieldOffset(3, asksOffset, 0);
 };
 
@@ -749,7 +749,7 @@ krypto.serialization.Snapshot.addAsks = function(builder, asksOffset) {
  * @param {flatbuffers.Builder} builder
  * @param {number} numElems
  */
-krypto.serialization.Snapshot.startAsksVector = function(builder, numElems) {
+krypto.serialization.Snapshot.startAsksVector = function (builder, numElems) {
   builder.startVector(16, numElems, 8);
 };
 
@@ -757,7 +757,7 @@ krypto.serialization.Snapshot.startAsksVector = function(builder, numElems) {
  * @param {flatbuffers.Builder} builder
  * @returns {flatbuffers.Offset}
  */
-krypto.serialization.Snapshot.endSnapshot = function(builder) {
+krypto.serialization.Snapshot.endSnapshot = function (builder) {
   var offset = builder.endObject();
   return offset;
 };
@@ -765,7 +765,7 @@ krypto.serialization.Snapshot.endSnapshot = function(builder) {
 /**
  * @constructor
  */
-krypto.serialization.IncrementalPriceLevel = function() {
+krypto.serialization.IncrementalPriceLevel = function () {
   /**
    * @type {flatbuffers.ByteBuffer}
    */
@@ -782,7 +782,7 @@ krypto.serialization.IncrementalPriceLevel = function() {
  * @param {flatbuffers.ByteBuffer} bb
  * @returns {krypto.serialization.IncrementalPriceLevel}
  */
-krypto.serialization.IncrementalPriceLevel.prototype.__init = function(i, bb) {
+krypto.serialization.IncrementalPriceLevel.prototype.__init = function (i, bb) {
   this.bb_pos = i;
   this.bb = bb;
   return this;
@@ -791,21 +791,21 @@ krypto.serialization.IncrementalPriceLevel.prototype.__init = function(i, bb) {
 /**
  * @returns {flatbuffers.Long}
  */
-krypto.serialization.IncrementalPriceLevel.prototype.price = function() {
+krypto.serialization.IncrementalPriceLevel.prototype.price = function () {
   return this.bb.readInt64(this.bb_pos);
 };
 
 /**
  * @returns {flatbuffers.Long}
  */
-krypto.serialization.IncrementalPriceLevel.prototype.quantity = function() {
+krypto.serialization.IncrementalPriceLevel.prototype.quantity = function () {
   return this.bb.readInt64(this.bb_pos + 8);
 };
 
 /**
  * @returns {flatbuffers.Long}
  */
-krypto.serialization.IncrementalPriceLevel.prototype.side = function() {
+krypto.serialization.IncrementalPriceLevel.prototype.side = function () {
   return this.bb.readInt64(this.bb_pos + 16);
 };
 
@@ -816,7 +816,7 @@ krypto.serialization.IncrementalPriceLevel.prototype.side = function() {
  * @param {flatbuffers.Long} side
  * @returns {flatbuffers.Offset}
  */
-krypto.serialization.IncrementalPriceLevel.createIncrementalPriceLevel = function(builder, price, quantity, side) {
+krypto.serialization.IncrementalPriceLevel.createIncrementalPriceLevel = function (builder, price, quantity, side) {
   builder.prep(8, 24);
   builder.writeInt64(side);
   builder.writeInt64(quantity);
@@ -827,7 +827,7 @@ krypto.serialization.IncrementalPriceLevel.createIncrementalPriceLevel = functio
 /**
  * @constructor
  */
-krypto.serialization.Incremental = function() {
+krypto.serialization.Incremental = function () {
   /**
    * @type {flatbuffers.ByteBuffer}
    */
@@ -844,7 +844,7 @@ krypto.serialization.Incremental = function() {
  * @param {flatbuffers.ByteBuffer} bb
  * @returns {krypto.serialization.Incremental}
  */
-krypto.serialization.Incremental.prototype.__init = function(i, bb) {
+krypto.serialization.Incremental.prototype.__init = function (i, bb) {
   this.bb_pos = i;
   this.bb = bb;
   return this;
@@ -855,14 +855,14 @@ krypto.serialization.Incremental.prototype.__init = function(i, bb) {
  * @param {krypto.serialization.Incremental=} obj
  * @returns {krypto.serialization.Incremental}
  */
-krypto.serialization.Incremental.getRootAsIncremental = function(bb, obj) {
+krypto.serialization.Incremental.getRootAsIncremental = function (bb, obj) {
   return (obj || new krypto.serialization.Incremental).__init(bb.readInt32(bb.position()) + bb.position(), bb);
 };
 
 /**
  * @returns {flatbuffers.Long}
  */
-krypto.serialization.Incremental.prototype.timestamp = function() {
+krypto.serialization.Incremental.prototype.timestamp = function () {
   var offset = this.bb.__offset(this.bb_pos, 4);
   return offset ? this.bb.readInt64(this.bb_pos + offset) : this.bb.createLong(0, 0);
 };
@@ -870,7 +870,7 @@ krypto.serialization.Incremental.prototype.timestamp = function() {
 /**
  * @returns {flatbuffers.Long}
  */
-krypto.serialization.Incremental.prototype.securityId = function() {
+krypto.serialization.Incremental.prototype.securityId = function () {
   var offset = this.bb.__offset(this.bb_pos, 6);
   return offset ? this.bb.readInt64(this.bb_pos + offset) : this.bb.createLong(0, 0);
 };
@@ -880,7 +880,7 @@ krypto.serialization.Incremental.prototype.securityId = function() {
  * @param {krypto.serialization.IncrementalPriceLevel=} obj
  * @returns {krypto.serialization.IncrementalPriceLevel}
  */
-krypto.serialization.Incremental.prototype.updates = function(index, obj) {
+krypto.serialization.Incremental.prototype.updates = function (index, obj) {
   var offset = this.bb.__offset(this.bb_pos, 8);
   return offset ? (obj || new krypto.serialization.IncrementalPriceLevel).__init(this.bb.__vector(this.bb_pos + offset) + index * 24, this.bb) : null;
 };
@@ -888,7 +888,7 @@ krypto.serialization.Incremental.prototype.updates = function(index, obj) {
 /**
  * @returns {number}
  */
-krypto.serialization.Incremental.prototype.updatesLength = function() {
+krypto.serialization.Incremental.prototype.updatesLength = function () {
   var offset = this.bb.__offset(this.bb_pos, 8);
   return offset ? this.bb.__vector_len(this.bb_pos + offset) : 0;
 };
@@ -896,7 +896,7 @@ krypto.serialization.Incremental.prototype.updatesLength = function() {
 /**
  * @param {flatbuffers.Builder} builder
  */
-krypto.serialization.Incremental.startIncremental = function(builder) {
+krypto.serialization.Incremental.startIncremental = function (builder) {
   builder.startObject(3);
 };
 
@@ -904,7 +904,7 @@ krypto.serialization.Incremental.startIncremental = function(builder) {
  * @param {flatbuffers.Builder} builder
  * @param {flatbuffers.Long} timestamp
  */
-krypto.serialization.Incremental.addTimestamp = function(builder, timestamp) {
+krypto.serialization.Incremental.addTimestamp = function (builder, timestamp) {
   builder.addFieldInt64(0, timestamp, builder.createLong(0, 0));
 };
 
@@ -912,7 +912,7 @@ krypto.serialization.Incremental.addTimestamp = function(builder, timestamp) {
  * @param {flatbuffers.Builder} builder
  * @param {flatbuffers.Long} securityId
  */
-krypto.serialization.Incremental.addSecurityId = function(builder, securityId) {
+krypto.serialization.Incremental.addSecurityId = function (builder, securityId) {
   builder.addFieldInt64(1, securityId, builder.createLong(0, 0));
 };
 
@@ -920,7 +920,7 @@ krypto.serialization.Incremental.addSecurityId = function(builder, securityId) {
  * @param {flatbuffers.Builder} builder
  * @param {flatbuffers.Offset} updatesOffset
  */
-krypto.serialization.Incremental.addUpdates = function(builder, updatesOffset) {
+krypto.serialization.Incremental.addUpdates = function (builder, updatesOffset) {
   builder.addFieldOffset(2, updatesOffset, 0);
 };
 
@@ -928,7 +928,7 @@ krypto.serialization.Incremental.addUpdates = function(builder, updatesOffset) {
  * @param {flatbuffers.Builder} builder
  * @param {number} numElems
  */
-krypto.serialization.Incremental.startUpdatesVector = function(builder, numElems) {
+krypto.serialization.Incremental.startUpdatesVector = function (builder, numElems) {
   builder.startVector(24, numElems, 8);
 };
 
@@ -936,7 +936,7 @@ krypto.serialization.Incremental.startUpdatesVector = function(builder, numElems
  * @param {flatbuffers.Builder} builder
  * @returns {flatbuffers.Offset}
  */
-krypto.serialization.Incremental.endIncremental = function(builder) {
+krypto.serialization.Incremental.endIncremental = function (builder) {
   var offset = builder.endObject();
   return offset;
 };
@@ -944,7 +944,7 @@ krypto.serialization.Incremental.endIncremental = function(builder) {
 /**
  * @constructor
  */
-krypto.serialization.Trade = function() {
+krypto.serialization.Trade = function () {
   /**
    * @type {flatbuffers.ByteBuffer}
    */
@@ -961,7 +961,7 @@ krypto.serialization.Trade = function() {
  * @param {flatbuffers.ByteBuffer} bb
  * @returns {krypto.serialization.Trade}
  */
-krypto.serialization.Trade.prototype.__init = function(i, bb) {
+krypto.serialization.Trade.prototype.__init = function (i, bb) {
   this.bb_pos = i;
   this.bb = bb;
   return this;
@@ -972,14 +972,14 @@ krypto.serialization.Trade.prototype.__init = function(i, bb) {
  * @param {krypto.serialization.Trade=} obj
  * @returns {krypto.serialization.Trade}
  */
-krypto.serialization.Trade.getRootAsTrade = function(bb, obj) {
+krypto.serialization.Trade.getRootAsTrade = function (bb, obj) {
   return (obj || new krypto.serialization.Trade).__init(bb.readInt32(bb.position()) + bb.position(), bb);
 };
 
 /**
  * @returns {flatbuffers.Long}
  */
-krypto.serialization.Trade.prototype.timestamp = function() {
+krypto.serialization.Trade.prototype.timestamp = function () {
   var offset = this.bb.__offset(this.bb_pos, 4);
   return offset ? this.bb.readInt64(this.bb_pos + offset) : this.bb.createLong(0, 0);
 };
@@ -987,7 +987,7 @@ krypto.serialization.Trade.prototype.timestamp = function() {
 /**
  * @returns {flatbuffers.Long}
  */
-krypto.serialization.Trade.prototype.securityId = function() {
+krypto.serialization.Trade.prototype.securityId = function () {
   var offset = this.bb.__offset(this.bb_pos, 6);
   return offset ? this.bb.readInt64(this.bb_pos + offset) : this.bb.createLong(0, 0);
 };
@@ -995,7 +995,7 @@ krypto.serialization.Trade.prototype.securityId = function() {
 /**
  * @returns {flatbuffers.Long}
  */
-krypto.serialization.Trade.prototype.price = function() {
+krypto.serialization.Trade.prototype.price = function () {
   var offset = this.bb.__offset(this.bb_pos, 8);
   return offset ? this.bb.readInt64(this.bb_pos + offset) : this.bb.createLong(0, 0);
 };
@@ -1003,7 +1003,7 @@ krypto.serialization.Trade.prototype.price = function() {
 /**
  * @returns {flatbuffers.Long}
  */
-krypto.serialization.Trade.prototype.quantity = function() {
+krypto.serialization.Trade.prototype.quantity = function () {
   var offset = this.bb.__offset(this.bb_pos, 10);
   return offset ? this.bb.readInt64(this.bb_pos + offset) : this.bb.createLong(0, 0);
 };
@@ -1011,7 +1011,7 @@ krypto.serialization.Trade.prototype.quantity = function() {
 /**
  * @returns {krypto.serialization.Side}
  */
-krypto.serialization.Trade.prototype.side = function() {
+krypto.serialization.Trade.prototype.side = function () {
   var offset = this.bb.__offset(this.bb_pos, 12);
   return offset ? /** @type {krypto.serialization.Side} */ (this.bb.readInt8(this.bb_pos + offset)) : krypto.serialization.Side.UNKNOWN;
 };
@@ -1020,7 +1020,7 @@ krypto.serialization.Trade.prototype.side = function() {
  * @param {flatbuffers.Encoding=} optionalEncoding
  * @returns {string|Uint8Array|null}
  */
-krypto.serialization.Trade.prototype.tradeId = function(optionalEncoding) {
+krypto.serialization.Trade.prototype.tradeId = function (optionalEncoding) {
   var offset = this.bb.__offset(this.bb_pos, 14);
   return offset ? this.bb.__string(this.bb_pos + offset, optionalEncoding) : null;
 };
@@ -1028,7 +1028,7 @@ krypto.serialization.Trade.prototype.tradeId = function(optionalEncoding) {
 /**
  * @param {flatbuffers.Builder} builder
  */
-krypto.serialization.Trade.startTrade = function(builder) {
+krypto.serialization.Trade.startTrade = function (builder) {
   builder.startObject(6);
 };
 
@@ -1036,7 +1036,7 @@ krypto.serialization.Trade.startTrade = function(builder) {
  * @param {flatbuffers.Builder} builder
  * @param {flatbuffers.Long} timestamp
  */
-krypto.serialization.Trade.addTimestamp = function(builder, timestamp) {
+krypto.serialization.Trade.addTimestamp = function (builder, timestamp) {
   builder.addFieldInt64(0, timestamp, builder.createLong(0, 0));
 };
 
@@ -1044,7 +1044,7 @@ krypto.serialization.Trade.addTimestamp = function(builder, timestamp) {
  * @param {flatbuffers.Builder} builder
  * @param {flatbuffers.Long} securityId
  */
-krypto.serialization.Trade.addSecurityId = function(builder, securityId) {
+krypto.serialization.Trade.addSecurityId = function (builder, securityId) {
   builder.addFieldInt64(1, securityId, builder.createLong(0, 0));
 };
 
@@ -1052,7 +1052,7 @@ krypto.serialization.Trade.addSecurityId = function(builder, securityId) {
  * @param {flatbuffers.Builder} builder
  * @param {flatbuffers.Long} price
  */
-krypto.serialization.Trade.addPrice = function(builder, price) {
+krypto.serialization.Trade.addPrice = function (builder, price) {
   builder.addFieldInt64(2, price, builder.createLong(0, 0));
 };
 
@@ -1060,7 +1060,7 @@ krypto.serialization.Trade.addPrice = function(builder, price) {
  * @param {flatbuffers.Builder} builder
  * @param {flatbuffers.Long} quantity
  */
-krypto.serialization.Trade.addQuantity = function(builder, quantity) {
+krypto.serialization.Trade.addQuantity = function (builder, quantity) {
   builder.addFieldInt64(3, quantity, builder.createLong(0, 0));
 };
 
@@ -1068,7 +1068,7 @@ krypto.serialization.Trade.addQuantity = function(builder, quantity) {
  * @param {flatbuffers.Builder} builder
  * @param {krypto.serialization.Side} side
  */
-krypto.serialization.Trade.addSide = function(builder, side) {
+krypto.serialization.Trade.addSide = function (builder, side) {
   builder.addFieldInt8(4, side, krypto.serialization.Side.UNKNOWN);
 };
 
@@ -1076,7 +1076,7 @@ krypto.serialization.Trade.addSide = function(builder, side) {
  * @param {flatbuffers.Builder} builder
  * @param {flatbuffers.Offset} tradeIdOffset
  */
-krypto.serialization.Trade.addTradeId = function(builder, tradeIdOffset) {
+krypto.serialization.Trade.addTradeId = function (builder, tradeIdOffset) {
   builder.addFieldOffset(5, tradeIdOffset, 0);
 };
 
@@ -1084,7 +1084,7 @@ krypto.serialization.Trade.addTradeId = function(builder, tradeIdOffset) {
  * @param {flatbuffers.Builder} builder
  * @returns {flatbuffers.Offset}
  */
-krypto.serialization.Trade.endTrade = function(builder) {
+krypto.serialization.Trade.endTrade = function (builder) {
   var offset = builder.endObject();
   return offset;
 };
@@ -1092,7 +1092,7 @@ krypto.serialization.Trade.endTrade = function(builder) {
 /**
  * @constructor
  */
-krypto.serialization.InstrumentRequest = function() {
+krypto.serialization.InstrumentRequest = function () {
   /**
    * @type {flatbuffers.ByteBuffer}
    */
@@ -1109,7 +1109,7 @@ krypto.serialization.InstrumentRequest = function() {
  * @param {flatbuffers.ByteBuffer} bb
  * @returns {krypto.serialization.InstrumentRequest}
  */
-krypto.serialization.InstrumentRequest.prototype.__init = function(i, bb) {
+krypto.serialization.InstrumentRequest.prototype.__init = function (i, bb) {
   this.bb_pos = i;
   this.bb = bb;
   return this;
@@ -1120,14 +1120,14 @@ krypto.serialization.InstrumentRequest.prototype.__init = function(i, bb) {
  * @param {krypto.serialization.InstrumentRequest=} obj
  * @returns {krypto.serialization.InstrumentRequest}
  */
-krypto.serialization.InstrumentRequest.getRootAsInstrumentRequest = function(bb, obj) {
+krypto.serialization.InstrumentRequest.getRootAsInstrumentRequest = function (bb, obj) {
   return (obj || new krypto.serialization.InstrumentRequest).__init(bb.readInt32(bb.position()) + bb.position(), bb);
 };
 
 /**
  * @returns {krypto.serialization.RequestType}
  */
-krypto.serialization.InstrumentRequest.prototype.type = function() {
+krypto.serialization.InstrumentRequest.prototype.type = function () {
   var offset = this.bb.__offset(this.bb_pos, 4);
   return offset ? /** @type {krypto.serialization.RequestType} */ (this.bb.readInt8(this.bb_pos + offset)) : krypto.serialization.RequestType.INVALID;
 };
@@ -1135,7 +1135,7 @@ krypto.serialization.InstrumentRequest.prototype.type = function() {
 /**
  * @param {flatbuffers.Builder} builder
  */
-krypto.serialization.InstrumentRequest.startInstrumentRequest = function(builder) {
+krypto.serialization.InstrumentRequest.startInstrumentRequest = function (builder) {
   builder.startObject(1);
 };
 
@@ -1143,7 +1143,7 @@ krypto.serialization.InstrumentRequest.startInstrumentRequest = function(builder
  * @param {flatbuffers.Builder} builder
  * @param {krypto.serialization.RequestType} type
  */
-krypto.serialization.InstrumentRequest.addType = function(builder, type) {
+krypto.serialization.InstrumentRequest.addType = function (builder, type) {
   builder.addFieldInt8(0, type, krypto.serialization.RequestType.INVALID);
 };
 
@@ -1151,7 +1151,7 @@ krypto.serialization.InstrumentRequest.addType = function(builder, type) {
  * @param {flatbuffers.Builder} builder
  * @returns {flatbuffers.Offset}
  */
-krypto.serialization.InstrumentRequest.endInstrumentRequest = function(builder) {
+krypto.serialization.InstrumentRequest.endInstrumentRequest = function (builder) {
   var offset = builder.endObject();
   return offset;
 };
@@ -1159,7 +1159,7 @@ krypto.serialization.InstrumentRequest.endInstrumentRequest = function(builder) 
 /**
  * @constructor
  */
-krypto.serialization.InstrumentResponse = function() {
+krypto.serialization.InstrumentResponse = function () {
   /**
    * @type {flatbuffers.ByteBuffer}
    */
@@ -1176,7 +1176,7 @@ krypto.serialization.InstrumentResponse = function() {
  * @param {flatbuffers.ByteBuffer} bb
  * @returns {krypto.serialization.InstrumentResponse}
  */
-krypto.serialization.InstrumentResponse.prototype.__init = function(i, bb) {
+krypto.serialization.InstrumentResponse.prototype.__init = function (i, bb) {
   this.bb_pos = i;
   this.bb = bb;
   return this;
@@ -1187,7 +1187,7 @@ krypto.serialization.InstrumentResponse.prototype.__init = function(i, bb) {
  * @param {krypto.serialization.InstrumentResponse=} obj
  * @returns {krypto.serialization.InstrumentResponse}
  */
-krypto.serialization.InstrumentResponse.getRootAsInstrumentResponse = function(bb, obj) {
+krypto.serialization.InstrumentResponse.getRootAsInstrumentResponse = function (bb, obj) {
   return (obj || new krypto.serialization.InstrumentResponse).__init(bb.readInt32(bb.position()) + bb.position(), bb);
 };
 
@@ -1196,7 +1196,7 @@ krypto.serialization.InstrumentResponse.getRootAsInstrumentResponse = function(b
  * @param {krypto.serialization.Instrument=} obj
  * @returns {krypto.serialization.Instrument}
  */
-krypto.serialization.InstrumentResponse.prototype.instruments = function(index, obj) {
+krypto.serialization.InstrumentResponse.prototype.instruments = function (index, obj) {
   var offset = this.bb.__offset(this.bb_pos, 4);
   return offset ? (obj || new krypto.serialization.Instrument).__init(this.bb.__indirect(this.bb.__vector(this.bb_pos + offset) + index * 4), this.bb) : null;
 };
@@ -1204,7 +1204,7 @@ krypto.serialization.InstrumentResponse.prototype.instruments = function(index, 
 /**
  * @returns {number}
  */
-krypto.serialization.InstrumentResponse.prototype.instrumentsLength = function() {
+krypto.serialization.InstrumentResponse.prototype.instrumentsLength = function () {
   var offset = this.bb.__offset(this.bb_pos, 4);
   return offset ? this.bb.__vector_len(this.bb_pos + offset) : 0;
 };
@@ -1212,7 +1212,7 @@ krypto.serialization.InstrumentResponse.prototype.instrumentsLength = function()
 /**
  * @param {flatbuffers.Builder} builder
  */
-krypto.serialization.InstrumentResponse.startInstrumentResponse = function(builder) {
+krypto.serialization.InstrumentResponse.startInstrumentResponse = function (builder) {
   builder.startObject(1);
 };
 
@@ -1220,7 +1220,7 @@ krypto.serialization.InstrumentResponse.startInstrumentResponse = function(build
  * @param {flatbuffers.Builder} builder
  * @param {flatbuffers.Offset} instrumentsOffset
  */
-krypto.serialization.InstrumentResponse.addInstruments = function(builder, instrumentsOffset) {
+krypto.serialization.InstrumentResponse.addInstruments = function (builder, instrumentsOffset) {
   builder.addFieldOffset(0, instrumentsOffset, 0);
 };
 
@@ -1229,7 +1229,7 @@ krypto.serialization.InstrumentResponse.addInstruments = function(builder, instr
  * @param {Array.<flatbuffers.Offset>} data
  * @returns {flatbuffers.Offset}
  */
-krypto.serialization.InstrumentResponse.createInstrumentsVector = function(builder, data) {
+krypto.serialization.InstrumentResponse.createInstrumentsVector = function (builder, data) {
   builder.startVector(4, data.length, 4);
   for (var i = data.length - 1; i >= 0; i--) {
     builder.addOffset(data[i]);
@@ -1241,7 +1241,7 @@ krypto.serialization.InstrumentResponse.createInstrumentsVector = function(build
  * @param {flatbuffers.Builder} builder
  * @param {number} numElems
  */
-krypto.serialization.InstrumentResponse.startInstrumentsVector = function(builder, numElems) {
+krypto.serialization.InstrumentResponse.startInstrumentsVector = function (builder, numElems) {
   builder.startVector(4, numElems, 4);
 };
 
@@ -1249,7 +1249,7 @@ krypto.serialization.InstrumentResponse.startInstrumentsVector = function(builde
  * @param {flatbuffers.Builder} builder
  * @returns {flatbuffers.Offset}
  */
-krypto.serialization.InstrumentResponse.endInstrumentResponse = function(builder) {
+krypto.serialization.InstrumentResponse.endInstrumentResponse = function (builder) {
   var offset = builder.endObject();
   return offset;
 };
@@ -1257,7 +1257,7 @@ krypto.serialization.InstrumentResponse.endInstrumentResponse = function(builder
 /**
  * @constructor
  */
-krypto.serialization.OrderRequest = function() {
+krypto.serialization.OrderRequest = function () {
   /**
    * @type {flatbuffers.ByteBuffer}
    */
@@ -1274,7 +1274,7 @@ krypto.serialization.OrderRequest = function() {
  * @param {flatbuffers.ByteBuffer} bb
  * @returns {krypto.serialization.OrderRequest}
  */
-krypto.serialization.OrderRequest.prototype.__init = function(i, bb) {
+krypto.serialization.OrderRequest.prototype.__init = function (i, bb) {
   this.bb_pos = i;
   this.bb = bb;
   return this;
@@ -1285,14 +1285,14 @@ krypto.serialization.OrderRequest.prototype.__init = function(i, bb) {
  * @param {krypto.serialization.OrderRequest=} obj
  * @returns {krypto.serialization.OrderRequest}
  */
-krypto.serialization.OrderRequest.getRootAsOrderRequest = function(bb, obj) {
+krypto.serialization.OrderRequest.getRootAsOrderRequest = function (bb, obj) {
   return (obj || new krypto.serialization.OrderRequest).__init(bb.readInt32(bb.position()) + bb.position(), bb);
 };
 
 /**
  * @returns {flatbuffers.Long}
  */
-krypto.serialization.OrderRequest.prototype.timestamp = function() {
+krypto.serialization.OrderRequest.prototype.timestamp = function () {
   var offset = this.bb.__offset(this.bb_pos, 4);
   return offset ? this.bb.readInt64(this.bb_pos + offset) : this.bb.createLong(0, 0);
 };
@@ -1300,7 +1300,7 @@ krypto.serialization.OrderRequest.prototype.timestamp = function() {
 /**
  * @returns {flatbuffers.Long}
  */
-krypto.serialization.OrderRequest.prototype.securityId = function() {
+krypto.serialization.OrderRequest.prototype.securityId = function () {
   var offset = this.bb.__offset(this.bb_pos, 6);
   return offset ? this.bb.readInt64(this.bb_pos + offset) : this.bb.createLong(0, 0);
 };
@@ -1308,7 +1308,7 @@ krypto.serialization.OrderRequest.prototype.securityId = function() {
 /**
  * @returns {flatbuffers.Long}
  */
-krypto.serialization.OrderRequest.prototype.price = function() {
+krypto.serialization.OrderRequest.prototype.price = function () {
   var offset = this.bb.__offset(this.bb_pos, 8);
   return offset ? this.bb.readInt64(this.bb_pos + offset) : this.bb.createLong(0, 0);
 };
@@ -1316,7 +1316,7 @@ krypto.serialization.OrderRequest.prototype.price = function() {
 /**
  * @returns {flatbuffers.Long}
  */
-krypto.serialization.OrderRequest.prototype.quantity = function() {
+krypto.serialization.OrderRequest.prototype.quantity = function () {
   var offset = this.bb.__offset(this.bb_pos, 10);
   return offset ? this.bb.readInt64(this.bb_pos + offset) : this.bb.createLong(0, 0);
 };
@@ -1324,7 +1324,7 @@ krypto.serialization.OrderRequest.prototype.quantity = function() {
 /**
  * @returns {krypto.serialization.Side}
  */
-krypto.serialization.OrderRequest.prototype.side = function() {
+krypto.serialization.OrderRequest.prototype.side = function () {
   var offset = this.bb.__offset(this.bb_pos, 12);
   return offset ? /** @type {krypto.serialization.Side} */ (this.bb.readInt8(this.bb_pos + offset)) : krypto.serialization.Side.UNKNOWN;
 };
@@ -1333,7 +1333,7 @@ krypto.serialization.OrderRequest.prototype.side = function() {
  * @param {flatbuffers.Encoding=} optionalEncoding
  * @returns {string|Uint8Array|null}
  */
-krypto.serialization.OrderRequest.prototype.orderId = function(optionalEncoding) {
+krypto.serialization.OrderRequest.prototype.orderId = function (optionalEncoding) {
   var offset = this.bb.__offset(this.bb_pos, 14);
   return offset ? this.bb.__string(this.bb_pos + offset, optionalEncoding) : null;
 };
@@ -1341,7 +1341,7 @@ krypto.serialization.OrderRequest.prototype.orderId = function(optionalEncoding)
 /**
  * @param {flatbuffers.Builder} builder
  */
-krypto.serialization.OrderRequest.startOrderRequest = function(builder) {
+krypto.serialization.OrderRequest.startOrderRequest = function (builder) {
   builder.startObject(6);
 };
 
@@ -1349,7 +1349,7 @@ krypto.serialization.OrderRequest.startOrderRequest = function(builder) {
  * @param {flatbuffers.Builder} builder
  * @param {flatbuffers.Long} timestamp
  */
-krypto.serialization.OrderRequest.addTimestamp = function(builder, timestamp) {
+krypto.serialization.OrderRequest.addTimestamp = function (builder, timestamp) {
   builder.addFieldInt64(0, timestamp, builder.createLong(0, 0));
 };
 
@@ -1357,7 +1357,7 @@ krypto.serialization.OrderRequest.addTimestamp = function(builder, timestamp) {
  * @param {flatbuffers.Builder} builder
  * @param {flatbuffers.Long} securityId
  */
-krypto.serialization.OrderRequest.addSecurityId = function(builder, securityId) {
+krypto.serialization.OrderRequest.addSecurityId = function (builder, securityId) {
   builder.addFieldInt64(1, securityId, builder.createLong(0, 0));
 };
 
@@ -1365,7 +1365,7 @@ krypto.serialization.OrderRequest.addSecurityId = function(builder, securityId) 
  * @param {flatbuffers.Builder} builder
  * @param {flatbuffers.Long} price
  */
-krypto.serialization.OrderRequest.addPrice = function(builder, price) {
+krypto.serialization.OrderRequest.addPrice = function (builder, price) {
   builder.addFieldInt64(2, price, builder.createLong(0, 0));
 };
 
@@ -1373,7 +1373,7 @@ krypto.serialization.OrderRequest.addPrice = function(builder, price) {
  * @param {flatbuffers.Builder} builder
  * @param {flatbuffers.Long} quantity
  */
-krypto.serialization.OrderRequest.addQuantity = function(builder, quantity) {
+krypto.serialization.OrderRequest.addQuantity = function (builder, quantity) {
   builder.addFieldInt64(3, quantity, builder.createLong(0, 0));
 };
 
@@ -1381,7 +1381,7 @@ krypto.serialization.OrderRequest.addQuantity = function(builder, quantity) {
  * @param {flatbuffers.Builder} builder
  * @param {krypto.serialization.Side} side
  */
-krypto.serialization.OrderRequest.addSide = function(builder, side) {
+krypto.serialization.OrderRequest.addSide = function (builder, side) {
   builder.addFieldInt8(4, side, krypto.serialization.Side.UNKNOWN);
 };
 
@@ -1389,7 +1389,7 @@ krypto.serialization.OrderRequest.addSide = function(builder, side) {
  * @param {flatbuffers.Builder} builder
  * @param {flatbuffers.Offset} orderIdOffset
  */
-krypto.serialization.OrderRequest.addOrderId = function(builder, orderIdOffset) {
+krypto.serialization.OrderRequest.addOrderId = function (builder, orderIdOffset) {
   builder.addFieldOffset(5, orderIdOffset, 0);
 };
 
@@ -1397,7 +1397,7 @@ krypto.serialization.OrderRequest.addOrderId = function(builder, orderIdOffset) 
  * @param {flatbuffers.Builder} builder
  * @returns {flatbuffers.Offset}
  */
-krypto.serialization.OrderRequest.endOrderRequest = function(builder) {
+krypto.serialization.OrderRequest.endOrderRequest = function (builder) {
   var offset = builder.endObject();
   return offset;
 };
@@ -1405,7 +1405,7 @@ krypto.serialization.OrderRequest.endOrderRequest = function(builder) {
 /**
  * @constructor
  */
-krypto.serialization.OrderUpdate = function() {
+krypto.serialization.OrderUpdate = function () {
   /**
    * @type {flatbuffers.ByteBuffer}
    */
@@ -1422,7 +1422,7 @@ krypto.serialization.OrderUpdate = function() {
  * @param {flatbuffers.ByteBuffer} bb
  * @returns {krypto.serialization.OrderUpdate}
  */
-krypto.serialization.OrderUpdate.prototype.__init = function(i, bb) {
+krypto.serialization.OrderUpdate.prototype.__init = function (i, bb) {
   this.bb_pos = i;
   this.bb = bb;
   return this;
@@ -1433,14 +1433,14 @@ krypto.serialization.OrderUpdate.prototype.__init = function(i, bb) {
  * @param {krypto.serialization.OrderUpdate=} obj
  * @returns {krypto.serialization.OrderUpdate}
  */
-krypto.serialization.OrderUpdate.getRootAsOrderUpdate = function(bb, obj) {
+krypto.serialization.OrderUpdate.getRootAsOrderUpdate = function (bb, obj) {
   return (obj || new krypto.serialization.OrderUpdate).__init(bb.readInt32(bb.position()) + bb.position(), bb);
 };
 
 /**
  * @returns {flatbuffers.Long}
  */
-krypto.serialization.OrderUpdate.prototype.timestamp = function() {
+krypto.serialization.OrderUpdate.prototype.timestamp = function () {
   var offset = this.bb.__offset(this.bb_pos, 4);
   return offset ? this.bb.readInt64(this.bb_pos + offset) : this.bb.createLong(0, 0);
 };
@@ -1449,7 +1449,7 @@ krypto.serialization.OrderUpdate.prototype.timestamp = function() {
  * @param {flatbuffers.Encoding=} optionalEncoding
  * @returns {string|Uint8Array|null}
  */
-krypto.serialization.OrderUpdate.prototype.orderId = function(optionalEncoding) {
+krypto.serialization.OrderUpdate.prototype.orderId = function (optionalEncoding) {
   var offset = this.bb.__offset(this.bb_pos, 6);
   return offset ? this.bb.__string(this.bb_pos + offset, optionalEncoding) : null;
 };
@@ -1457,7 +1457,7 @@ krypto.serialization.OrderUpdate.prototype.orderId = function(optionalEncoding) 
 /**
  * @returns {krypto.serialization.OrderStatus}
  */
-krypto.serialization.OrderUpdate.prototype.status = function() {
+krypto.serialization.OrderUpdate.prototype.status = function () {
   var offset = this.bb.__offset(this.bb_pos, 8);
   return offset ? /** @type {krypto.serialization.OrderStatus} */ (this.bb.readInt8(this.bb_pos + offset)) : krypto.serialization.OrderStatus.IN_FLIGHT;
 };
@@ -1465,7 +1465,7 @@ krypto.serialization.OrderUpdate.prototype.status = function() {
 /**
  * @returns {flatbuffers.Long}
  */
-krypto.serialization.OrderUpdate.prototype.filledQuantity = function() {
+krypto.serialization.OrderUpdate.prototype.filledQuantity = function () {
   var offset = this.bb.__offset(this.bb_pos, 10);
   return offset ? this.bb.readInt64(this.bb_pos + offset) : this.bb.createLong(0, 0);
 };
@@ -1473,7 +1473,7 @@ krypto.serialization.OrderUpdate.prototype.filledQuantity = function() {
 /**
  * @param {flatbuffers.Builder} builder
  */
-krypto.serialization.OrderUpdate.startOrderUpdate = function(builder) {
+krypto.serialization.OrderUpdate.startOrderUpdate = function (builder) {
   builder.startObject(4);
 };
 
@@ -1481,7 +1481,7 @@ krypto.serialization.OrderUpdate.startOrderUpdate = function(builder) {
  * @param {flatbuffers.Builder} builder
  * @param {flatbuffers.Long} timestamp
  */
-krypto.serialization.OrderUpdate.addTimestamp = function(builder, timestamp) {
+krypto.serialization.OrderUpdate.addTimestamp = function (builder, timestamp) {
   builder.addFieldInt64(0, timestamp, builder.createLong(0, 0));
 };
 
@@ -1489,7 +1489,7 @@ krypto.serialization.OrderUpdate.addTimestamp = function(builder, timestamp) {
  * @param {flatbuffers.Builder} builder
  * @param {flatbuffers.Offset} orderIdOffset
  */
-krypto.serialization.OrderUpdate.addOrderId = function(builder, orderIdOffset) {
+krypto.serialization.OrderUpdate.addOrderId = function (builder, orderIdOffset) {
   builder.addFieldOffset(1, orderIdOffset, 0);
 };
 
@@ -1497,7 +1497,7 @@ krypto.serialization.OrderUpdate.addOrderId = function(builder, orderIdOffset) {
  * @param {flatbuffers.Builder} builder
  * @param {krypto.serialization.OrderStatus} status
  */
-krypto.serialization.OrderUpdate.addStatus = function(builder, status) {
+krypto.serialization.OrderUpdate.addStatus = function (builder, status) {
   builder.addFieldInt8(2, status, krypto.serialization.OrderStatus.IN_FLIGHT);
 };
 
@@ -1505,7 +1505,7 @@ krypto.serialization.OrderUpdate.addStatus = function(builder, status) {
  * @param {flatbuffers.Builder} builder
  * @param {flatbuffers.Long} filledQuantity
  */
-krypto.serialization.OrderUpdate.addFilledQuantity = function(builder, filledQuantity) {
+krypto.serialization.OrderUpdate.addFilledQuantity = function (builder, filledQuantity) {
   builder.addFieldInt64(3, filledQuantity, builder.createLong(0, 0));
 };
 
@@ -1513,7 +1513,7 @@ krypto.serialization.OrderUpdate.addFilledQuantity = function(builder, filledQua
  * @param {flatbuffers.Builder} builder
  * @returns {flatbuffers.Offset}
  */
-krypto.serialization.OrderUpdate.endOrderUpdate = function(builder) {
+krypto.serialization.OrderUpdate.endOrderUpdate = function (builder) {
   var offset = builder.endObject();
   return offset;
 };
@@ -1521,7 +1521,7 @@ krypto.serialization.OrderUpdate.endOrderUpdate = function(builder) {
 /**
  * @constructor
  */
-krypto.serialization.Order = function() {
+krypto.serialization.Order = function () {
   /**
    * @type {flatbuffers.ByteBuffer}
    */
@@ -1538,7 +1538,7 @@ krypto.serialization.Order = function() {
  * @param {flatbuffers.ByteBuffer} bb
  * @returns {krypto.serialization.Order}
  */
-krypto.serialization.Order.prototype.__init = function(i, bb) {
+krypto.serialization.Order.prototype.__init = function (i, bb) {
   this.bb_pos = i;
   this.bb = bb;
   return this;
@@ -1549,7 +1549,7 @@ krypto.serialization.Order.prototype.__init = function(i, bb) {
  * @param {krypto.serialization.Order=} obj
  * @returns {krypto.serialization.Order}
  */
-krypto.serialization.Order.getRootAsOrder = function(bb, obj) {
+krypto.serialization.Order.getRootAsOrder = function (bb, obj) {
   return (obj || new krypto.serialization.Order).__init(bb.readInt32(bb.position()) + bb.position(), bb);
 };
 
@@ -1557,7 +1557,7 @@ krypto.serialization.Order.getRootAsOrder = function(bb, obj) {
  * @param {krypto.serialization.OrderRequest=} obj
  * @returns {krypto.serialization.OrderRequest|null}
  */
-krypto.serialization.Order.prototype.request = function(obj) {
+krypto.serialization.Order.prototype.request = function (obj) {
   var offset = this.bb.__offset(this.bb_pos, 4);
   return offset ? (obj || new krypto.serialization.OrderRequest).__init(this.bb.__indirect(this.bb_pos + offset), this.bb) : null;
 };
@@ -1567,7 +1567,7 @@ krypto.serialization.Order.prototype.request = function(obj) {
  * @param {krypto.serialization.OrderUpdate=} obj
  * @returns {krypto.serialization.OrderUpdate}
  */
-krypto.serialization.Order.prototype.updates = function(index, obj) {
+krypto.serialization.Order.prototype.updates = function (index, obj) {
   var offset = this.bb.__offset(this.bb_pos, 6);
   return offset ? (obj || new krypto.serialization.OrderUpdate).__init(this.bb.__indirect(this.bb.__vector(this.bb_pos + offset) + index * 4), this.bb) : null;
 };
@@ -1575,7 +1575,7 @@ krypto.serialization.Order.prototype.updates = function(index, obj) {
 /**
  * @returns {number}
  */
-krypto.serialization.Order.prototype.updatesLength = function() {
+krypto.serialization.Order.prototype.updatesLength = function () {
   var offset = this.bb.__offset(this.bb_pos, 6);
   return offset ? this.bb.__vector_len(this.bb_pos + offset) : 0;
 };
@@ -1583,7 +1583,7 @@ krypto.serialization.Order.prototype.updatesLength = function() {
 /**
  * @returns {number}
  */
-krypto.serialization.Order.prototype.fees = function() {
+krypto.serialization.Order.prototype.fees = function () {
   var offset = this.bb.__offset(this.bb_pos, 8);
   return offset ? this.bb.readFloat64(this.bb_pos + offset) : 0.0;
 };
@@ -1591,7 +1591,7 @@ krypto.serialization.Order.prototype.fees = function() {
 /**
  * @param {flatbuffers.Builder} builder
  */
-krypto.serialization.Order.startOrder = function(builder) {
+krypto.serialization.Order.startOrder = function (builder) {
   builder.startObject(3);
 };
 
@@ -1599,7 +1599,7 @@ krypto.serialization.Order.startOrder = function(builder) {
  * @param {flatbuffers.Builder} builder
  * @param {flatbuffers.Offset} requestOffset
  */
-krypto.serialization.Order.addRequest = function(builder, requestOffset) {
+krypto.serialization.Order.addRequest = function (builder, requestOffset) {
   builder.addFieldOffset(0, requestOffset, 0);
 };
 
@@ -1607,7 +1607,7 @@ krypto.serialization.Order.addRequest = function(builder, requestOffset) {
  * @param {flatbuffers.Builder} builder
  * @param {flatbuffers.Offset} updatesOffset
  */
-krypto.serialization.Order.addUpdates = function(builder, updatesOffset) {
+krypto.serialization.Order.addUpdates = function (builder, updatesOffset) {
   builder.addFieldOffset(1, updatesOffset, 0);
 };
 
@@ -1616,7 +1616,7 @@ krypto.serialization.Order.addUpdates = function(builder, updatesOffset) {
  * @param {Array.<flatbuffers.Offset>} data
  * @returns {flatbuffers.Offset}
  */
-krypto.serialization.Order.createUpdatesVector = function(builder, data) {
+krypto.serialization.Order.createUpdatesVector = function (builder, data) {
   builder.startVector(4, data.length, 4);
   for (var i = data.length - 1; i >= 0; i--) {
     builder.addOffset(data[i]);
@@ -1628,7 +1628,7 @@ krypto.serialization.Order.createUpdatesVector = function(builder, data) {
  * @param {flatbuffers.Builder} builder
  * @param {number} numElems
  */
-krypto.serialization.Order.startUpdatesVector = function(builder, numElems) {
+krypto.serialization.Order.startUpdatesVector = function (builder, numElems) {
   builder.startVector(4, numElems, 4);
 };
 
@@ -1636,7 +1636,7 @@ krypto.serialization.Order.startUpdatesVector = function(builder, numElems) {
  * @param {flatbuffers.Builder} builder
  * @param {number} fees
  */
-krypto.serialization.Order.addFees = function(builder, fees) {
+krypto.serialization.Order.addFees = function (builder, fees) {
   builder.addFieldFloat64(2, fees, 0.0);
 };
 
@@ -1644,7 +1644,7 @@ krypto.serialization.Order.addFees = function(builder, fees) {
  * @param {flatbuffers.Builder} builder
  * @returns {flatbuffers.Offset}
  */
-krypto.serialization.Order.endOrder = function(builder) {
+krypto.serialization.Order.endOrder = function (builder) {
   var offset = builder.endObject();
   return offset;
 };
@@ -1652,7 +1652,7 @@ krypto.serialization.Order.endOrder = function(builder) {
 /**
  * @constructor
  */
-krypto.serialization.Position = function() {
+krypto.serialization.Position = function () {
   /**
    * @type {flatbuffers.ByteBuffer}
    */
@@ -1669,7 +1669,7 @@ krypto.serialization.Position = function() {
  * @param {flatbuffers.ByteBuffer} bb
  * @returns {krypto.serialization.Position}
  */
-krypto.serialization.Position.prototype.__init = function(i, bb) {
+krypto.serialization.Position.prototype.__init = function (i, bb) {
   this.bb_pos = i;
   this.bb = bb;
   return this;
@@ -1678,14 +1678,14 @@ krypto.serialization.Position.prototype.__init = function(i, bb) {
 /**
  * @returns {flatbuffers.Long}
  */
-krypto.serialization.Position.prototype.securityId = function() {
+krypto.serialization.Position.prototype.securityId = function () {
   return this.bb.readInt64(this.bb_pos);
 };
 
 /**
  * @returns {flatbuffers.Long}
  */
-krypto.serialization.Position.prototype.position = function() {
+krypto.serialization.Position.prototype.position = function () {
   return this.bb.readInt64(this.bb_pos + 8);
 };
 
@@ -1695,7 +1695,7 @@ krypto.serialization.Position.prototype.position = function() {
  * @param {flatbuffers.Long} position
  * @returns {flatbuffers.Offset}
  */
-krypto.serialization.Position.createPosition = function(builder, security_id, position) {
+krypto.serialization.Position.createPosition = function (builder, security_id, position) {
   builder.prep(8, 16);
   builder.writeInt64(position);
   builder.writeInt64(security_id);
@@ -1705,7 +1705,7 @@ krypto.serialization.Position.createPosition = function(builder, security_id, po
 /**
  * @constructor
  */
-krypto.serialization.RiskSummary = function() {
+krypto.serialization.RiskSummary = function () {
   /**
    * @type {flatbuffers.ByteBuffer}
    */
@@ -1722,7 +1722,7 @@ krypto.serialization.RiskSummary = function() {
  * @param {flatbuffers.ByteBuffer} bb
  * @returns {krypto.serialization.RiskSummary}
  */
-krypto.serialization.RiskSummary.prototype.__init = function(i, bb) {
+krypto.serialization.RiskSummary.prototype.__init = function (i, bb) {
   this.bb_pos = i;
   this.bb = bb;
   return this;
@@ -1733,14 +1733,14 @@ krypto.serialization.RiskSummary.prototype.__init = function(i, bb) {
  * @param {krypto.serialization.RiskSummary=} obj
  * @returns {krypto.serialization.RiskSummary}
  */
-krypto.serialization.RiskSummary.getRootAsRiskSummary = function(bb, obj) {
+krypto.serialization.RiskSummary.getRootAsRiskSummary = function (bb, obj) {
   return (obj || new krypto.serialization.RiskSummary).__init(bb.readInt32(bb.position()) + bb.position(), bb);
 };
 
 /**
  * @returns {flatbuffers.Long}
  */
-krypto.serialization.RiskSummary.prototype.timestamp = function() {
+krypto.serialization.RiskSummary.prototype.timestamp = function () {
   var offset = this.bb.__offset(this.bb_pos, 4);
   return offset ? this.bb.readInt64(this.bb_pos + offset) : this.bb.createLong(0, 0);
 };
@@ -1750,7 +1750,7 @@ krypto.serialization.RiskSummary.prototype.timestamp = function() {
  * @param {krypto.serialization.Position=} obj
  * @returns {krypto.serialization.Position}
  */
-krypto.serialization.RiskSummary.prototype.positions = function(index, obj) {
+krypto.serialization.RiskSummary.prototype.positions = function (index, obj) {
   var offset = this.bb.__offset(this.bb_pos, 6);
   return offset ? (obj || new krypto.serialization.Position).__init(this.bb.__vector(this.bb_pos + offset) + index * 16, this.bb) : null;
 };
@@ -1758,7 +1758,7 @@ krypto.serialization.RiskSummary.prototype.positions = function(index, obj) {
 /**
  * @returns {number}
  */
-krypto.serialization.RiskSummary.prototype.positionsLength = function() {
+krypto.serialization.RiskSummary.prototype.positionsLength = function () {
   var offset = this.bb.__offset(this.bb_pos, 6);
   return offset ? this.bb.__vector_len(this.bb_pos + offset) : 0;
 };
@@ -1766,7 +1766,7 @@ krypto.serialization.RiskSummary.prototype.positionsLength = function() {
 /**
  * @returns {number}
  */
-krypto.serialization.RiskSummary.prototype.pnl = function() {
+krypto.serialization.RiskSummary.prototype.pnl = function () {
   var offset = this.bb.__offset(this.bb_pos, 8);
   return offset ? this.bb.readFloat64(this.bb_pos + offset) : 0.0;
 };
@@ -1774,7 +1774,7 @@ krypto.serialization.RiskSummary.prototype.pnl = function() {
 /**
  * @param {flatbuffers.Builder} builder
  */
-krypto.serialization.RiskSummary.startRiskSummary = function(builder) {
+krypto.serialization.RiskSummary.startRiskSummary = function (builder) {
   builder.startObject(3);
 };
 
@@ -1782,7 +1782,7 @@ krypto.serialization.RiskSummary.startRiskSummary = function(builder) {
  * @param {flatbuffers.Builder} builder
  * @param {flatbuffers.Long} timestamp
  */
-krypto.serialization.RiskSummary.addTimestamp = function(builder, timestamp) {
+krypto.serialization.RiskSummary.addTimestamp = function (builder, timestamp) {
   builder.addFieldInt64(0, timestamp, builder.createLong(0, 0));
 };
 
@@ -1790,7 +1790,7 @@ krypto.serialization.RiskSummary.addTimestamp = function(builder, timestamp) {
  * @param {flatbuffers.Builder} builder
  * @param {flatbuffers.Offset} positionsOffset
  */
-krypto.serialization.RiskSummary.addPositions = function(builder, positionsOffset) {
+krypto.serialization.RiskSummary.addPositions = function (builder, positionsOffset) {
   builder.addFieldOffset(1, positionsOffset, 0);
 };
 
@@ -1798,7 +1798,7 @@ krypto.serialization.RiskSummary.addPositions = function(builder, positionsOffse
  * @param {flatbuffers.Builder} builder
  * @param {number} numElems
  */
-krypto.serialization.RiskSummary.startPositionsVector = function(builder, numElems) {
+krypto.serialization.RiskSummary.startPositionsVector = function (builder, numElems) {
   builder.startVector(16, numElems, 8);
 };
 
@@ -1806,7 +1806,7 @@ krypto.serialization.RiskSummary.startPositionsVector = function(builder, numEle
  * @param {flatbuffers.Builder} builder
  * @param {number} pnl
  */
-krypto.serialization.RiskSummary.addPnl = function(builder, pnl) {
+krypto.serialization.RiskSummary.addPnl = function (builder, pnl) {
   builder.addFieldFloat64(2, pnl, 0.0);
 };
 
@@ -1814,7 +1814,7 @@ krypto.serialization.RiskSummary.addPnl = function(builder, pnl) {
  * @param {flatbuffers.Builder} builder
  * @returns {flatbuffers.Offset}
  */
-krypto.serialization.RiskSummary.endRiskSummary = function(builder) {
+krypto.serialization.RiskSummary.endRiskSummary = function (builder) {
   var offset = builder.endObject();
   return offset;
 };
