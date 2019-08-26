@@ -5,18 +5,7 @@ import {
 } from '../actions/instrumentActions';
 
 const initialState = {
-  instruments: [{
-    id: "179212",
-    type: "CRYPTO",
-    symbol: "BTC-USD",
-    exchange: "COINBASE",
-    exchangeSymbol: "BTC_USD",
-    tickSize: 0.0001,
-    minSize: 10,
-    maxSize: 100000,
-    cryptoBase: "BTC",
-    cryptoQuote: "USD"
-  }],
+  instruments: [],
   loading: false,
   error: null
 };

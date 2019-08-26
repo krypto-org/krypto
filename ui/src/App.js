@@ -1,15 +1,8 @@
-import React from "react";
-import { BrowserRouter } from "react-router-dom";
-import Layout from "./components/ApplicationLayout";
-import { Provider } from "react-redux";
-import { createStore } from "redux";
-// import thunk from "redux-thunk";
-// import logger from "redux-logger";
-import rootReducer from "./reducers";
-
-const store = createStore(
-  rootReducer
-)
+import React from "react"
+import { BrowserRouter } from "react-router-dom"
+import Layout from "./components/ApplicationLayout"
+import { Provider } from "react-redux"
+import store from "store"
 
 class App extends React.Component {
   render() {
@@ -23,4 +16,4 @@ class App extends React.Component {
   }
 }
 
-export default App;
+export default App
