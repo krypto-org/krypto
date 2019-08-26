@@ -1,17 +1,16 @@
 {
-  "name": "electron-react-ant-boilerplate",
-  "version": "1.0.9",
-  "description": "Electron, Webpack4, React, Babel 7, ES6, PostCSS, Sass, Ant Design",
+  "name": "krypto",
+  "version": "0.0.1",
+  "description": "Krypto Trading Platform",
   "license": "MIT",
   "private": false,
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/kevoj/electron-react-ant-boilerplate.git"
+    "url": "https://github.com/kapilsh/krypto"
   },
   "author": {
-    "name": "leonardo R",
-    "email": "leonardo.ricog@gmail.com",
-    "url": "https://github.com/kevoj"
+    "name": "Kapil Sharma",
+    "url": "https://github.com/kapilsh"
   },
   "keywords": [
     "react",
@@ -138,7 +137,7 @@
     "webpack-merge": "^4.2.1"
   },
   "build": {
-    "productName": "MyApp",
+    "productName": "Krypto",
     "appId": "org.develar.MyApp",
     "files": [
       "dist",
