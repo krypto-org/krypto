@@ -3,8 +3,15 @@ import { Layout } from 'antd';
 const { Content, Footer } = Layout;
 import { Route } from "react-router-dom";
 import routes from "../routes"
+import PropTypes from "prop-types"
+import { connect } from 'react-redux';
+import { fetchInstruments } from "../actions/instrumentActions"
 
 class ContentPage extends React.Component {
+  componentDidMount() {
+    this.props.fetchInstruments();
+  }
+
   render() {
     return (
       <Layout>
@@ -19,4 +26,14 @@ class ContentPage extends React.Component {
   }
 }
 
-export default ContentPage;
+ContentPage.propTypes = {
+  fetchInstruments: PropTypes.func.isRequired
+}
+
+const mapDispatchToProps = (dispatch) => {
+  return {
+    fetchInstruments: () => dispatch(fetchInstruments())
+  }
+}
+
+export default connect(null, mapDispatchToProps)(ContentPage);

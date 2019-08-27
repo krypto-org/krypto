@@ -5,13 +5,8 @@ import { connect } from 'react-redux';
 import ReactTable from "react-table";
 import PropTypes from "prop-types"
 import "react-table/react-table.css";
-import { fetchInstruments } from "../../actions/instrumentActions"
 
 class Instruments extends Component {
-  componentDidMount() {
-    this.props.fetchInstruments();
-  }
-
   render() {
     return (
       <div className={styles.instruments}>
@@ -85,8 +80,7 @@ class Instruments extends Component {
 Instruments.propTypes = {
   instruments: PropTypes.array.isRequired,
   error: PropTypes.object,
-  loaded: PropTypes.bool.isRequired,
-  fetchInstruments: PropTypes.func.isRequired
+  loaded: PropTypes.bool.isRequired
 }
 
 const mapStateToProps = (state, ownProps) => {
@@ -98,10 +92,4 @@ const mapStateToProps = (state, ownProps) => {
   }
 }
 
-const mapDispatchToProps = (dispatch) => {
-  return {
-    fetchInstruments: () => dispatch(fetchInstruments())
-  }
-}
-
-export default connect(mapStateToProps, mapDispatchToProps)(Instruments);
+export default connect(mapStateToProps)(Instruments);

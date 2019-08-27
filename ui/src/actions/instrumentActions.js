@@ -3,14 +3,20 @@ import { createInstrumentRequest, requesterSocket, parseInstruments } from "../k
 export const FETCH_INSTRUMENTS_BEGIN = "FETCH_INSTRUMENTS_BEGIN";
 export const FETCH_INSTRUMENTS_SUCCESS = "FETCH_INSTRUMENTS_SUCCESS";
 export const FETCH_INSTRUMENTS_FAILURE = "FETCH_INSTRUMENTS_FAILURE";
+export const GENERATE_PRICE_CACHE = "GENERATE_PRICE_CACHE";
+
+export const generatePriceCache = (prices, tableMap) => ({
+  type: GENERATE_PRICE_CACHE,
+  payload: { prices, tableMap }
+});
 
 export const fetchInstrumentsBegin = () => ({
   type: FETCH_INSTRUMENTS_BEGIN
 });
 
-export const fetchInstrumentsSuccess = instruments => ({
+export const fetchInstrumentsSuccess = (instruments, cached) => ({
   type: FETCH_INSTRUMENTS_SUCCESS,
-  payload: { instruments }
+  payload: { instruments, cached }
 });
 
 export const fetchInstrumentsFailure = error => ({
@@ -18,18 +24,35 @@ export const fetchInstrumentsFailure = error => ({
   payload: { error }
 });
 
-export const fetchInstruments = () => {
-  return (dispatch) => {
+export const fetchInstruments = (forced = false) => {
+  return (dispatch, getState) => {
+    const cached = getState().instruments.cached;
+    if (cached && !forced) {
+      dispatch(fetchInstrumentsSuccess(getState().instruments.instruments, cached))
+      return
+    }
     dispatch(fetchInstrumentsBegin());
     const request = createInstrumentRequest()
-    console.log("created request")
     const socket = requesterSocket();
-    console.log("created socket")
     socket.on("message", (service, payload) => {
       console.log('got reply from ', service.toString(), ":", payload);
       parseInstruments(payload).then(
-        instruments =>
-          dispatch(fetchInstrumentsSuccess(instruments)))
+        instruments => {
+          const prices = instruments.map(e => ({
+            symbol: e.symbol + "@" + e.exchange,
+            bid: NaN,
+            bid_quantity: 0,
+            ask: NaN,
+            ask_quantity: 0,
+            last: NaN,
+            last_quantity: 0
+          }))
+          const tableMap = instruments.reduce((r, e, i) => {
+            r[e.id.toString()] = i
+            return r
+          }, {})
+          Promise.all([dispatch(fetchInstrumentsSuccess(instruments, true)), dispatch(generatePriceCache(prices, tableMap))])
+        })
         .catch(error => dispatch(fetchInstrumentsFailure(error)))
     })
     socket.send(["instruments", request.toString()])

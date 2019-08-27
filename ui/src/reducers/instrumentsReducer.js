@@ -1,13 +1,17 @@
 import {
   FETCH_INSTRUMENTS_BEGIN,
   FETCH_INSTRUMENTS_SUCCESS,
-  FETCH_INSTRUMENTS_FAILURE
+  FETCH_INSTRUMENTS_FAILURE,
+  GENERATE_PRICE_CACHE
 } from '../actions/instrumentActions';
 
 const initialState = {
   instruments: [],
+  prices: [],
+  tableMap: {},
   loading: false,
-  error: null
+  error: null,
+  cached: false
 };
 
 export default function instrumentsReducer(state = initialState, action) {
@@ -23,7 +27,8 @@ export default function instrumentsReducer(state = initialState, action) {
       return {
         ...state,
         loading: false,
-        instruments: action.payload.instruments
+        instruments: action.payload.instruments,
+        cached: action.payload.cached
       };
 
     case FETCH_INSTRUMENTS_FAILURE:
@@ -31,7 +36,14 @@ export default function instrumentsReducer(state = initialState, action) {
         ...state,
         loading: false,
         error: action.payload.error,
+        cached: false,
         instruments: []
+      };
+    case GENERATE_PRICE_CACHE:
+      return {
+        ...state,
+        prices: action.payload.prices,
+        tableMap: action.payload.tableMap
       };
     default:
       return state;

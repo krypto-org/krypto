@@ -2,16 +2,15 @@ import React, { Component } from "react";
 import { Row, Col, Tag } from 'antd';
 import styles from "./Prices.scss"
 
+import PropTypes from "prop-types"
+import { connect } from "react-redux"
+
 import ReactTable from "react-table";
 import "react-table/react-table.css";
 
 class Prices extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      prices: [],
-      connected: false
-    };
+  componentDidMount() {
+    console.log(this.props)
   }
 
   render() {
@@ -19,8 +18,8 @@ class Prices extends Component {
       <div className={styles.prices}>
         <Row>
           <Col span={4}>
-            <Tag color={this.state.connected ? "green" : "red"} style={{ margin: "10px 0" }}>
-              {this.state.connected ? "CONNECTED" : "DISCONNECTED"}
+            <Tag color={this.props.connected ? "green" : "red"} style={{ margin: "10px 0" }}>
+              {this.props.connected ? "CONNECTED" : "DISCONNECTED"}
             </Tag>
           </Col>
           <Col span={20}></Col>
@@ -28,7 +27,7 @@ class Prices extends Component {
         <Row>
           <Col span={24}>
             <ReactTable
-              data={this.state.prices}
+              data={this.props.prices}
               columns={[
                 {
                   Header: "Symbol",
@@ -77,4 +76,21 @@ class Prices extends Component {
   }
 }
 
-export default Prices;
+Prices.propTypes = {
+  instruments: PropTypes.array.isRequired,
+  prices: PropTypes.array.isRequired,
+  tableMap: PropTypes.object.isRequired,
+  connected: PropTypes.bool.isRequired
+}
+
+const mapStateToProps = (state, ownProps) => {
+  return {
+    ...ownProps,
+    instruments: state.instruments.instruments,
+    prices: state.instruments.prices,
+    tableMap: state.instruments.tableMap,
+    connected: false
+  }
+}
+
+export default connect(mapStateToProps)(Prices);
