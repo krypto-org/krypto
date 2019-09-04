@@ -14,8 +14,8 @@
 
 namespace krypto::network {
 
-    template<typename Consumer, bool Verbose = false>
-    class Subscriber : public Consumer {
+    template<typename Derived, bool Verbose = false>
+    class Subscriber {
     private:
         zmq::context_t context_;
         std::string endpoint_;
@@ -32,13 +32,13 @@ namespace krypto::network {
     public:
         explicit Subscriber(std::string);
 
-        Subscriber(const Subscriber<Consumer, Verbose> &other) = delete;
+        Subscriber(const Subscriber<Derived, Verbose> &other) = delete;
 
-        Subscriber(Subscriber<Consumer, Verbose> &&other) = delete;
+        Subscriber(Subscriber<Derived, Verbose> &&other) = delete;
 
-        Subscriber<Consumer, Verbose> &operator=(const Subscriber<Consumer, Verbose> &) = delete;
+        Subscriber<Derived, Verbose> &operator=(const Subscriber<Derived, Verbose> &) = delete;
 
-        Subscriber<Consumer, Verbose> &operator=(Subscriber<Consumer, Verbose> &&) = delete;
+        Subscriber<Derived, Verbose> &operator=(Subscriber<Derived, Verbose> &&) = delete;
 
         ~Subscriber();
 
@@ -51,6 +51,10 @@ namespace krypto::network {
         void start();
 
         void stop();
+
+        Derived& derived_instance() { return static_cast<Derived&>(*this); }
+        
+        Derived const& derived_instance() const { return static_cast<Derived const&>(*this); }
     };
 
     template<typename Consumer, bool Verbose>
@@ -128,12 +132,12 @@ namespace krypto::network {
         switch (msg_type) {
             case krypto::utils::MsgType::QUOTE: {
                 auto payload = flatbuffers::GetRoot<krypto::serialization::Quote>(payload_msg.data());
-                Consumer::consume(payload);
+                derived_instance().process(payload);
                 return;
             }
             case krypto::utils::MsgType::TRADE: {
                 auto payload = flatbuffers::GetRoot<krypto::serialization::Trade>(payload_msg.data());
-                Consumer::consume(payload);
+                derived_instance().process(payload);
                 return;
             }
             default: {

@@ -5,16 +5,18 @@
 #include <krypto/config.h>
 #include <krypto/logger.h>
 #include <krypto/utils/common.h>
-#include <krypto/mktdata/client.h>
+#include <krypto/network/subscriber.h>
 
 
 namespace {
-    struct MktdataPrinter {
-        static void consume(const krypto::serialization::Quote *quote) {
+struct MktdataPrinter : public krypto::network::Subscriber<MktdataPrinter, true> {
+        using krypto::network::Subscriber<MktdataPrinter, true>::Subscriber;
+
+        void process(const krypto::serialization::Quote *quote) {
             std::cout << "QUOTE: "<< quote->security_id() << '\n';
         }
 
-        static void consume(const krypto::serialization::Trade *trade) {
+         void process(const krypto::serialization::Trade *trade) {
             std::cout << "TRADE: " << trade->security_id() << '\n';
         }
     };
@@ -35,16 +37,15 @@ int main(int argc, char **argv) {
     krypto::utils::Startup::init();
     const krypto::Config config(argv[1]);
 
-    krypto::mktdata::Client<krypto::utils::ExchangeType::COINBASE,
-            MktdataPrinter> client{config};
-    auto done = std::async(std::launch::async, [&client]() {
-        client.subscribe(krypto::utils::MsgType::ALL);
-        client.start();
+    MktdataPrinter printer{config.at<std::string>("/services/publisher/mktdata/proxy/backend/client")};
+    auto done = std::async(std::launch::async, [&printer]() {
+        printer.subscribe(krypto::utils::MsgType::ALL);
+        printer.start();
     });
 
-    shutdown_handler = [&client](int signal) {
+    shutdown_handler = [&printer](int signal) {
         SIGNAL_STATUS = signal;
-        client.stop();
+        printer.stop();
     };
 
     std::signal(SIGINT, signal_handler);

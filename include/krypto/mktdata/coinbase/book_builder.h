@@ -46,7 +46,7 @@ namespace krypto::mktdata::coinbase {
 
     template<bool Verbose>
     BookBuilder<Verbose>::BookBuilder(const krypto::Config &config) :
-            publisher_{config.at<std::string>("/services/publisher/mktdata/coinbase/server")} {
+            publisher_{config.at<std::string>("/services/publisher/mktdata/proxy/frontend/client")} {
 
         krypto::instruments::InstrumentClient client{config};
         auto instruments = client.query_all();
@@ -65,8 +65,7 @@ namespace krypto::mktdata::coinbase {
             }
         });
 
-        publisher_.start<false>();
-
+        publisher_.start();
     }
 
     template<bool Verbose>

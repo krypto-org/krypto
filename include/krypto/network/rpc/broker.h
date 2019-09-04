@@ -26,7 +26,7 @@ namespace krypto::network::rpc {
         bool bind();
 
     public:
-        Broker(const krypto::Config &config);
+        explicit Broker(const krypto::Config &config);
 
         ~Broker();
 

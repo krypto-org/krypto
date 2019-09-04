@@ -4,19 +4,19 @@
 
 #include <zmq.hpp>
 
+#include <krypto/config.h>
 
 namespace krypto::network {
     class ZmqProxy final {
     private:
-        const zmq::context_t &context_;
+        zmq::context_t context_;
         std::string frontend_address_;
         std::string backend_address_;
-        std::vector<std::string> topics_;
-        zmq::socket_t frontend_;
-        zmq::socket_t backend_;
+        std::unique_ptr<zmq::socket_t> frontend_;
+        std::unique_ptr<zmq::socket_t> backend_;
+        std::atomic_bool running_;
     public:
-        ZmqProxy(zmq::context_t &, std::string, std::string,
-                 std::initializer_list<std::string>);
+        explicit ZmqProxy(const krypto::Config &config, const std::string& service_type);
 
         ~ZmqProxy();
 
@@ -29,6 +29,8 @@ namespace krypto::network {
         ZmqProxy &operator=(ZmqProxy &&other) = delete;
 
         void start();
+
+        void stop();
     };
 }
 
