@@ -50,10 +50,10 @@ void krypto::mktdata::WebsocketServer::on_message(
 void krypto::mktdata::WebsocketServer::process_messages() {
     running_ = true;
     while (running_) {
-        std::lock_guard<std::mutex> guard(connection_lock_);
         std::string msg;
         message_queue_.pop(msg);
 
+        std::lock_guard<std::mutex> guard(connection_lock_);
         for (auto&& con : connections_) {
             server_.send(con, msg, websocketpp::frame::opcode::text);
         }
@@ -62,38 +62,36 @@ void krypto::mktdata::WebsocketServer::process_messages() {
 
 void krypto::mktdata::WebsocketServer::process(const krypto::serialization::Quote *quote) {
     std::lock_guard<mutex> guard(connection_lock_);
-    if (connections_.empty())
-        return;
-
-    nlohmann::json msg;
-    msg["kind"] = "quote";
-    msg["security_id"] = quote->security_id();
-    msg["timestamp_second"] = quote->timestamp() / 1000000000;
-    msg["timestamp_nano"] = quote->timestamp() % 1000000000;
-    msg["bid"] = krypto::mktdata::extract_price(quote->bid());
-    msg["ask"] = krypto::mktdata::extract_price(quote->ask());
-    msg["bid_quantity"] = krypto::mktdata::extract_quantity(quote->bid_quantity());
-    msg["ask_quantity"] = krypto::mktdata::extract_quantity(quote->ask_quantity());
-    msg["last"] = krypto::mktdata::extract_price(quote->last());
-    msg["last_quantity"] = krypto::mktdata::extract_quantity(quote->last_quantity());
-    message_queue_.push(msg.dump());
+    if (!connections_.empty()) {
+        nlohmann::json msg;
+        msg["kind"] = "quote";
+        msg["security_id"] = quote->security_id();
+        msg["timestamp_second"] = quote->timestamp() / 1000000000;
+        msg["timestamp_nano"] = quote->timestamp() % 1000000000;
+        msg["bid"] = krypto::mktdata::extract_price(quote->bid());
+        msg["ask"] = krypto::mktdata::extract_price(quote->ask());
+        msg["bid_quantity"] = krypto::mktdata::extract_quantity(quote->bid_quantity());
+        msg["ask_quantity"] = krypto::mktdata::extract_quantity(quote->ask_quantity());
+        msg["last"] = krypto::mktdata::extract_price(quote->last());
+        msg["last_quantity"] = krypto::mktdata::extract_quantity(quote->last_quantity());
+        message_queue_.push(msg.dump());
+    }
 }
 
 void krypto::mktdata::WebsocketServer::process(const krypto::serialization::Trade *trade) {
     std::lock_guard<mutex> guard(connection_lock_);
-    if (connections_.empty())
-        return;
-
-    nlohmann::json msg;
-    msg["kind"] = "quote";
-    msg["security_id"] = trade->security_id();
-    msg["timestamp_second"] = trade->timestamp() / 1000000000;
-    msg["timestamp_nano"] = trade->timestamp() % 1000000000;
-    msg["price"] = krypto::mktdata::extract_price(trade->price());
-    msg["quantity"] = krypto::mktdata::extract_quantity(trade->quantity());
-    msg["side"] = krypto::serialization::EnumNameSide(trade->side());
-    msg["trade_id"] = trade->trade_id()->str();
-    message_queue_.push(msg.dump());
+    if (!connections_.empty()) {
+        nlohmann::json msg;
+        msg["kind"] = "trade";
+        msg["security_id"] = trade->security_id();
+        msg["timestamp_second"] = trade->timestamp() / 1000000000;
+        msg["timestamp_nano"] = trade->timestamp() % 1000000000;
+        msg["price"] = krypto::mktdata::extract_price(trade->price());
+        msg["quantity"] = krypto::mktdata::extract_quantity(trade->quantity());
+        msg["side"] = krypto::serialization::EnumNameSide(trade->side());
+        msg["trade_id"] = trade->trade_id()->str();
+        message_queue_.push(msg.dump());
+    }
 }
 
 void krypto::mktdata::WebsocketServer::done() {

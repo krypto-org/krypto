@@ -3,12 +3,14 @@
 #include <atomic>
 #include <queue>
 
-#include <krypto/mktdata/book.h>
 #include <tbb/concurrent_queue.h>
 #include <nlohmann/json.hpp>
+
 #include <krypto/network/mktdata/top_of_book.h>
+#include <krypto/mktdata/book.h>
 #include <krypto/mktdata/convert.h>
 #include <krypto/instruments/client.h>
+#include <krypto/utils/date_time.h>
 
 
 namespace krypto::mktdata::coinbase {
@@ -23,7 +25,7 @@ namespace krypto::mktdata::coinbase {
         krypto::network::mktdata::TopOfBookPublisher publisher_;
 
         void apply_incremental(const std::string &symbol, int64_t price, int64_t qty, OrderSide side);
-
+        int64_t parse_time(const std::string& ts);
     public:
         explicit BookBuilder(const krypto::Config &config);
 
@@ -109,6 +111,11 @@ namespace krypto::mktdata::coinbase {
                 send = true;
             }
 
+            auto current_time = krypto::utils::current_time_in_nanoseconds();
+
+            books.at(symbol)->timestamp = current_time;
+            books.at(symbol)->quote.timestamp = current_time;
+
             if (send) {
                 auto id = id_by_symbol_.at(symbol);
                 auto topic = krypto::utils::create_topic(krypto::utils::MsgType::QUOTE, id);
@@ -152,8 +159,6 @@ namespace krypto::mktdata::coinbase {
 
             books.at(symbol)->bids.clear();
             books.at(symbol)->asks.clear();
-
-            KRYP_LOG(info, symbol);
 
             auto bids = snapshot.at("bids").get<std::vector<std::vector<std::string>>>();
             auto asks = snapshot.at("asks").get<std::vector<std::vector<std::string>>>();
@@ -200,6 +205,8 @@ namespace krypto::mktdata::coinbase {
     void BookBuilder<Verbose>::handle_trade(nlohmann::json trade) {
         auto symbol = trade.at("product_id").get<std::string>();
 
+        books.at(symbol)->timestamp = krypto::utils::current_time_in_nanoseconds();
+
         auto id = id_by_symbol_.at(symbol);
 
         auto price = krypto::mktdata::convert_price(
@@ -226,6 +233,11 @@ namespace krypto::mktdata::coinbase {
     template<bool Verbose>
     BookBuilder<Verbose>::~BookBuilder() {
         incr_queue_.clear();
+    }
+
+    template<bool Verbose>
+    int64_t BookBuilder<Verbose>::parse_time(const std::string& ts) {
+        return krypto::utils::parse_8601(ts).count();
     }
 }
 

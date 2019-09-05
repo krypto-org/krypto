@@ -48,8 +48,6 @@ namespace krypto::network {
 
     void ZmqProxy::stop() {
         running_ = false;
-        frontend_->unbind(frontend_address_);
-        backend_->unbind(backend_address_);
         frontend_->close();
         backend_->close();
     }

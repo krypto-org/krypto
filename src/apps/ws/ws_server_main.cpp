@@ -28,14 +28,10 @@ int main(int argc, char **argv) {
 
     krypto::mktdata::WebsocketServer ws{config};
 
-    auto mktdata_done = std::async(std::launch::async, [&ws]() {
-        ws.subscribe(krypto::utils::MsgType::ALL);
-        ws.start();
-    });
+    std::thread mktdata_thread(std::bind(&krypto::mktdata::WebsocketServer::start, &ws));
+    ws.subscribe(krypto::utils::MsgType::ALL);
 
-    auto done = std::async(std::launch::async, [&ws]() {
-        ws.process_messages();
-    });
+    std::thread ws_thread(std::bind(&krypto::mktdata::WebsocketServer::process_messages, &ws));
 
     ws.ioc_run();
 
@@ -47,8 +43,8 @@ int main(int argc, char **argv) {
 
     std::signal(SIGINT, signal_handler);
 
-    done.wait();
-    mktdata_done.wait();
+    ws_thread.join();
+    mktdata_thread.join();
 
     KRYP_LOG(info, "Shutdown Server");
     return 0;
