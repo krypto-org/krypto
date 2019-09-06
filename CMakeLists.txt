@@ -93,7 +93,11 @@ add_library(krypto STATIC
         src/krypto/instruments/server.cpp
         include/krypto/utils/common.h
         src/krypto/utils/common.cpp
-        include/krypto/exchanges/coinbase.h include/krypto/mktdata/coinbase/server.h include/krypto/mktdata/client.h src/examples/mktdata_printer_main.cpp include/krypto/network/rpc/async_client.h)
+        include/krypto/exchanges/coinbase.h
+        include/krypto/mktdata/coinbase/server.h
+        include/krypto/network/rpc/async_client.h
+        include/krypto/mktdata/ws_server.h
+        src/krypto/mktdata/ws_server.cpp include/krypto/utils/date_time.h src/krypto/utils/date_time.cpp)
 target_link_libraries(krypto Threads::Threads)
 
 add_library(crypto STATIC IMPORTED include/krypto/mktdata/coinbase/book_builder.h)
@@ -112,20 +116,34 @@ find_library(GL GL /usr/lib/x86_64-linux-gnu)
 #add_executable(krypto-ui src/apps/ui/main.cpp src/apps/ui/imgui_impl_glfw.cpp src/apps/ui/imgui_impl_opengl3.cpp)
 #target_link_libraries(krypto-ui krypto CONAN_PKG::boost ssl crypto dl CONAN_PKG::bzip2 CONAN_PKG::zlib CONAN_PKG::tbb CONAN_PKG::zmq CONAN_PKG::cppzmq CONAN_PKG::glfw CONAN_PKG::glad CONAN_PKG::imgui Threads::Threads)
 
+# Apps
+
 add_executable(imgui-demo src/apps/ui/demo.cpp src/apps/ui/imgui_impl_glfw.cpp src/apps/ui/imgui_impl_opengl3.cpp)
 target_link_libraries(imgui-demo CONAN_PKG::glfw CONAN_PKG::glad CONAN_PKG::imgui Threads::Threads)
 
 add_executable(krypto-instruments-server src/apps/instruments/server_main.cpp include/krypto/root_certificates.h src/krypto/utils/common.cpp)
 target_link_libraries(krypto-instruments-server krypto CONAN_PKG::boost ssl crypto dl CONAN_PKG::bzip2 CONAN_PKG::zlib CONAN_PKG::tbb CONAN_PKG::zmq CONAN_PKG::cppzmq CONAN_PKG::glfw CONAN_PKG::glad CONAN_PKG::imgui Threads::Threads)
 
-add_executable(config-loader src/examples/config_loader_main.cpp)
-target_link_libraries(config-loader krypto)
-
 add_executable(krypto-broker src/apps/network/broker_main.cpp)
 target_link_libraries(krypto-broker krypto CONAN_PKG::boost ssl crypto dl CONAN_PKG::bzip2 CONAN_PKG::zlib CONAN_PKG::tbb CONAN_PKG::zmq CONAN_PKG::cppzmq Threads::Threads)
+
+add_executable(krypto-proxy src/apps/network/proxy_main.cpp)
+target_link_libraries(krypto-proxy krypto CONAN_PKG::boost ssl crypto dl CONAN_PKG::bzip2 CONAN_PKG::zlib CONAN_PKG::tbb CONAN_PKG::zmq CONAN_PKG::cppzmq Threads::Threads)
+
+add_executable(krypto-ws-server src/apps/ws/ws_server_main.cpp)
+target_link_libraries(krypto-ws-server krypto CONAN_PKG::boost ssl crypto dl CONAN_PKG::bzip2 CONAN_PKG::zlib CONAN_PKG::tbb CONAN_PKG::zmq CONAN_PKG::cppzmq Threads::Threads)
+
+# Examples
+
+add_executable(mktdata-printer src/examples/mktdata_printer_main.cpp)
+target_link_libraries(mktdata-printer krypto CONAN_PKG::boost ssl crypto dl CONAN_PKG::bzip2 CONAN_PKG::zlib CONAN_PKG::tbb CONAN_PKG::zmq CONAN_PKG::cppzmq Threads::Threads)
 
 add_executable(query-instruments src/examples/query_instruments_main.cpp)
 target_link_libraries(query-instruments krypto CONAN_PKG::boost ssl crypto dl CONAN_PKG::bzip2 CONAN_PKG::zlib CONAN_PKG::tbb CONAN_PKG::zmq CONAN_PKG::cppzmq Threads::Threads)
 
-add_executable(mktdata-printer src/examples/mktdata_printer_main.cpp)
-target_link_libraries(mktdata-printer krypto CONAN_PKG::boost ssl crypto dl CONAN_PKG::bzip2 CONAN_PKG::zlib CONAN_PKG::tbb CONAN_PKG::zmq CONAN_PKG::cppzmq Threads::Threads)
+#add_executable(mktdata-printer src/examples/mktdata_printer_main.cpp)
+#target_link_libraries(mktdata-printer krypto CONAN_PKG::boost ssl crypto dl CONAN_PKG::bzip2 CONAN_PKG::zlib CONAN_PKG::tbb CONAN_PKG::zmq CONAN_PKG::cppzmq Threads::Threads)
+
+add_executable(config-loader src/examples/config_loader_main.cpp)
+target_link_libraries(config-loader krypto)
+

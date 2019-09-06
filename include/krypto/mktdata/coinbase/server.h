@@ -46,6 +46,8 @@ namespace krypto::mktdata::coinbase {
                     book_builder_.handle_incr(std::move(update));
                 } else if (type == "match") {
                     book_builder_.handle_trade(std::move(update));
+                } else if (type == "heartbeat") {
+                    book_builder_.handle_heartbeat(std::move(update));
                 } else {
                     KRYP_LOG(debug, update.dump());
                 }

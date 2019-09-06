@@ -34,7 +34,6 @@ namespace krypto::network {
 
         ~PublisherBase();
 
-        template<bool WithProxy>
         void start();
 
         template<typename... Args>
@@ -56,14 +55,9 @@ namespace krypto::network {
     }
 
     template<typename Derived>
-    template<bool WithProxy>
     void PublisherBase<Derived>::start() {
-        if constexpr (WithProxy) {
-            socket_->connect(endpoint_);
-        } else {
-            socket_->bind(endpoint_);
-        }
-
+        KRYP_LOG(info, "Connecting to proxy @ {}", endpoint_);
+        socket_->connect(endpoint_);
         connected_ = true;
     }
 

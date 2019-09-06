@@ -60,10 +60,23 @@ services = {
 
     publisher = {
         mktdata = {
-            coinbase = {
-                port = 7${exchanges.coinbase.id}
-                server = "tcp://*:"${services.publisher.mktdata.coinbase.port}
-                client = "tcp://"${global.ip}":"${services.publisher.mktdata.coinbase.port}
+            proxy = {
+                frontend = {
+                    port = 7676
+                    server = "tcp://*:"${services.publisher.mktdata.proxy.frontend.port}
+                    client = "tcp://"${global.ip}":"${services.publisher.mktdata.proxy.frontend.port}
+                }
+                backend = {
+                    port = 7677
+                    server = "tcp://*:"${services.publisher.mktdata.proxy.backend.port}
+                    client = "tcp://"${global.ip}":"${services.publisher.mktdata.proxy.backend.port}
+                }
+            }
+
+            ws = {
+                port = 5757
+                server = "ws://*:"${services.publisher.mktdata.ws.port}
+                client = "ws://"${global.ip}":"${services.publisher.mktdata.ws.port}
             }
         }
     }
