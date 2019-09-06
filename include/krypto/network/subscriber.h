@@ -140,6 +140,11 @@ namespace krypto::network {
                 derived_instance().process(payload);
                 return;
             }
+            case krypto::utils::MsgType::HEARTBEAT: {
+                auto payload = flatbuffers::GetRoot<krypto::serialization::Heartbeat>(payload_msg.data());
+                derived_instance().process(payload);
+                return;
+            }
             default: {
                 KRYP_LOG(warn, "Unknown Topic Received: {}", topic);
             }

@@ -34,3 +34,11 @@ void krypto::network::mktdata::TopOfBookPublisher::serialize(const krypto::mktda
     fb_builder_.Finish(t);
 }
 
+void krypto::network::mktdata::TopOfBookPublisher::serialize(const krypto::utils::Heartbeat &hb) {
+    krypto::serialization::HeartbeatBuilder hb_builder{fb_builder_};
+    hb_builder.add_security_id(hb.security_id);
+    hb_builder.add_timestamp(hb.timestamp);
+    auto hb_offset = hb_builder.Finish();
+    fb_builder_.Finish(hb_offset);
+}
+

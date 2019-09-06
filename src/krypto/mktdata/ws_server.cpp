@@ -97,3 +97,14 @@ void krypto::mktdata::WebsocketServer::process(const krypto::serialization::Trad
 void krypto::mktdata::WebsocketServer::done() {
     running_ = false;
 }
+
+void krypto::mktdata::WebsocketServer::process(const krypto::serialization::Heartbeat *hb) {
+    std::lock_guard<mutex> guard(connection_lock_);
+    if (!connections_.empty()) {
+        nlohmann::json msg;
+        msg["kind"] = "heartbeat";
+        msg["security_id"] = hb->security_id();
+        msg["timestamp_second"] = hb->timestamp() / 1000000000;
+        message_queue_.push(msg.dump());
+    }
+}

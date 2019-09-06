@@ -2,6 +2,8 @@
 
 #include <krypto/network/publisher.h>
 #include <krypto/mktdata/book.h>
+#include <krypto/utils/common.h>
+
 
 namespace krypto::network::mktdata {
 
@@ -17,6 +19,8 @@ namespace krypto::network::mktdata {
         void serialize(const krypto::mktdata::Quote& quote);
 
         void serialize(const krypto::mktdata::Trade& quote);
+
+        void serialize(const krypto::utils::Heartbeat& hb);
     };
 
 }

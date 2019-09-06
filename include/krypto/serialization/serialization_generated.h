@@ -11,6 +11,8 @@ namespace serialization {
 
 struct SequenceNumber;
 
+struct Heartbeat;
+
 struct Instrument;
 
 struct Quote;
@@ -435,6 +437,56 @@ inline flatbuffers::Offset<SequenceNumber> CreateSequenceNumber(
     int64_t value = 0) {
   SequenceNumberBuilder builder_(_fbb);
   builder_.add_value(value);
+  return builder_.Finish();
+}
+
+struct Heartbeat FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+  enum {
+    VT_SECURITY_ID = 4,
+    VT_TIMESTAMP = 6
+  };
+  int64_t security_id() const {
+    return GetField<int64_t>(VT_SECURITY_ID, 0);
+  }
+  int64_t timestamp() const {
+    return GetField<int64_t>(VT_TIMESTAMP, 0);
+  }
+  bool Verify(flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyField<int64_t>(verifier, VT_SECURITY_ID) &&
+           VerifyField<int64_t>(verifier, VT_TIMESTAMP) &&
+           verifier.EndTable();
+  }
+};
+
+struct HeartbeatBuilder {
+  flatbuffers::FlatBufferBuilder &fbb_;
+  flatbuffers::uoffset_t start_;
+  void add_security_id(int64_t security_id) {
+    fbb_.AddElement<int64_t>(Heartbeat::VT_SECURITY_ID, security_id, 0);
+  }
+  void add_timestamp(int64_t timestamp) {
+    fbb_.AddElement<int64_t>(Heartbeat::VT_TIMESTAMP, timestamp, 0);
+  }
+  explicit HeartbeatBuilder(flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  HeartbeatBuilder &operator=(const HeartbeatBuilder &);
+  flatbuffers::Offset<Heartbeat> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = flatbuffers::Offset<Heartbeat>(end);
+    return o;
+  }
+};
+
+inline flatbuffers::Offset<Heartbeat> CreateHeartbeat(
+    flatbuffers::FlatBufferBuilder &_fbb,
+    int64_t security_id = 0,
+    int64_t timestamp = 0) {
+  HeartbeatBuilder builder_(_fbb);
+  builder_.add_timestamp(timestamp);
+  builder_.add_security_id(security_id);
   return builder_.Finish();
 }
 

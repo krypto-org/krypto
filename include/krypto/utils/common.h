@@ -10,6 +10,11 @@
 #include <krypto/serialization/serialization_generated.h>
 
 namespace krypto::utils {
+    struct Heartbeat {
+        uint64_t timestamp;
+        uint64_t security_id;
+    };
+
     constexpr const uint64_t exchange_base = 100;
 
     enum struct ExchangeType : uint8_t {

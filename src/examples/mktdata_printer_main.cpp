@@ -19,6 +19,10 @@ struct MktdataPrinter : public krypto::network::Subscriber<MktdataPrinter, true>
          void process(const krypto::serialization::Trade *trade) {
             std::cout << "TRADE: " << trade->security_id() << '\n';
         }
+
+        void process(const krypto::serialization::Heartbeat *hb) {
+            std::cout << "HB: " << hb->security_id() << '\n';
+        }
     };
 
     volatile std::sig_atomic_t SIGNAL_STATUS;

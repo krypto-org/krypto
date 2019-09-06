@@ -44,6 +44,8 @@ namespace krypto::mktdata::coinbase {
         void handle_snap(nlohmann::json snapshot);
 
         void handle_trade(nlohmann::json trade);
+
+        void handle_heartbeat(nlohmann::json hb);
     };
 
     template<bool Verbose>
@@ -238,6 +240,17 @@ namespace krypto::mktdata::coinbase {
     template<bool Verbose>
     int64_t BookBuilder<Verbose>::parse_time(const std::string& ts) {
         return krypto::utils::parse_8601(ts).count();
+    }
+
+    template<bool Verbose>
+    void BookBuilder<Verbose>::handle_heartbeat(nlohmann::json hb) {
+        //{"last_trade_id":0,"product_id":"ZEC-BTC","sequence":25841202,
+        // "time":"2019-09-05T23:50:54.686991357Z","type":"heartbeat"}
+        auto symbol = hb.at("product_id").get<std::string>();
+        auto id = id_by_symbol_.at(symbol);
+        krypto::utils::Heartbeat to_send{krypto::utils::current_time_in_nanoseconds(), id};
+        auto topic = krypto::utils::create_topic(krypto::utils::MsgType::HEARTBEAT, id);
+        publisher_.send(topic, to_send);
     }
 }
 

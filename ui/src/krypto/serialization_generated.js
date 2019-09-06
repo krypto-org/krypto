@@ -168,6 +168,89 @@ krypto.serialization.SequenceNumber.endSequenceNumber = function (builder) {
 /**
  * @constructor
  */
+krypto.serialization.Heartbeat = function() {
+  /**
+   * @type {flatbuffers.ByteBuffer}
+   */
+  this.bb = null;
+
+  /**
+   * @type {number}
+   */
+  this.bb_pos = 0;
+};
+
+/**
+ * @param {number} i
+ * @param {flatbuffers.ByteBuffer} bb
+ * @returns {krypto.serialization.Heartbeat}
+ */
+krypto.serialization.Heartbeat.prototype.__init = function(i, bb) {
+  this.bb_pos = i;
+  this.bb = bb;
+  return this;
+};
+
+/**
+ * @param {flatbuffers.ByteBuffer} bb
+ * @param {krypto.serialization.Heartbeat=} obj
+ * @returns {krypto.serialization.Heartbeat}
+ */
+krypto.serialization.Heartbeat.getRootAsHeartbeat = function(bb, obj) {
+  return (obj || new krypto.serialization.Heartbeat).__init(bb.readInt32(bb.position()) + bb.position(), bb);
+};
+
+/**
+ * @returns {flatbuffers.Long}
+ */
+krypto.serialization.Heartbeat.prototype.securityId = function() {
+  var offset = this.bb.__offset(this.bb_pos, 4);
+  return offset ? this.bb.readInt64(this.bb_pos + offset) : this.bb.createLong(0, 0);
+};
+
+/**
+ * @returns {flatbuffers.Long}
+ */
+krypto.serialization.Heartbeat.prototype.timestamp = function() {
+  var offset = this.bb.__offset(this.bb_pos, 6);
+  return offset ? this.bb.readInt64(this.bb_pos + offset) : this.bb.createLong(0, 0);
+};
+
+/**
+ * @param {flatbuffers.Builder} builder
+ */
+krypto.serialization.Heartbeat.startHeartbeat = function(builder) {
+  builder.startObject(2);
+};
+
+/**
+ * @param {flatbuffers.Builder} builder
+ * @param {flatbuffers.Long} securityId
+ */
+krypto.serialization.Heartbeat.addSecurityId = function(builder, securityId) {
+  builder.addFieldInt64(0, securityId, builder.createLong(0, 0));
+};
+
+/**
+ * @param {flatbuffers.Builder} builder
+ * @param {flatbuffers.Long} timestamp
+ */
+krypto.serialization.Heartbeat.addTimestamp = function(builder, timestamp) {
+  builder.addFieldInt64(1, timestamp, builder.createLong(0, 0));
+};
+
+/**
+ * @param {flatbuffers.Builder} builder
+ * @returns {flatbuffers.Offset}
+ */
+krypto.serialization.Heartbeat.endHeartbeat = function(builder) {
+  var offset = builder.endObject();
+  return offset;
+};
+
+/**
+ * @constructor
+ */
 krypto.serialization.Instrument = function () {
   /**
    * @type {flatbuffers.ByteBuffer}
@@ -1818,7 +1901,5 @@ krypto.serialization.RiskSummary.endRiskSummary = function (builder) {
   var offset = builder.endObject();
   return offset;
 };
-
-// Exports for Node.js and RequireJS
 
 export default krypto;

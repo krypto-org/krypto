@@ -12,6 +12,11 @@ table SequenceNumber {
   value: long;
 }
 
+table Heartbeat {
+  security_id: long;
+  timestamp: long;
+}
+
 // instruments
 
 enum InstrumentType: byte {UNKNOWN, STOCK, FUTURE, OPTION, FOREX, CRYPTO}
