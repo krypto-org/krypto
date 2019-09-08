@@ -1,5 +1,8 @@
 {
-  "presets": ["@babel/env", "@babel/react"],
+  "presets": [
+    "@babel/env",
+    "@babel/react"
+  ],
   "plugins": [
     [
       "import",
@@ -14,22 +17,26 @@
     "react-hot-loader/babel",
     [
       "babel-plugin-root-import",
-
       {
-        "rootPathPrefix": "@",
         "rootPathSuffix": "./src"
       }
     ]
   ],
   "env": {
     "development": {
-      "plugins": ["@babel/plugin-transform-modules-commonjs"]
+      "plugins": [
+        "@babel/plugin-transform-modules-commonjs"
+      ]
     },
     "test": {
-      "plugins": ["@babel/plugin-transform-modules-commonjs"]
+      "plugins": [
+        "@babel/plugin-transform-modules-commonjs"
+      ]
     },
     "production": {
-      "plugins": ["transform-react-remove-prop-types"]
+      "plugins": [
+        "transform-react-remove-prop-types"
+      ]
     }
   }
 }
