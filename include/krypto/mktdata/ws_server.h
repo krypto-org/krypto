@@ -2,12 +2,16 @@
 
 #include <iostream>
 #include <set>
+#include <cstdint>
+#include <utility>
+#include <krypto/config.h>
 
 #include <tbb/concurrent_queue.h>
 #include <websocketpp/common/thread.hpp>
 #include <websocketpp/config/asio_no_tls.hpp>
 #include <websocketpp/server.hpp>
 
+#include <krypto/mktdata/book.h>
 #include <krypto/network/subscriber.h>
 #include <krypto/serialization/serialization_generated.h>
 
@@ -22,9 +26,7 @@ using websocketpp::lib::lock_guard;
 using websocketpp::lib::unique_lock;
 using websocketpp::lib::condition_variable;
 
-#include <cstdint>
-#include <utility>
-#include <krypto/config.h>
+
 
 namespace krypto::mktdata {
     typedef websocketpp::server<websocketpp::config::asio> server_t;
@@ -49,8 +51,9 @@ namespace krypto::mktdata {
         server_t server_;
         con_list_t connections_;
         tbb::concurrent_bounded_queue<std::string> message_queue_;
-
+        std::unordered_map<uint64_t, Quote> quotes_;
         std::mutex connection_lock_;
         std::atomic_bool running_;
+        uint64_t next_update_ts_;
     };
 }
