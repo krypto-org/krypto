@@ -10,9 +10,8 @@ import {
 
 
 const initialState = {
-  prices: [],
+  prices: {},
   trades: [],
-  tableMap: {},
   initialized: false,
   connected: false
 };
@@ -24,7 +23,6 @@ export default function mktdataReducer(state = initialState, action) {
       return {
         ...state,
         prices: action.payload.prices,
-        tableMap: action.payload.tableMap,
         initialized: true
       };
     case REDUX_WEBSOCKET_CONNECT:
@@ -47,21 +45,20 @@ export default function mktdataReducer(state = initialState, action) {
     case REDUX_WEBSOCKET_MESSAGE:
       {
         let data = JSON.parse(action.payload.message)
-        if (data.kind == "quote") {
-          let idx = state.tableMap[data.security_id]
-          const prices = state.prices.map((price, index) => {
-            if (idx !== index) {
-              return price
-            }
+        if (data.kind == "quotes") {
+          const prices = data.payload.reduce((r, e) => {
+            e["index"] = state.prices[e.security_id].index
+            e["symbol"] = state.prices[e.security_id].symbol
+            r[e.security_id.toString()] = e
+            return r
+          }, {})
 
-            return {
-              ...price,
-              ...data,
-            }
-          })
           let newState = {
             ...state,
-            prices: prices
+            prices: {
+              ...state.prices,
+              ...prices
+            }
           }
           return newState
         }

@@ -20,11 +20,10 @@ export const REDUX_WEBSOCKET_CONNECT = `${WEBSOCKET_PREFIX}::${WEBSOCKET_CONNECT
 export const REDUX_WEBSOCKET_DISCONNECT = `${WEBSOCKET_PREFIX}::${WEBSOCKET_DISCONNECT}`
 export const REDUX_WEBSOCKET_SEND = `${WEBSOCKET_PREFIX}::${WEBSOCKET_SEND}`
 
-export const generatePriceCache = (prices, tableMap) => ({
+export const generatePriceCache = (prices) => ({
   type: GENERATE_PRICE_CACHE,
   payload: {
-    prices,
-    tableMap
+    prices
   }
 });
 
@@ -36,21 +35,21 @@ export const websocketSend = payload => ({
 
 export const onInstrumentsCached = (instruments) => {
   return (dispatch) => {
-    const prices = instruments.map(e => ({
-      symbol: e.symbol + "@" + e.exchange,
-      bid: NaN,
-      bid_quantity: 0,
-      ask: NaN,
-      ask_quantity: 0,
-      last: NaN,
-      last_quantity: 0
-    }))
-    const tableMap = instruments.reduce((r, e, i) => {
-      r[e.id.toString()] = i
+    const prices = instruments.reduce((r, e, i) => {
+      r[e.id.toString()] = {
+        index: i,
+        symbol: e.symbol + "@" + e.exchange,
+        bid: NaN,
+        bid_quantity: 0,
+        ask: NaN,
+        ask_quantity: 0,
+        last: NaN,
+        last_quantity: 0
+      }
       return r
     }, {})
     console.log(`Dispatched: ${prices.length}`)
-    dispatch(generatePriceCache(prices, tableMap))
+    dispatch(generatePriceCache(prices))
   }
 }
 

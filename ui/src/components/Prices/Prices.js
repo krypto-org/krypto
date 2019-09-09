@@ -27,6 +27,8 @@ class Prices extends Component {
   }
 
   render() {
+
+    const prices = Object.keys(this.props.prices).map((key) => this.props.prices[key])
     return (
       <div className={styles.prices}>
         <Row>
@@ -45,7 +47,7 @@ class Prices extends Component {
         <Row>
           <Col span={24}>
             <ReactTable
-              data={this.props.prices}
+              data={prices}
               columns={[
                 {
                   Header: "Symbol",
@@ -53,39 +55,48 @@ class Prices extends Component {
                 },
                 {
                   Header: "Bid",
-                  accessor: d => isNaN(d.bid) ? "NaN" : d.bid,
+                  accessor: d => isNaN(d.bid) ? "NaN" : d.bid.toFixed(4),
                   id: "bid"
                 },
                 {
                   Header: "Bid Qty",
-                  accessor: "bid_quantity"
+                  accessor: d => d.bid_quantity.toFixed(4),
+                  id: "bid_quantity"
                 },
                 {
                   Header: "Ask Qty",
-                  accessor: "ask_quantity"
+                  accessor: d => d.ask_quantity.toFixed(4),
+                  id: "ask_quantity"
                 },
                 {
                   Header: "Ask",
-                  accessor: d => isNaN(d.ask) ? "NaN" : d.ask,
+                  accessor: d => isNaN(d.ask) ? "NaN" : d.ask.toFixed(4),
                   id: "ask"
                 },
                 {
                   Header: "Last",
-                  accessor: d => isNaN(d.last) ? "NaN" : d.last,
+                  accessor: d => isNaN(d.last) ? "NaN" : d.last.toFixed(4),
                   id: "last"
                 },
                 {
                   Header: "Last Qty",
-                  accessor: "last_quantity"
+                  accessor: d => d.last_quantity.toFixed(4),
+                  id: "last_quantity"
                 }
               ]}
               defaultPageSize={100}
               className="-striped -highlight"
-              getTdProps={() => ({
-                style: {
-                  textAlign: 'center'
+              getTdProps={(state, rowInfo, column) => {
+                if (column.id != "symbol") {
+                  return ({
+                    style: {
+                      textAlign: 'right'
+                    }
+                  })
+                } else {
+                  return {}
                 }
-              })}
+              }}
               style={{
                 height: "800px",
                 width: "100%"
@@ -99,8 +110,7 @@ class Prices extends Component {
 
 Prices.propTypes = {
   instruments: PropTypes.array.isRequired,
-  prices: PropTypes.array.isRequired,
-  tableMap: PropTypes.object.isRequired,
+  prices: PropTypes.object.isRequired,
   instrumentsConnected: PropTypes.bool.isRequired,
   mdInitialized: PropTypes.bool.isRequired,
   mdFetching: PropTypes.bool.isRequired,
@@ -115,7 +125,6 @@ const mapStateToProps = (state, ownProps) => {
     instruments: state.instruments.instruments,
     instrumentsConnected: state.instruments.cached,
     prices: state.mktdata.prices,
-    tableMap: state.mktdata.tableMap,
     mdInitialized: state.mktdata.initialized,
     mdFetching: state.mktdata.connected,
   }
