@@ -1,8 +1,7 @@
 import {
   FETCH_INSTRUMENTS_BEGIN,
   FETCH_INSTRUMENTS_SUCCESS,
-  FETCH_INSTRUMENTS_FAILURE,
-  GENERATE_PRICE_CACHE
+  FETCH_INSTRUMENTS_FAILURE
 } from '../actions/instrumentActions';
 
 const initialState = {
@@ -38,12 +37,6 @@ export default function instrumentsReducer(state = initialState, action) {
         error: action.payload.error,
         cached: false,
         instruments: []
-      };
-    case GENERATE_PRICE_CACHE:
-      return {
-        ...state,
-        prices: action.payload.prices,
-        tableMap: action.payload.tableMap
       };
     default:
       return state;

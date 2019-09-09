@@ -195,7 +195,6 @@ const config = {
       compress: true,
       inline: true,
       lazy: false,
-      stats: "errors-only",
       historyApiFallback: {
         verbose: true,
         disableDotRule: false
@@ -212,7 +211,7 @@ const config = {
           env: process.env,
           stdio: "inherit"
         })
-          .on("close", code => process.exit(0))
+          .on("close", code => process.exit(code))
           .on("error", spawnError => console.error(spawnError));
       }
     },

@@ -32,3 +32,10 @@ export const parseInstruments = async (payload) => {
     }
   });
 }
+
+export const mainIpAddress = "192.168.1.12"
+
+export const brokerIpAddress = mainIpAddress
+
+export const wsIpAddress = mainIpAddress
+
