@@ -77,6 +77,7 @@ services = {
                 port = 5757
                 server = "ws://*:"${services.publisher.mktdata.ws.port}
                 client = "ws://"${global.ip}":"${services.publisher.mktdata.ws.port}
+                throttle_frequency_nano = 250000000
             }
         }
     }
