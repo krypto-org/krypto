@@ -54,24 +54,24 @@ class Prices extends Component {
                   accessor: "symbol"
                 },
                 {
-                  Header: "Bid",
-                  accessor: d => isNaN(d.bid) ? "NaN" : d.bid.toFixed(4),
-                  id: "bid"
-                },
-                {
                   Header: "Bid Qty",
                   accessor: d => d.bid_quantity.toFixed(4),
                   id: "bid_quantity"
                 },
                 {
-                  Header: "Ask Qty",
-                  accessor: d => d.ask_quantity.toFixed(4),
-                  id: "ask_quantity"
+                  Header: "Bid",
+                  accessor: d => isNaN(d.bid) ? "NaN" : d.bid.toFixed(4),
+                  id: "bid"
                 },
                 {
                   Header: "Ask",
                   accessor: d => isNaN(d.ask) ? "NaN" : d.ask.toFixed(4),
                   id: "ask"
+                },
+                {
+                  Header: "Ask Qty",
+                  accessor: d => d.ask_quantity.toFixed(4),
+                  id: "ask_quantity"
                 },
                 {
                   Header: "Last",
@@ -86,6 +86,11 @@ class Prices extends Component {
               ]}
               defaultPageSize={100}
               className="-striped -highlight"
+              getTrProps={() => ({
+                style: {
+                  fontSize: '10px'
+                }
+              })}
               getTdProps={(state, rowInfo, column) => {
                 if (column.id != "symbol") {
                   return ({
@@ -94,7 +99,8 @@ class Prices extends Component {
                     }
                   })
                 } else {
-                  return {}
+                  return {
+                  }
                 }
               }}
               style={{
