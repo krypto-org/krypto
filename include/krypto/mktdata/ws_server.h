@@ -54,6 +54,7 @@ namespace krypto::mktdata {
         std::unordered_map<uint64_t, Quote> quotes_;
         std::mutex connection_lock_;
         std::atomic_bool running_;
-        uint64_t next_update_ts_;
+        int64_t next_update_ts_;
+        uint64_t throttle_frequency_;
     };
 }

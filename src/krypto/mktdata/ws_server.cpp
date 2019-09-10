@@ -10,7 +10,8 @@ krypto::mktdata::WebsocketServer::WebsocketServer(
                 config.at<std::string>("/services/publisher/mktdata/proxy/backend/client")),
         port_{config.at<uint16_t>("/services/publisher/mktdata/ws/port")},
         running_{false},
-        next_update_ts_{krypto::utils::current_time_in_nanoseconds()} {
+        next_update_ts_{static_cast<int64_t>(krypto::utils::current_time_in_nanoseconds())},
+        throttle_frequency_{config.at<uint64_t >("/services/publisher/mktdata/ws/throttle_frequency_nano")} {
     server_.init_asio();
     server_.set_open_handler(bind(&WebsocketServer::on_open, this, ::_1));
     server_.set_close_handler(bind(&WebsocketServer::on_close, this, ::_1));
@@ -96,7 +97,7 @@ void krypto::mktdata::WebsocketServer::process(const krypto::serialization::Quot
             }
             to_send["payload"] = quotes_array;
             message_queue_.push(to_send.dump());
-            next_update_ts_ += 1000000000;
+            next_update_ts_ += throttle_frequency_;
         }
     }
 }
