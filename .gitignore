@@ -41,3 +41,5 @@ ui/node_modules
 ui/yarn.lock
 ui/yarn-error.log
 ui/package-lock.json
+ui/dist/*
+ui/release/*
