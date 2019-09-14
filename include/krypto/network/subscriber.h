@@ -4,6 +4,7 @@
 #include <utility>
 #include <thread>
 #include <atomic>
+#include <variant>
 
 #include <zmq.hpp>
 
@@ -17,6 +18,11 @@ namespace krypto::network {
     template<typename Derived, bool Verbose = false>
     class Subscriber {
     private:
+        using receive_variant_t = std::variant<
+                const krypto::serialization::Quote *,
+                const krypto::serialization::Trade *,
+                const krypto::serialization::Heartbeat *>;
+
         zmq::context_t context_;
         std::string endpoint_;
         bool connected_;
@@ -28,6 +34,9 @@ namespace krypto::network {
         void disconnect();
 
         void recv();
+
+        std::optional<receive_variant_t> parse(const zmq::message_t &msg,
+                                               const krypto::utils::MsgType msg_type);
 
     public:
         explicit Subscriber(std::string);
@@ -46,15 +55,15 @@ namespace krypto::network {
 
         void subscribe(const std::vector<std::string> &);
 
-        void subscribe(krypto::utils::MsgType );
+        void subscribe(krypto::utils::MsgType);
 
         void start();
 
         void stop();
 
-        Derived& derived_instance() { return static_cast<Derived&>(*this); }
-        
-        Derived const& derived_instance() const { return static_cast<Derived const&>(*this); }
+        Derived &derived_instance() { return static_cast<Derived &>(*this); }
+
+        Derived const &derived_instance() const { return static_cast<Derived const &>(*this); }
     };
 
     template<typename Consumer, bool Verbose>
@@ -129,25 +138,12 @@ namespace krypto::network {
             KRYP_LOG(info, "Received data -- topic: {} | payload size: {}", topic, payload_msg.size());
         }
 
-        switch (msg_type) {
-            case krypto::utils::MsgType::QUOTE: {
-                auto payload = flatbuffers::GetRoot<krypto::serialization::Quote>(payload_msg.data());
-                derived_instance().process(payload);
-                return;
-            }
-            case krypto::utils::MsgType::TRADE: {
-                auto payload = flatbuffers::GetRoot<krypto::serialization::Trade>(payload_msg.data());
-                derived_instance().process(payload);
-                return;
-            }
-            case krypto::utils::MsgType::HEARTBEAT: {
-                auto payload = flatbuffers::GetRoot<krypto::serialization::Heartbeat>(payload_msg.data());
-                derived_instance().process(payload);
-                return;
-            }
-            default: {
-                KRYP_LOG(warn, "Unknown Topic Received: {}", topic);
-            }
+        auto payload = parse(payload_msg, msg_type);
+
+        if (payload.has_value()) {
+            std::visit([&](auto &&x) { derived_instance().process(x); }, payload.value());
+        } else {
+            KRYP_LOG(warn, "Unknown Topic Received: {}", topic);
         }
     }
 
@@ -164,6 +160,24 @@ namespace krypto::network {
         running_ = false;
     }
 
-
+    template<typename Derived, bool Verbose>
+    std::optional<typename Subscriber<Derived, Verbose>::receive_variant_t>
+    Subscriber<Derived, Verbose>::parse(const zmq::message_t &msg, const krypto::utils::MsgType msg_type) {
+        switch (msg_type) {
+            case krypto::utils::MsgType::QUOTE: {
+                return flatbuffers::GetRoot<krypto::serialization::Quote>(msg.data());
+            }
+            case krypto::utils::MsgType::TRADE: {
+                return flatbuffers::GetRoot<krypto::serialization::Trade>(msg.data());
+            }
+            case krypto::utils::MsgType::HEARTBEAT: {
+                return flatbuffers::GetRoot<krypto::serialization::Heartbeat>(msg.data());
+            }
+            default: {
+                break;
+            }
+        }
+        return std::nullopt;
+    }
 }
 
