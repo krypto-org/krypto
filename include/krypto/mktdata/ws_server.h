@@ -13,6 +13,7 @@
 
 #include <krypto/mktdata/book.h>
 #include <krypto/network/subscriber.h>
+#include <krypto/mktdata/parser.h>
 #include <krypto/serialization/serialization_generated.h>
 
 using websocketpp::connection_hdl;
@@ -31,7 +32,7 @@ using websocketpp::lib::condition_variable;
 namespace krypto::mktdata {
     typedef websocketpp::server<websocketpp::config::asio> server_t;
 
-    class WebsocketServer final : public krypto::network::Subscriber<WebsocketServer, false> {
+    class WebsocketServer final : public krypto::network::Subscriber<WebsocketServer, Parser , false> {
     public:
         explicit WebsocketServer(const krypto::Config& config);
         void ioc_run();

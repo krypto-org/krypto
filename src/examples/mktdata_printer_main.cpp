@@ -6,11 +6,11 @@
 #include <krypto/logger.h>
 #include <krypto/utils/common.h>
 #include <krypto/network/subscriber.h>
-
+#include <krypto/mktdata/parser.h>
 
 namespace {
-struct MktdataPrinter : public krypto::network::Subscriber<MktdataPrinter, true> {
-        using krypto::network::Subscriber<MktdataPrinter, true>::Subscriber;
+struct MktdataPrinter : public krypto::network::Subscriber<MktdataPrinter, krypto::mktdata::Parser , true> {
+        using krypto::network::Subscriber<MktdataPrinter, krypto::mktdata::Parser, true>::Subscriber;
 
         void process(const krypto::serialization::Quote *quote) {
             std::cout << "QUOTE: "<< quote->security_id() << '\n';

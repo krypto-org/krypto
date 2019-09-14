@@ -8,14 +8,13 @@
 
 #include <zmq.hpp>
 
-#include <krypto/serialization/serialization_generated.h>
 #include <krypto/logger.h>
 #include "krypto/utils/common.h"
 
 
 namespace krypto::network {
 
-    template<typename Derived, bool Verbose = false>
+    template<typename Derived, typename Parser, bool Verbose = false>
     class Subscriber {
     private:
         using receive_variant_t = std::variant<
@@ -35,19 +34,16 @@ namespace krypto::network {
 
         void recv();
 
-        std::optional<receive_variant_t> parse(const zmq::message_t &msg,
-                                               const krypto::utils::MsgType msg_type);
-
     public:
         explicit Subscriber(std::string);
 
-        Subscriber(const Subscriber<Derived, Verbose> &other) = delete;
+        Subscriber(const Subscriber<Derived, Parser, Verbose> &other) = delete;
 
-        Subscriber(Subscriber<Derived, Verbose> &&other) = delete;
+        Subscriber(Subscriber<Derived, Parser, Verbose> &&other) = delete;
 
-        Subscriber<Derived, Verbose> &operator=(const Subscriber<Derived, Verbose> &) = delete;
+        Subscriber<Derived, Parser, Verbose> &operator=(const Subscriber<Derived, Parser, Verbose> &) = delete;
 
-        Subscriber<Derived, Verbose> &operator=(Subscriber<Derived, Verbose> &&) = delete;
+        Subscriber<Derived, Parser, Verbose> &operator=(Subscriber<Derived, Parser, Verbose> &&) = delete;
 
         ~Subscriber();
 
@@ -66,8 +62,8 @@ namespace krypto::network {
         Derived const &derived_instance() const { return static_cast<Derived const &>(*this); }
     };
 
-    template<typename Consumer, bool Verbose>
-    Subscriber<Consumer, Verbose>::Subscriber(std::string endpoint) :
+    template<typename Consumer, typename Parser, bool Verbose>
+    Subscriber<Consumer, Parser, Verbose>::Subscriber(std::string endpoint) :
             context_{1},
             endpoint_(std::move(endpoint)),
             connected_(false),
@@ -76,31 +72,31 @@ namespace krypto::network {
         connect();
     }
 
-    template<typename Consumer, bool Verbose>
-    Subscriber<Consumer, Verbose>::~Subscriber() {
+    template<typename Consumer, typename Parser, bool Verbose>
+    Subscriber<Consumer, Parser, Verbose>::~Subscriber() {
         disconnect();
     }
 
-    template<typename Consumer, bool Verbose>
-    void Subscriber<Consumer, Verbose>::subscribe(const std::string &topic) {
+    template<typename Consumer, typename Parser, bool Verbose>
+    void Subscriber<Consumer, Parser, Verbose>::subscribe(const std::string &topic) {
         socket_->setsockopt(ZMQ_SUBSCRIBE, &topic[0], topic.length());
     }
 
-    template<typename Consumer, bool Verbose>
-    void Subscriber<Consumer, Verbose>::subscribe(const std::vector<std::string> &topics) {
+    template<typename Consumer, typename Parser, bool Verbose>
+    void Subscriber<Consumer, Parser, Verbose>::subscribe(const std::vector<std::string> &topics) {
         std::for_each(topics.begin(), topics.end(), [this](auto &&topic) {
             subscribe(topic);
         });
     }
 
-    template<typename Consumer, bool Verbose>
-    void Subscriber<Consumer, Verbose>::subscribe(const krypto::utils::MsgType msg_type) {
+    template<typename Consumer, typename Parser, bool Verbose>
+    void Subscriber<Consumer, Parser, Verbose>::subscribe(const krypto::utils::MsgType msg_type) {
         auto topic = krypto::utils::MsgTypeEnum::enum_to_names.at(msg_type);
         subscribe(topic);
     }
 
-    template<typename Consumer, bool Verbose>
-    void Subscriber<Consumer, Verbose>::connect() {
+    template<typename Consumer, typename Parser, bool Verbose>
+    void Subscriber<Consumer, Parser, Verbose>::connect() {
         if (!connected_) {
             KRYP_LOG(info, "Connecting to {} ... ", endpoint_);
             socket_->connect(endpoint_);
@@ -109,8 +105,8 @@ namespace krypto::network {
         }
     }
 
-    template<typename Consumer, bool Verbose>
-    void Subscriber<Consumer, Verbose>::disconnect() {
+    template<typename Consumer, typename Parser, bool Verbose>
+    void Subscriber<Consumer, Parser, Verbose>::disconnect() {
         if (connected_) {
             connected_ = false;
             KRYP_LOG(info, "Disconnecting from {} ... ", endpoint_);
@@ -121,8 +117,8 @@ namespace krypto::network {
     }
 
 
-    template<typename Consumer, bool Verbose>
-    void Subscriber<Consumer, Verbose>::recv() {
+    template<typename Consumer, typename Parser, bool Verbose>
+    void Subscriber<Consumer, Parser, Verbose>::recv() {
 
         zmq::message_t topic_msg;
         socket_->recv(&topic_msg);
@@ -138,7 +134,7 @@ namespace krypto::network {
             KRYP_LOG(info, "Received data -- topic: {} | payload size: {}", topic, payload_msg.size());
         }
 
-        auto payload = parse(payload_msg, msg_type);
+        auto payload = Parser::parse(payload_msg, msg_type);
 
         if (payload.has_value()) {
             std::visit([&](auto &&x) { derived_instance().process(x); }, payload.value());
@@ -147,37 +143,17 @@ namespace krypto::network {
         }
     }
 
-    template<typename Consumer, bool Verbose>
-    void Subscriber<Consumer, Verbose>::start() {
+    template<typename Consumer, typename Parser, bool Verbose>
+    void Subscriber<Consumer, Parser, Verbose>::start() {
         running_ = true;
         while (running_) {
             recv();
         }
     }
 
-    template<typename Consumer, bool Verbose>
-    void Subscriber<Consumer, Verbose>::stop() {
+    template<typename Consumer, typename Parser, bool Verbose>
+    void Subscriber<Consumer, Parser, Verbose>::stop() {
         running_ = false;
-    }
-
-    template<typename Derived, bool Verbose>
-    std::optional<typename Subscriber<Derived, Verbose>::receive_variant_t>
-    Subscriber<Derived, Verbose>::parse(const zmq::message_t &msg, const krypto::utils::MsgType msg_type) {
-        switch (msg_type) {
-            case krypto::utils::MsgType::QUOTE: {
-                return flatbuffers::GetRoot<krypto::serialization::Quote>(msg.data());
-            }
-            case krypto::utils::MsgType::TRADE: {
-                return flatbuffers::GetRoot<krypto::serialization::Trade>(msg.data());
-            }
-            case krypto::utils::MsgType::HEARTBEAT: {
-                return flatbuffers::GetRoot<krypto::serialization::Heartbeat>(msg.data());
-            }
-            default: {
-                break;
-            }
-        }
-        return std::nullopt;
     }
 }
 
