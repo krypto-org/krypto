@@ -11,33 +11,9 @@ namespace {
 
 
 std::vector<krypto::utils::Instrument> krypto::instruments::InstrumentClient::query_all()  {
-    auto response = send<krypto::serialization::InstrumentResponse, krypto::serialization::RequestType>(
+    send<krypto::serialization::InstrumentResponse, krypto::serialization::RequestType>(
             "instruments", krypto::serialization::RequestType::RequestType_ALL);
-
-    std::vector<krypto::utils::Instrument> result;
-
-    if (response) {
-        auto insts = response->instruments();
-        KRYP_LOG(info, "Received {} instruments", insts->Length());
-        for (size_t i = 0; i < insts->Length(); ++i) {
-            auto inst = insts->Get(i);
-            krypto::utils::Instrument to_insert{
-                static_cast<uint64_t>(inst->id()),
-                convert_inst_type(inst->type()),
-                inst->symbol()->str(),
-                krypto::utils::ExchangeTypeEnum::names_to_enums.at(inst->exchange()->str()),
-                inst->exchange_symbol()->str(),
-                inst->tick_size(),
-                inst->min_size(),
-                inst->max_size(),
-                convert_currency(inst->crypto_base()),
-                convert_currency(inst->crypto_quote())
-                };
-            result.push_back(to_insert);
-        }
-
-    }
-    return result;
+    return instruments_;
 }
 
 void krypto::instruments::InstrumentClient::serialize(
@@ -46,4 +22,28 @@ void krypto::instruments::InstrumentClient::serialize(
     builder.add_type(requestType);
     auto req = builder.Finish();
     fb_builder_.Finish(req);
+}
+
+void krypto::instruments::InstrumentClient::process_response(const krypto::serialization::InstrumentResponse *response) {
+    if (response) {
+        instruments_.clear();
+        auto insts = response->instruments();
+        KRYP_LOG(info, "Received {} instruments", insts->Length());
+        for (size_t i = 0; i < insts->Length(); ++i) {
+            auto inst = insts->Get(i);
+            krypto::utils::Instrument to_insert{
+                    static_cast<uint64_t>(inst->id()),
+                    convert_inst_type(inst->type()),
+                    inst->symbol()->str(),
+                    krypto::utils::ExchangeTypeEnum::names_to_enums.at(inst->exchange()->str()),
+                    inst->exchange_symbol()->str(),
+                    inst->tick_size(),
+                    inst->min_size(),
+                    inst->max_size(),
+                    convert_currency(inst->crypto_base()),
+                    convert_currency(inst->crypto_quote())
+            };
+            instruments_.push_back(to_insert);
+        }
+    }
 }

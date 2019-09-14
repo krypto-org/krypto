@@ -21,10 +21,10 @@ namespace krypto::network::rpc {
         std::unique_ptr<zmq::socket_t> socket_;
 
         template<typename... Args>
-        const bool send_impl(const std::string &, Args...);
+        bool send_impl(const std::string &, Args...);
 
         template<typename ReceiveType>
-        const ReceiveType * receive_impl(const std::string &);
+        void receive_impl(const std::string &);
 
     protected:
         flatbuffers::FlatBufferBuilder fb_builder_;
@@ -34,7 +34,7 @@ namespace krypto::network::rpc {
         void connect();
 
         template<typename ReceiveType, typename... Args>
-        const ReceiveType * send(std::string service, Args... args);
+        void send(std::string service, Args... args);
     };
 
     template<typename Derived, bool Verbose>
@@ -63,7 +63,7 @@ namespace krypto::network::rpc {
 
     template<typename Derived, bool Verbose>
     template<typename ReceiveType, typename... Args>
-    const ReceiveType * ClientBase<Derived, Verbose>::send(std::string service_name, Args... args) {
+    void ClientBase<Derived, Verbose>::send(std::string service_name, Args... args) {
 
         send_impl(service_name, args...);
 
@@ -71,12 +71,12 @@ namespace krypto::network::rpc {
             KRYP_LOG(debug, "Sent message to {}", service_name);
         }
 
-        return receive_impl<ReceiveType>(service_name);
+        receive_impl<ReceiveType>(service_name);
     }
 
     template<typename Derived, bool Verbose>
     template<typename... Args>
-    const bool ClientBase<Derived, Verbose>::send_impl(const std::string &service_name, Args... args) {
+    bool ClientBase<Derived, Verbose>::send_impl(const std::string &service_name, Args... args) {
         std::bitset<2> status;
 
         zmq::message_t service_name_msg(service_name.size());
@@ -96,35 +96,36 @@ namespace krypto::network::rpc {
 
     template<typename Derived, bool Verbose>
     template<typename ReceiveType>
-    const ReceiveType * ClientBase<Derived, Verbose>::receive_impl(const std::string &service_name) {
+    void ClientBase<Derived, Verbose>::receive_impl(const std::string &service_name) {
 
         zmq::message_t service_msg;
 
         if (!socket_->recv(&service_msg, 0)) {
-            return nullptr;
+            return;
         }
 
         auto s_name = std::string(static_cast<char *>(service_msg.data()), service_msg.size());
 
         if (s_name != service_name) {
             KRYP_LOG(warn, "Service name received [{}] != expected [{}]", s_name, service_name);
-            return std::nullptr_t {};
+            return;
         }
 
         if (!service_msg.more()) {
             KRYP_LOG(error, "No data received");
-            return nullptr;
+            return;
         }
 
         zmq::message_t payload_msg;
         socket_->recv(&payload_msg);
 
-        auto payload = flatbuffers::GetRoot<ReceiveType>(payload_msg.data());
-
         if (payload_msg.more()) {
             KRYP_LOG(error, "Received more than 2 frames");
         }
 
-        return payload;
+        auto payload = flatbuffers::GetRoot<ReceiveType>(payload_msg.data());
+
+        auto &derived = static_cast<Derived &>(*this);
+        derived.process_response(payload);
     }
 }
