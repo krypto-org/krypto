@@ -77,6 +77,8 @@ namespace krypto::utils {
         QUOTE,
         TRADE,
         HEARTBEAT,
+        INSTRUMENT_REQUEST,
+        INSTRUMENT_RESPONSE,
         SIZE
     };
 

@@ -12,8 +12,7 @@ namespace {
 
 std::vector<krypto::utils::Instrument> krypto::instruments::InstrumentClient::query_all()  {
     InstrumentRequest request{krypto::serialization::RequestType::RequestType_ALL};
-    send<krypto::serialization::InstrumentResponse>(
-            "instruments", request);
+    send("instruments", request);
     return instruments_;
 }
 
@@ -25,7 +24,7 @@ void krypto::instruments::InstrumentClient::serialize(const krypto::instruments:
 }
 
 
-void krypto::instruments::InstrumentClient::process_response(const krypto::serialization::InstrumentResponse *response) {
+void krypto::instruments::InstrumentClient::process(const krypto::serialization::InstrumentResponse *response) {
     if (response) {
         instruments_.clear();
         auto insts = response->instruments();

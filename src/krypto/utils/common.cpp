@@ -67,7 +67,9 @@ namespace krypto::utils {
                 "",
                         "Q",
                         "T",
-                        "H"
+                        "H",
+                        "I_REQ",
+                        "I_RES"
                 };
         return names;
     }

@@ -9,12 +9,13 @@
 #include <zmq.hpp>
 
 #include <krypto/network/helper.h>
+#include <krypto/utils/common.h>
 #include <krypto/logger.h>
 #include <krypto/config.h>
 
 namespace krypto::network::rpc {
 
-    template<typename Derived, typename RequestVariant, bool Verbose = false>
+    template<typename Derived, typename RequestVariant, typename Parser, bool Verbose = false>
     class ClientBase {
     private:
         zmq::context_t context_;
@@ -23,7 +24,6 @@ namespace krypto::network::rpc {
 
         bool send_impl(const std::string &, const RequestVariant &);
 
-        template<typename ReceiveType>
         void receive_impl(const std::string &);
 
     protected:
@@ -33,12 +33,11 @@ namespace krypto::network::rpc {
 
         void connect();
 
-        template<typename ReceiveType>
         void send(std::string service, const RequestVariant &);
     };
 
-    template<typename Derived, typename RequestVariant, bool Verbose>
-    ClientBase<Derived, RequestVariant, Verbose>::ClientBase(
+    template<typename Derived, typename RequestVariant, typename Parser,bool Verbose>
+    ClientBase<Derived, RequestVariant, Parser,Verbose>::ClientBase(
             const krypto::Config &config) :
             context_{1},
             broker_{config.at<std::string>("/services/rpc/broker/frontend/client")} {
@@ -48,8 +47,8 @@ namespace krypto::network::rpc {
         connect();
     }
 
-    template<typename Derived, typename RequestVariant, bool Verbose>
-    void ClientBase<Derived, RequestVariant, Verbose>::connect() {
+    template<typename Derived, typename RequestVariant, typename Parser,bool Verbose>
+    void ClientBase<Derived, RequestVariant, Parser, Verbose>::connect() {
         if constexpr  (Verbose) {
             KRYP_LOG(info, "Connecting to broker @ {}", broker_);
         }
@@ -61,9 +60,8 @@ namespace krypto::network::rpc {
         socket_->connect(broker_.c_str());
     }
 
-    template<typename Derived, typename RequestVariant, bool Verbose>
-    template<typename ReceiveType>
-    void ClientBase<Derived, RequestVariant, Verbose>::send(std::string service_name, const RequestVariant &request) {
+    template<typename Derived, typename RequestVariant,typename Parser, bool Verbose>
+    void ClientBase<Derived, RequestVariant, Parser, Verbose>::send(std::string service_name, const RequestVariant &request) {
 
         send_impl(service_name, request);
 
@@ -71,12 +69,12 @@ namespace krypto::network::rpc {
             KRYP_LOG(debug, "Sent message to {}", service_name);
         }
 
-        receive_impl<ReceiveType>(service_name);
+        receive_impl(service_name);
     }
 
-    template<typename Derived, typename RequestVariant, bool Verbose>
-    bool ClientBase<Derived, RequestVariant, Verbose>::send_impl(const std::string &service_name,
-                                                                 const RequestVariant &request) {
+    template<typename Derived, typename RequestVariant, typename Parser,bool Verbose>
+    bool ClientBase<Derived, RequestVariant, Parser, Verbose>::send_impl(
+            const std::string &service_name, const RequestVariant &request) {
         std::bitset<2> status;
 
         send_empty_frame(*socket_, ZMQ_SNDMORE);
@@ -97,9 +95,8 @@ namespace krypto::network::rpc {
         return status.all();
     }
 
-    template<typename Derived, typename RequestVariant, bool Verbose>
-    template<typename ReceiveType>
-    void ClientBase<Derived, RequestVariant, Verbose>::receive_impl(const std::string &service_name) {
+    template<typename Derived, typename RequestVariant, typename Parser,bool Verbose>
+    void ClientBase<Derived, RequestVariant,Parser, Verbose>::receive_impl(const std::string &service_name) {
 
         recv_empty_frame(*socket_);
 
@@ -128,9 +125,14 @@ namespace krypto::network::rpc {
             KRYP_LOG(error, "Received more than 2 frames");
         }
 
-        auto payload = flatbuffers::GetRoot<ReceiveType>(payload_msg.data());
-
         auto &derived = static_cast<Derived &>(*this);
-        derived.process_response(payload);
+
+        auto payload = Parser::parse(payload_msg, krypto::utils::MsgType::INSTRUMENT_RESPONSE);
+
+        if (payload.has_value()) {
+            std::visit([&](auto &&x) { derived.process(x); }, payload.value());
+        } else {
+            KRYP_LOG(warn, "Unknown Response Type Received");
+        }
     }
 }
