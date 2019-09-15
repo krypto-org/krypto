@@ -35,6 +35,12 @@ namespace krypto::network {
         socket.send(message, flags_);
     }
 
+    void send_msg_type(zmq::socket_t &socket, const krypto::utils::MsgType &msg_type, int flags_) {
+        zmq::message_t message(1);
+        std::memcpy(message.data(), &msg_type, 1);
+        socket.send(message, flags_);
+    }
+
     std::string recv_string(zmq::socket_t &socket) {
         zmq::message_t msg;
         socket.recv(&msg);
@@ -60,6 +66,13 @@ namespace krypto::network {
         zmq::message_t msg;
         socket.recv(&msg);
         auto result = static_cast<SocketStatus *>(msg.data());
+        return *result;
+    }
+
+    krypto::utils::MsgType recv_msg_type(zmq::socket_t &socket) {
+        zmq::message_t msg;
+        socket.recv(&msg);
+        auto result = static_cast<krypto::utils::MsgType *>(msg.data());
         return *result;
     }
 }

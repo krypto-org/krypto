@@ -3,6 +3,8 @@
 #include <string_view>
 #include <zmq.hpp>
 
+#include <krypto/utils/common.h>
+
 namespace krypto::network {
 
     enum class SocketStatus : uint8_t {
@@ -32,9 +34,13 @@ namespace krypto::network {
 
     void send_status(zmq::socket_t &socket, SocketStatus &&status, int flags_ = 0);
 
+    void send_msg_type(zmq::socket_t &socket, const krypto::utils::MsgType &msg_type, int flags_ = 0);
+
     std::string recv_string(zmq::socket_t &socket);
 
     void recv_empty_frame(zmq::socket_t &socket);
 
     SocketStatus recv_status(zmq::socket_t &socket);
+
+    krypto::utils::MsgType recv_msg_type(zmq::socket_t &socket);
 }

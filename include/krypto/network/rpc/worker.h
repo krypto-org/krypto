@@ -123,7 +123,7 @@ namespace krypto::network::rpc {
                 send_string(*socket_, service_, ZMQ_SNDMORE);
                 send_string(*socket_, address, ZMQ_SNDMORE);
                 send_empty_frame(*socket_, ZMQ_SNDMORE);
-
+                send_msg_type(*socket_, krypto::utils::MsgType::INSTRUMENT_RESPONSE, ZMQ_SNDMORE);
                 socket_->send(result_msg);
 
                 if constexpr (Verbose) {

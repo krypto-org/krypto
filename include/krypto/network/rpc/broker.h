@@ -76,6 +76,8 @@ namespace krypto::network::rpc {
                     auto client_addr = recv_string(*backend_);
                     recv_empty_frame(*backend_);
 
+                    auto msg_type = recv_msg_type(*backend_);
+
                     zmq::message_t payload;
                     backend_->recv(&payload);
 
@@ -86,6 +88,8 @@ namespace krypto::network::rpc {
                     if constexpr (Verbose) {
                         KRYP_LOG(info, "{} :: received reply payload of size {}", service_name, payload.size());
                     }
+
+                    send_msg_type(*frontend_, msg_type, ZMQ_SNDMORE);
 
                     frontend_->send(payload);
                 }

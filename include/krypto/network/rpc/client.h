@@ -118,6 +118,8 @@ namespace krypto::network::rpc {
             return;
         }
 
+        auto msg_type = recv_msg_type(*socket_);
+
         zmq::message_t payload_msg;
         socket_->recv(&payload_msg);
 
@@ -127,7 +129,7 @@ namespace krypto::network::rpc {
 
         auto &derived = static_cast<Derived &>(*this);
 
-        auto payload = Parser::parse(payload_msg, krypto::utils::MsgType::INSTRUMENT_RESPONSE);
+        auto payload = Parser::parse(payload_msg, msg_type);
 
         if (payload.has_value()) {
             std::visit([&](auto &&x) { derived.process(x); }, payload.value());
