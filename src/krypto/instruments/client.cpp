@@ -11,18 +11,19 @@ namespace {
 
 
 std::vector<krypto::utils::Instrument> krypto::instruments::InstrumentClient::query_all()  {
-    send<krypto::serialization::InstrumentResponse, krypto::serialization::RequestType>(
-            "instruments", krypto::serialization::RequestType::RequestType_ALL);
+    InstrumentRequest request{krypto::serialization::RequestType::RequestType_ALL};
+    send<krypto::serialization::InstrumentResponse>(
+            "instruments", request);
     return instruments_;
 }
 
-void krypto::instruments::InstrumentClient::serialize(
-        const krypto::serialization::RequestType requestType) {
+void krypto::instruments::InstrumentClient::serialize(const krypto::instruments::InstrumentRequest& request) {
     krypto::serialization::InstrumentRequestBuilder builder{fb_builder_};
-    builder.add_type(requestType);
+    builder.add_type(request.request_type);
     auto req = builder.Finish();
     fb_builder_.Finish(req);
 }
+
 
 void krypto::instruments::InstrumentClient::process_response(const krypto::serialization::InstrumentResponse *response) {
     if (response) {

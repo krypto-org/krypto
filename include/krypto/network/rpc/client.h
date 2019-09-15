@@ -3,6 +3,7 @@
 #include <utility>
 #include <bitset>
 #include <memory>
+#include <variant>
 
 #include <flatbuffers/flatbuffers.h>
 #include <zmq.hpp>
@@ -13,15 +14,14 @@
 
 namespace krypto::network::rpc {
 
-    template<typename Derived, bool Verbose = false>
+    template<typename Derived, typename RequestVariant, bool Verbose = false>
     class ClientBase {
     private:
         zmq::context_t context_;
         std::string broker_;
         std::unique_ptr<zmq::socket_t> socket_;
 
-        template<typename... Args>
-        bool send_impl(const std::string &, Args...);
+        bool send_impl(const std::string &, const RequestVariant &);
 
         template<typename ReceiveType>
         void receive_impl(const std::string &);
@@ -29,17 +29,17 @@ namespace krypto::network::rpc {
     protected:
         flatbuffers::FlatBufferBuilder fb_builder_;
     public:
-        explicit ClientBase(const krypto::Config& config);
+        explicit ClientBase(const krypto::Config &config);
 
         void connect();
 
-        template<typename ReceiveType, typename... Args>
-        void send(std::string service, Args... args);
+        template<typename ReceiveType>
+        void send(std::string service, const RequestVariant &);
     };
 
-    template<typename Derived, bool Verbose>
-    ClientBase<Derived, Verbose>::ClientBase(
-            const krypto::Config& config) :
+    template<typename Derived, typename RequestVariant, bool Verbose>
+    ClientBase<Derived, RequestVariant, Verbose>::ClientBase(
+            const krypto::Config &config) :
             context_{1},
             broker_{config.at<std::string>("/services/rpc/broker/frontend/client")} {
 
@@ -48,8 +48,8 @@ namespace krypto::network::rpc {
         connect();
     }
 
-    template<typename Derived, bool Verbose>
-    void ClientBase<Derived, Verbose>::connect() {
+    template<typename Derived, typename RequestVariant, bool Verbose>
+    void ClientBase<Derived, RequestVariant, Verbose>::connect() {
         if constexpr  (Verbose) {
             KRYP_LOG(info, "Connecting to broker @ {}", broker_);
         }
@@ -61,11 +61,11 @@ namespace krypto::network::rpc {
         socket_->connect(broker_.c_str());
     }
 
-    template<typename Derived, bool Verbose>
-    template<typename ReceiveType, typename... Args>
-    void ClientBase<Derived, Verbose>::send(std::string service_name, Args... args) {
+    template<typename Derived, typename RequestVariant, bool Verbose>
+    template<typename ReceiveType>
+    void ClientBase<Derived, RequestVariant, Verbose>::send(std::string service_name, const RequestVariant &request) {
 
-        send_impl(service_name, args...);
+        send_impl(service_name, request);
 
         if constexpr  (Verbose) {
             KRYP_LOG(debug, "Sent message to {}", service_name);
@@ -74,9 +74,9 @@ namespace krypto::network::rpc {
         receive_impl<ReceiveType>(service_name);
     }
 
-    template<typename Derived, bool Verbose>
-    template<typename... Args>
-    bool ClientBase<Derived, Verbose>::send_impl(const std::string &service_name, Args... args) {
+    template<typename Derived, typename RequestVariant, bool Verbose>
+    bool ClientBase<Derived, RequestVariant, Verbose>::send_impl(const std::string &service_name,
+                                                                 const RequestVariant &request) {
         std::bitset<2> status;
 
         send_empty_frame(*socket_, ZMQ_SNDMORE);
@@ -86,7 +86,8 @@ namespace krypto::network::rpc {
         status.set(0, socket_->send(service_name_msg, ZMQ_SNDMORE));
 
         auto &derived = static_cast<Derived &>(*this);
-        derived.serialize(args...);
+
+        std::visit([&](auto &&r) { derived.serialize(r); }, request);
 
         zmq::message_t payload_msg(fb_builder_.GetSize());
         std::memcpy(payload_msg.data(), fb_builder_.GetBufferPointer(), fb_builder_.GetSize());
@@ -96,9 +97,9 @@ namespace krypto::network::rpc {
         return status.all();
     }
 
-    template<typename Derived, bool Verbose>
+    template<typename Derived, typename RequestVariant, bool Verbose>
     template<typename ReceiveType>
-    void ClientBase<Derived, Verbose>::receive_impl(const std::string &service_name) {
+    void ClientBase<Derived, RequestVariant, Verbose>::receive_impl(const std::string &service_name) {
 
         recv_empty_frame(*socket_);
 
