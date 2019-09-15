@@ -43,7 +43,7 @@ namespace krypto::network::rpc {
             context_{1},
             broker_{config.at<std::string>("/services/rpc/broker/frontend/client")} {
 
-        socket_ = std::make_unique<zmq::socket_t>(context_, ZMQ_REQ);
+        socket_ = std::make_unique<zmq::socket_t>(context_, ZMQ_DEALER);
 
         connect();
     }
@@ -79,6 +79,8 @@ namespace krypto::network::rpc {
     bool ClientBase<Derived, Verbose>::send_impl(const std::string &service_name, Args... args) {
         std::bitset<2> status;
 
+        send_empty_frame(*socket_, ZMQ_SNDMORE);
+
         zmq::message_t service_name_msg(service_name.size());
         std::memcpy(service_name_msg.data(), service_name.data(), service_name.size());
         status.set(0, socket_->send(service_name_msg, ZMQ_SNDMORE));
@@ -97,6 +99,8 @@ namespace krypto::network::rpc {
     template<typename Derived, bool Verbose>
     template<typename ReceiveType>
     void ClientBase<Derived, Verbose>::receive_impl(const std::string &service_name) {
+
+        recv_empty_frame(*socket_);
 
         zmq::message_t service_msg;
 
