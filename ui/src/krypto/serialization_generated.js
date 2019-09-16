@@ -84,7 +84,8 @@ krypto.serialization.Currency = {
   ZEC: 22,
   ZRX: 23,
   XTZ: 24,
-  ALGO: 25
+  ALGO: 25,
+  DASH: 26
 };
 
 /**

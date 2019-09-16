@@ -55,7 +55,8 @@ namespace krypto::utils {
                         "ZEC",
                         "ZRX",
                         "XTZ",
-                        "ALGO"
+                        "ALGO",
+                        "DASH"
                 };
         return names;
     }

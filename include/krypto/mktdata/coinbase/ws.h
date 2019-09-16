@@ -31,17 +31,17 @@ namespace krypto::mktdata::coinbase {
 
         void on_open(websocketpp::connection_hdl hdl);
 
-        void on_close(websocketpp::connection_hdl hdl);
+        void on_close(const websocketpp::connection_hdl& hdl);
 
-        void on_fail(websocketpp::connection_hdl hdl);
+        void on_fail(const websocketpp::connection_hdl& hdl);
 
-        void on_message(websocketpp::connection_hdl, ws_client_t::message_ptr msg);
+        void on_message(const websocketpp::connection_hdl&, ws_client_t::message_ptr msg);
 
         void start();
 
         void stop();
 
-        void send(std::string message);
+        void send(std::string&& message);
     private:
         std::string uri_;
         WsConnectionStatus status_;
