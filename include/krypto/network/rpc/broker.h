@@ -78,20 +78,22 @@ namespace krypto::network::rpc {
 
                     auto msg_type = recv_msg_type(*backend_);
 
-                    zmq::message_t payload;
-                    backend_->recv(&payload);
-
                     send_string(*frontend_, client_addr, ZMQ_SNDMORE);
                     send_empty_frame(*frontend_, ZMQ_SNDMORE);
                     send_string(*frontend_, service_name, ZMQ_SNDMORE);
 
-                    if constexpr (Verbose) {
-                        KRYP_LOG(info, "{} :: received reply payload of size {}", service_name, payload.size());
-                    }
-
                     send_msg_type(*frontend_, msg_type, ZMQ_SNDMORE);
 
-                    frontend_->send(payload);
+                    if (msg_type != krypto::utils::MsgType::UNDEFINED) {
+                        zmq::message_t payload;
+                        backend_->recv(&payload);
+
+                        if constexpr (Verbose) {
+                            KRYP_LOG(info, "{} :: received reply payload of size {}", service_name, payload.size());
+                        }
+
+                        frontend_->send(payload);
+                    }
                 }
             }
 

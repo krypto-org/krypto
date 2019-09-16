@@ -117,11 +117,16 @@ namespace krypto::network::rpc {
 
         auto msg_type = recv_msg_type(*socket_);
 
+        if (msg_type == krypto::utils::MsgType::UNDEFINED) {
+            KRYP_LOG(error, "Received acknowledgement message - no payload");
+            return;
+        }
+
         zmq::message_t payload_msg;
         socket_->recv(&payload_msg);
 
         if (payload_msg.more()) {
-            KRYP_LOG(error, "Received more than 2 frames");
+            KRYP_LOG(error, "Received more than 3 frames");
         }
 
         auto &derived = static_cast<Derived &>(*this);

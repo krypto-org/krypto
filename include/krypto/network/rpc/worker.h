@@ -114,19 +114,22 @@ namespace krypto::network::rpc {
                 auto &derived = static_cast<Derived &>(*this);
                 auto payload = flatbuffers::GetRoot<ReceiveType>(payload_msg.data());
 
-                derived.process(payload);
+                auto result_msg_type = derived.process(payload);
 
-                zmq::message_t result_msg(fb_builder_.GetSize());
-                std::memcpy(result_msg.data(), fb_builder_.GetBufferPointer(), fb_builder_.GetSize());
 
                 send_empty_frame(*socket_, ZMQ_SNDMORE);
                 send_status(*socket_, SocketStatus::REPLY, ZMQ_SNDMORE);
                 send_string(*socket_, service_, ZMQ_SNDMORE);
                 send_string(*socket_, address, ZMQ_SNDMORE);
                 send_empty_frame(*socket_, ZMQ_SNDMORE);
-                send_msg_type(*socket_, derived.response_type(msg_type), ZMQ_SNDMORE);
-                socket_->send(result_msg);
+                send_msg_type(*socket_, result_msg_type, ZMQ_SNDMORE);
 
+                if (result_msg_type != krypto::utils::MsgType::UNDEFINED) {
+                    zmq::message_t result_msg(fb_builder_.GetSize());
+                    std::memcpy(result_msg.data(), fb_builder_.GetBufferPointer(), fb_builder_.GetSize());
+                    socket_->send(result_msg);
+                }
+                
                 if constexpr (Verbose) {
                     KRYP_LOG(info, "Sent result to {}", address);
                 }

@@ -18,9 +18,7 @@ namespace krypto::instruments {
         using krypto::network::rpc::WorkerBase<Server, krypto::serialization::InstrumentRequest,
                 krypto::serialization::InstrumentResponse, true>::start;
 
-        void process(const krypto::serialization::InstrumentRequest *);
-
-        krypto::utils::MsgType response_type(const krypto::utils::MsgType msg_type);
+        krypto::utils::MsgType process(const krypto::serialization::InstrumentRequest *);
     };
 }
 

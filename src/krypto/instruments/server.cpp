@@ -12,7 +12,7 @@ namespace {
             krypto::utils::Currency, krypto::serialization::Currency>;
 }
 
-void krypto::instruments::Server::process(const krypto::serialization::InstrumentRequest *) {
+krypto::utils::MsgType krypto::instruments::Server::process(const krypto::serialization::InstrumentRequest *) {
     fb_builder_.Clear();
     std::vector<flatbuffers::Offset<krypto::serialization::Instrument>> instruments;
     for (auto &&inst : cache_) {
@@ -34,16 +34,11 @@ void krypto::instruments::Server::process(const krypto::serialization::Instrumen
     builder.add_instruments(instruments_offset);
     auto response = builder.Finish();
     fb_builder_.Finish(response);
+
+    return krypto::utils::MsgType::INSTRUMENT_RESPONSE;
 }
 
 krypto::instruments::Server::Server(const krypto::Config &config, std::string service) :
         WorkerBase(config, std::move(service)), store_{config} {
     cache_ = store_.load();
-}
-
-krypto::utils::MsgType krypto::instruments::Server::response_type(const krypto::utils::MsgType msg_type) {
-    if (msg_type == krypto::utils::MsgType::INSTRUMENT_REQUEST) {
-        return krypto::utils::MsgType::INSTRUMENT_RESPONSE;
-    }
-    return krypto::utils::MsgType::UNDEFINED;
 }

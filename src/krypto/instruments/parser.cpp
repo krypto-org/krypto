@@ -5,6 +5,8 @@ krypto::instruments::Parser::parse(
         const zmq::message_t &msg, krypto::utils::MsgType msg_type) {
     if (msg_type == krypto::utils::MsgType::INSTRUMENT_RESPONSE) {
         return flatbuffers::GetRoot<krypto::serialization::InstrumentResponse>(msg.data());
+    } else if (msg_type == krypto::utils::MsgType::INSTRUMENT_REQUEST) {
+        return flatbuffers::GetRoot<krypto::serialization::InstrumentRequest>(msg.data());
     }
 
     return std::nullopt;
