@@ -115,6 +115,9 @@ table InstrumentRequest {
   type: RequestType;
 }
 
+table InstrumentCacheRefreshRequest {
+}
+
 table InstrumentResponse {
   instruments: [Instrument];
 }

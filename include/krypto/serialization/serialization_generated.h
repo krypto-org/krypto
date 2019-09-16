@@ -29,6 +29,8 @@ struct Trade;
 
 struct InstrumentRequest;
 
+struct InstrumentCacheRefreshRequest;
+
 struct InstrumentResponse;
 
 struct OrderRequest;
@@ -1064,6 +1066,34 @@ inline flatbuffers::Offset<InstrumentRequest> CreateInstrumentRequest(
     RequestType type = RequestType_INVALID) {
   InstrumentRequestBuilder builder_(_fbb);
   builder_.add_type(type);
+  return builder_.Finish();
+}
+
+struct InstrumentCacheRefreshRequest FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+  bool Verify(flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           verifier.EndTable();
+  }
+};
+
+struct InstrumentCacheRefreshRequestBuilder {
+  flatbuffers::FlatBufferBuilder &fbb_;
+  flatbuffers::uoffset_t start_;
+  explicit InstrumentCacheRefreshRequestBuilder(flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  InstrumentCacheRefreshRequestBuilder &operator=(const InstrumentCacheRefreshRequestBuilder &);
+  flatbuffers::Offset<InstrumentCacheRefreshRequest> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = flatbuffers::Offset<InstrumentCacheRefreshRequest>(end);
+    return o;
+  }
+};
+
+inline flatbuffers::Offset<InstrumentCacheRefreshRequest> CreateInstrumentCacheRefreshRequest(
+    flatbuffers::FlatBufferBuilder &_fbb) {
+  InstrumentCacheRefreshRequestBuilder builder_(_fbb);
   return builder_.Finish();
 }
 

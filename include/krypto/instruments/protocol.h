@@ -17,7 +17,8 @@ namespace krypto::instruments {
 
     struct ServerParser final {
         using receive_variant_t = std::variant<
-                const krypto::serialization::InstrumentRequest *>;
+                const krypto::serialization::InstrumentRequest *,
+                const krypto::serialization::InstrumentCacheRefreshRequest * >;
 
         static std::optional<receive_variant_t> parse(
                 const zmq::message_t &msg, krypto::utils::MsgType msg_type);

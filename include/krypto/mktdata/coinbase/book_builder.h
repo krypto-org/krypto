@@ -53,7 +53,11 @@ namespace krypto::mktdata::coinbase {
             publisher_{config.at<std::string>("/services/publisher/mktdata/proxy/frontend/client")} {
 
         krypto::instruments::InstrumentClient client{config};
-        auto instruments = client.query_all();
+        auto instruments = client.query_all(1000);
+
+        if (instruments.empty()) {
+            KRYP_LOG(info, "No instruments received");
+        }
 
         std::for_each(instruments.cbegin(), instruments.cend(), [=](auto &&instr) {
             if (instr.exchange == krypto::utils::ExchangeType::COINBASE) {

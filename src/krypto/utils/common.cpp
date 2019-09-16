@@ -64,12 +64,14 @@ namespace krypto::utils {
     std::array<std::string, enum_size<MsgType>()> enum_names<MsgType>() {
         std::array<std::string, enum_size<MsgType>()> names =
                 {
-                "",
+                        "",
+                        "A",
                         "Q",
                         "T",
                         "H",
                         "I_REQ",
-                        "I_RES"
+                        "I_RES",
+                        "I_CACHE_REQ"
                 };
         return names;
     }

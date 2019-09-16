@@ -98,12 +98,18 @@ namespace krypto::network::rpc {
         zmq::poll(&items[0], 1, timeout);
 
         if (items[0].revents && ZMQ_POLLIN) {
+
             recv_empty_frame(*socket_);
             auto s_name = recv_string(*socket_);
             auto msg_type = recv_msg_type(*socket_);
 
             if (msg_type == krypto::utils::MsgType::UNDEFINED) {
-                KRYP_LOG(error, "Received acknowledgement message - no payload");
+                KRYP_LOG(error, "Received undefined message");
+                return false;
+            }
+
+            if (msg_type == krypto::utils::MsgType::NO_PAYLOAD) {
+                KRYP_LOG(info, "Received acknowledgement message - no payload");
                 return true;
             }
 

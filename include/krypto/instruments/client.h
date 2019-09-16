@@ -7,7 +7,7 @@
 #include <krypto/serialization/serialization_generated.h>
 
 namespace krypto::instruments {
-    using received_variant_t = std::variant<InstrumentRequest>;
+    using received_variant_t = std::variant<InstrumentRequest, InstrumentCacheRefreshRequest>;
 
     class InstrumentClient final
             : public krypto::network::rpc::ClientBase<InstrumentClient, received_variant_t, ClientParser, true> {
@@ -19,8 +19,12 @@ namespace krypto::instruments {
 
         std::vector<krypto::utils::Instrument> query_all(int timeout = -1);
 
+        void refresh_cache();
+
         void process(const krypto::serialization::InstrumentResponse *response);
 
         void serialize(const InstrumentRequest &request);
+
+        void serialize(const InstrumentCacheRefreshRequest &request);
     };
 }

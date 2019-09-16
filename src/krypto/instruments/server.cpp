@@ -42,3 +42,10 @@ krypto::instruments::Server::Server(const krypto::Config &config, std::string se
         WorkerBase(config, std::move(service)), store_{config} {
     cache_ = store_.load();
 }
+
+krypto::utils::MsgType
+krypto::instruments::Server::process(const krypto::serialization::InstrumentCacheRefreshRequest *request) {
+    cache_.clear();
+    cache_ = store_.load();
+    return krypto::utils::MsgType::NO_PAYLOAD;
+}

@@ -82,18 +82,23 @@ namespace krypto::network::rpc {
                     send_empty_frame(*frontend_, ZMQ_SNDMORE);
                     send_string(*frontend_, service_name, ZMQ_SNDMORE);
 
-                    send_msg_type(*frontend_, msg_type, ZMQ_SNDMORE);
+                    bool no_more_flag = msg_type == krypto::utils::MsgType::NO_PAYLOAD ||
+                                         msg_type == krypto::utils::MsgType::UNDEFINED;
 
-                    if (msg_type != krypto::utils::MsgType::UNDEFINED) {
-                        zmq::message_t payload;
-                        backend_->recv(&payload);
+                    send_msg_type(*frontend_, msg_type, no_more_flag ? ZMQ_NULL : ZMQ_SNDMORE);
 
-                        if constexpr (Verbose) {
-                            KRYP_LOG(info, "{} :: received reply payload of size {}", service_name, payload.size());
-                        }
-
-                        frontend_->send(payload);
+                    if (no_more_flag) {
+                        continue;
                     }
+
+                    zmq::message_t payload;
+                    backend_->recv(&payload);
+
+                    if constexpr (Verbose) {
+                        KRYP_LOG(info, "{} :: received reply payload of size {}", service_name, payload.size());
+                    }
+
+                    frontend_->send(payload);
                 }
             }
 
@@ -124,7 +129,8 @@ namespace krypto::network::rpc {
                     KRYP_LOG(info, "Service not available");
                     send_string(*frontend_, client_addr, ZMQ_SNDMORE);
                     send_empty_frame(*frontend_, ZMQ_SNDMORE);
-                    send_string(*frontend_, service);
+                    send_string(*frontend_, service, ZMQ_SNDMORE);
+                    send_msg_type(*frontend_, krypto::utils::MsgType::UNDEFINED);
                 }
             }
         }

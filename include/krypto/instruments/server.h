@@ -20,6 +20,8 @@ namespace krypto::instruments {
                 ServerParser::receive_variant_t, true>::start;
 
         krypto::utils::MsgType process(const krypto::serialization::InstrumentRequest *);
+
+        krypto::utils::MsgType process(const krypto::serialization::InstrumentCacheRefreshRequest *);
     };
 }
 

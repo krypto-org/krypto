@@ -11,4 +11,9 @@ namespace krypto::instruments {
         static const constexpr krypto::utils::MsgType message_type =
                 krypto::utils::MsgType::INSTRUMENT_REQUEST;
     };
+
+    struct InstrumentCacheRefreshRequest {
+        static const constexpr krypto::utils::MsgType message_type =
+                krypto::utils::MsgType::INSTRUMENT_CACHE_REFRESH_REQUEST;
+    };
 }

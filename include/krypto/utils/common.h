@@ -74,11 +74,13 @@ namespace krypto::utils {
 
     enum class MsgType : uint8_t {
         UNDEFINED,
+        NO_PAYLOAD,
         QUOTE,
         TRADE,
         HEARTBEAT,
         INSTRUMENT_REQUEST,
         INSTRUMENT_RESPONSE,
+        INSTRUMENT_CACHE_REFRESH_REQUEST,
         SIZE
     };
 

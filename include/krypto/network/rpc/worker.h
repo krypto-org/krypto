@@ -129,9 +129,11 @@ namespace krypto::network::rpc {
                 send_string(*socket_, service_, ZMQ_SNDMORE);
                 send_string(*socket_, address, ZMQ_SNDMORE);
                 send_empty_frame(*socket_, ZMQ_SNDMORE);
-                send_msg_type(*socket_, result_msg_type, ZMQ_SNDMORE);
 
-                if (result_msg_type != krypto::utils::MsgType::UNDEFINED) {
+                bool flag = result_msg_type == krypto::utils::MsgType::NO_PAYLOAD;
+                send_msg_type(*socket_, result_msg_type, flag ? ZMQ_NULL : ZMQ_SNDMORE);
+
+                if (!flag) {
                     zmq::message_t result_msg(fb_builder_.GetSize());
                     std::memcpy(result_msg.data(), fb_builder_.GetBufferPointer(), fb_builder_.GetSize());
                     socket_->send(result_msg);

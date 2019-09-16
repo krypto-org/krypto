@@ -14,6 +14,9 @@ int main(int argc, char ** argv) {
     krypto::instruments::InstrumentClient client{config};
     
     auto result = client.query_all();
-    
+    KRYP_LOG(info, "{}", result.size());
+    KRYP_LOG(info, "Refresh Cache");
+    client.refresh_cache();
+    result = client.query_all();
     KRYP_LOG(info, "{}", result.size());
 }
