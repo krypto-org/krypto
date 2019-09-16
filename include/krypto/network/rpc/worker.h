@@ -2,6 +2,7 @@
 
 #include <chrono>
 #include <memory>
+#include <variant>
 
 #include <flatbuffers/flatbuffers.h>
 #include <zmq.hpp>
@@ -10,7 +11,7 @@
 #include <krypto/config.h>
 
 namespace krypto::network::rpc {
-    template<typename Derived, typename ReceiveType, typename SendType, bool Verbose = false>
+    template<typename Derived, typename ReceiveParser, typename ResponseVariant, bool Verbose = false>
     class WorkerBase {
     private:
         zmq::context_t context_;
@@ -37,8 +38,8 @@ namespace krypto::network::rpc {
         void stop();
     };
 
-    template<typename Derived, typename ReceiveType, typename SendType, bool Verbose>
-    WorkerBase<Derived, ReceiveType, SendType, Verbose>::WorkerBase(
+    template<typename Derived, typename ReceiveParser, typename ResponseVariant, bool Verbose>
+    WorkerBase<Derived, ReceiveParser, ResponseVariant, Verbose>::WorkerBase(
             const krypto::Config &config,
             std::string service) :
             context_{1},
@@ -48,8 +49,8 @@ namespace krypto::network::rpc {
         socket_ = std::make_unique<zmq::socket_t>(context_, ZMQ_DEALER);
     }
 
-    template<typename Derived, typename ReceiveType, typename SendType, bool Verbose>
-    void WorkerBase<Derived, ReceiveType, SendType, Verbose>::connect() {
+    template<typename Derived, typename ReceiveParser, typename ResponseVariant, bool Verbose>
+    void WorkerBase<Derived, ReceiveParser, ResponseVariant, Verbose>::connect() {
         int linger = 0;
         socket_->setsockopt(ZMQ_LINGER, &linger, sizeof(linger));
 
@@ -73,8 +74,8 @@ namespace krypto::network::rpc {
         }
     }
 
-    template<typename Derived, typename ReceiveType, typename SendType, bool Verbose>
-    void WorkerBase<Derived, ReceiveType, SendType, Verbose>::send_ready() {
+    template<typename Derived, typename ReceiveParser, typename ResponseVariant, bool Verbose>
+    void WorkerBase<Derived, ReceiveParser, ResponseVariant, Verbose>::send_ready() {
         if constexpr (Verbose) {
             KRYP_LOG(info, "Sending ready status");
         }
@@ -84,8 +85,8 @@ namespace krypto::network::rpc {
         send_string(*socket_, service_);
     }
 
-    template<typename Derived, typename ReceiveType, typename SendType, bool Verbose>
-    void WorkerBase<Derived, ReceiveType, SendType, Verbose>::start() {
+    template<typename Derived, typename ReceiveParser, typename ResponseVariant, bool Verbose>
+    void WorkerBase<Derived, ReceiveParser, ResponseVariant, Verbose>::start() {
 
         connect();
 
@@ -111,11 +112,17 @@ namespace krypto::network::rpc {
                              payload_msg.size(), address);
                 }
 
+                auto payload = ReceiveParser::parse(payload_msg, msg_type);
+
                 auto &derived = static_cast<Derived &>(*this);
-                auto payload = flatbuffers::GetRoot<ReceiveType>(payload_msg.data());
 
-                auto result_msg_type = derived.process(payload);
+                krypto::utils::MsgType result_msg_type = krypto::utils::MsgType::UNDEFINED;
 
+                if (payload.has_value()) {
+                    result_msg_type = std::visit([&](auto &&r) -> krypto::utils::MsgType {
+                        return derived.process(r);
+                    }, payload.value());
+                }
 
                 send_empty_frame(*socket_, ZMQ_SNDMORE);
                 send_status(*socket_, SocketStatus::REPLY, ZMQ_SNDMORE);
@@ -129,7 +136,7 @@ namespace krypto::network::rpc {
                     std::memcpy(result_msg.data(), fb_builder_.GetBufferPointer(), fb_builder_.GetSize());
                     socket_->send(result_msg);
                 }
-                
+
                 if constexpr (Verbose) {
                     KRYP_LOG(info, "Sent result to {}", address);
                 }
@@ -139,13 +146,13 @@ namespace krypto::network::rpc {
         send_disconnect();
     }
 
-    template<typename Derived, typename ReceiveType, typename SendType, bool Verbose>
-    void WorkerBase<Derived, ReceiveType, SendType, Verbose>::stop() {
+    template<typename Derived, typename ReceiveParser, typename ResponseVariant, bool Verbose>
+    void WorkerBase<Derived, ReceiveParser, ResponseVariant, Verbose>::stop() {
         running_ = false;
     }
 
-    template<typename Derived, typename ReceiveType, typename SendType, bool Verbose>
-    void WorkerBase<Derived, ReceiveType, SendType, Verbose>::send_disconnect() {
+    template<typename Derived, typename ReceiveParser, typename ResponseVariant, bool Verbose>
+    void WorkerBase<Derived, ReceiveParser, ResponseVariant, Verbose>::send_disconnect() {
         if constexpr (Verbose) {
             KRYP_LOG(info, "Sending disconnect status");
         }

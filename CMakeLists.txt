@@ -87,7 +87,7 @@ add_library(krypto STATIC
         include/krypto/network/rpc/worker.h
         include/krypto/network/rpc/broker.h
         include/krypto/instruments/message_types.h
-        include/krypto/instruments/parser.h
+        include/krypto/instruments/protocol.h
         src/krypto/network/rpc/broker.cpp
         src/krypto/instruments/client.cpp
         include/krypto/instruments/client.h
@@ -105,7 +105,7 @@ add_library(krypto STATIC
         include/krypto/mktdata/parser.h
         src/krypto/mktdata/parser.cpp
         src/krypto/instruments/message_types.cpp
-        src/krypto/instruments/parser.cpp)
+        src/krypto/instruments/protocol.cpp)
 target_link_libraries(krypto Threads::Threads)
 
 add_library(crypto STATIC IMPORTED include/krypto/mktdata/coinbase/book_builder.h)
