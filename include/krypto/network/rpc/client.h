@@ -24,8 +24,6 @@ namespace krypto::network::rpc {
 
         void send_impl(const std::string &, const RequestVariant &);
 
-        void receive_impl(const std::string &);
-
     protected:
         flatbuffers::FlatBufferBuilder fb_builder_;
     public:
@@ -33,7 +31,9 @@ namespace krypto::network::rpc {
 
         void connect();
 
-        void send(std::string service, const RequestVariant &);
+        void send(const std::string& service, const RequestVariant &);
+
+        bool receive(int timeout=-1);
     };
 
     template<typename Derived, typename RequestVariant, typename Parser,bool Verbose>
@@ -61,15 +61,11 @@ namespace krypto::network::rpc {
     }
 
     template<typename Derived, typename RequestVariant,typename Parser, bool Verbose>
-    void ClientBase<Derived, RequestVariant, Parser, Verbose>::send(std::string service_name, const RequestVariant &request) {
-
+    void ClientBase<Derived, RequestVariant, Parser, Verbose>::send(const std::string& service_name, const RequestVariant &request) {
         send_impl(service_name, request);
-
         if constexpr  (Verbose) {
             KRYP_LOG(debug, "Sent message to {}", service_name);
         }
-
-        receive_impl(service_name);
     }
 
     template<typename Derived, typename RequestVariant, typename Parser,bool Verbose>
@@ -93,50 +89,44 @@ namespace krypto::network::rpc {
     }
 
     template<typename Derived, typename RequestVariant, typename Parser,bool Verbose>
-    void ClientBase<Derived, RequestVariant,Parser, Verbose>::receive_impl(const std::string &service_name) {
+    bool ClientBase<Derived, RequestVariant,Parser, Verbose>::receive(int timeout) {
 
-        recv_empty_frame(*socket_);
+        zmq::pollitem_t items[] = {
+                {*socket_, 0, ZMQ_POLLIN, 0},
+        };
 
-        zmq::message_t service_msg;
+        zmq::poll(&items[0], 1, timeout);
 
-        if (!socket_->recv(&service_msg, 0)) {
-            return;
+        if (items[0].revents && ZMQ_POLLIN) {
+            recv_empty_frame(*socket_);
+            auto s_name = recv_string(*socket_);
+            auto msg_type = recv_msg_type(*socket_);
+
+            if (msg_type == krypto::utils::MsgType::UNDEFINED) {
+                KRYP_LOG(error, "Received acknowledgement message - no payload");
+                return true;
+            }
+
+            zmq::message_t payload_msg;
+            socket_->recv(&payload_msg);
+
+            if (payload_msg.more()) {
+                KRYP_LOG(error, "Received more than 3 frames");
+            }
+
+            auto &derived = static_cast<Derived &>(*this);
+
+            auto payload = Parser::parse(payload_msg, msg_type);
+
+            if (payload.has_value()) {
+                std::visit([&](auto &&x) { derived.process(x); }, payload.value());
+            } else {
+                KRYP_LOG(warn, "Unknown Response Type Received");
+            }
+
+            return true;
         }
 
-        auto s_name = std::string(static_cast<char *>(service_msg.data()), service_msg.size());
-
-        if (s_name != service_name) {
-            KRYP_LOG(warn, "Service name received [{}] != expected [{}]", s_name, service_name);
-            return;
-        }
-
-        if (!service_msg.more()) {
-            KRYP_LOG(error, "No data received");
-            return;
-        }
-
-        auto msg_type = recv_msg_type(*socket_);
-
-        if (msg_type == krypto::utils::MsgType::UNDEFINED) {
-            KRYP_LOG(error, "Received acknowledgement message - no payload");
-            return;
-        }
-
-        zmq::message_t payload_msg;
-        socket_->recv(&payload_msg);
-
-        if (payload_msg.more()) {
-            KRYP_LOG(error, "Received more than 3 frames");
-        }
-
-        auto &derived = static_cast<Derived &>(*this);
-
-        auto payload = Parser::parse(payload_msg, msg_type);
-
-        if (payload.has_value()) {
-            std::visit([&](auto &&x) { derived.process(x); }, payload.value());
-        } else {
-            KRYP_LOG(warn, "Unknown Response Type Received");
-        }
+        return false;
     }
 }

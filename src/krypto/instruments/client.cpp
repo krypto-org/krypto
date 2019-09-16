@@ -10,9 +10,10 @@ namespace {
 }
 
 
-std::vector<krypto::utils::Instrument> krypto::instruments::InstrumentClient::query_all()  {
+std::vector<krypto::utils::Instrument> krypto::instruments::InstrumentClient::query_all(int timeout)  {
     InstrumentRequest request{krypto::serialization::RequestType::RequestType_ALL};
     send("instruments", request);
+    receive(timeout);
     return instruments_;
 }
 

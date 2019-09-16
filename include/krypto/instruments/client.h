@@ -17,7 +17,7 @@ namespace krypto::instruments {
         using krypto::network::rpc::ClientBase<InstrumentClient, received_variant_t, ClientParser, true>::ClientBase;
         using krypto::network::rpc::ClientBase<InstrumentClient, received_variant_t, ClientParser, true>::connect;
 
-        std::vector<krypto::utils::Instrument> query_all();
+        std::vector<krypto::utils::Instrument> query_all(int timeout = -1);
 
         void process(const krypto::serialization::InstrumentResponse *response);
 
