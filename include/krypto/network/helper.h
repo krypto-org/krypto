@@ -15,7 +15,7 @@ namespace krypto::network {
         DISCONNECT = 0x05,
     };
 
-    static const constexpr char *MDP_COMMANDS[] = {
+    static const constexpr char *SocketStatusNames[] = {
             nullptr,
             "READY",
             "REQUEST",
