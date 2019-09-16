@@ -67,6 +67,7 @@ namespace krypto::utils {
         ZRX,
         XTZ,
         ALGO,
+        DASH,
         SIZE
     };
 

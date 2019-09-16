@@ -47,7 +47,8 @@ enum Currency : byte {
     ZEC,
     ZRX,
     XTZ,
-    ALGO
+    ALGO,
+    DASH
 }
 
 enum RequestType: byte {INVALID, ALL, ID, EXCHANGE, PRODUCT}

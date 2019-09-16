@@ -33,35 +33,33 @@ krypto::mktdata::coinbase::WsConnection::WsConnection(
 
 
 void krypto::mktdata::coinbase::WsConnection::on_open(wpp::connection_hdl hdl) {
-    KRYP_LOG(info, "Opened Websocket Connection to {}", uri_);
+    KRYP_LOG(info, "Opened websocket connection to {}", uri_);
     std::lock_guard<std::mutex> guard(connection_lock_);
     status_ = WsConnectionStatus::OPEN;
 
     auto subscription = generate_subscription();
-
     KRYP_LOG(info, "Sending subscription: {}", subscription);
-
-    send(subscription);
+    send(std::move(subscription));
 }
 
-void krypto::mktdata::coinbase::WsConnection::on_close(wpp::connection_hdl hdl) {
-    KRYP_LOG(info, "Closed Websocket Connection to {}", uri_);
+void krypto::mktdata::coinbase::WsConnection::on_close(const wpp::connection_hdl& hdl) {
+    KRYP_LOG(warn, "Closed websocket connection to {}", uri_);
     std::lock_guard<std::mutex> guard(connection_lock_);
     status_ = WsConnectionStatus::CLOSE;
 }
 
-void krypto::mktdata::coinbase::WsConnection::on_fail(wpp::connection_hdl hdl) {
-    KRYP_LOG(info, "Websocket Connection to {} Failed", uri_);
+void krypto::mktdata::coinbase::WsConnection::on_fail(const wpp::connection_hdl& hdl) {
+    KRYP_LOG(error, "Websocket connection to {} failed", uri_);
     std::lock_guard<std::mutex> guard(connection_lock_);
     status_ = WsConnectionStatus::FAILED;
 }
 
-void krypto::mktdata::coinbase::WsConnection::on_message(wpp::connection_hdl, ws_client_t::message_ptr msg) {
+void krypto::mktdata::coinbase::WsConnection::on_message(const wpp::connection_hdl&, ws_client_t::message_ptr msg) {
     if (msg->get_opcode() == wpp::frame::opcode::text) {
         auto payload = nlohmann::json::parse(msg->get_payload());
         update_channel_.push(payload);
     } else {
-        KRYP_LOG(warn, "NON TEXT MESSGAE RECEIVED");
+        KRYP_LOG(warn, "Non-text message received");
     }
 }
 
@@ -69,20 +67,22 @@ void krypto::mktdata::coinbase::WsConnection::start() {
     wpp::lib::error_code ec;
     ws_client_t::connection_ptr con = client_.get_connection(uri_, ec);
     if (ec) {
-        KRYP_LOG(info, "Websocket Connection to {} Failed: {}", uri_, ec.message());
+        KRYP_LOG(info, "Websocket connection to {} failed: {}", uri_, ec.message());
         return;
     }
     hdl_ = con->get_handle();
     client_.connect(con);
     client_.run();
+
+    KRYP_LOG(info, "Websocket IO loop stooped");
 }
 
-void krypto::mktdata::coinbase::WsConnection::send(std::string message) {
+void krypto::mktdata::coinbase::WsConnection::send(std::string&& message) {
     auto json = nlohmann::json::parse(message);
     wpp::lib::error_code ec;
     client_.send(hdl_, json.dump(), wpp::frame::opcode::text, ec);
     if (ec) {
-        KRYP_LOG(error, "Send Error: {}", ec.message());
+        KRYP_LOG(error, "Send error: {}", ec.message());
     }
 }
 
