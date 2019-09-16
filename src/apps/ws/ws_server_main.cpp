@@ -29,7 +29,7 @@ int main(int argc, char **argv) {
     krypto::mktdata::WebsocketServer ws{config};
 
     std::thread mktdata_thread(std::bind(&krypto::mktdata::WebsocketServer::start, &ws));
-    ws.subscribe(krypto::utils::MsgType::ALL);
+    ws.subscribe(krypto::utils::MsgType::UNDEFINED);
 
     std::thread ws_thread(std::bind(&krypto::mktdata::WebsocketServer::process_messages, &ws));
 

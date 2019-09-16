@@ -100,6 +100,7 @@ namespace krypto::network::rpc {
                 auto client_addr = recv_string(*frontend_);
                 recv_empty_frame(*frontend_);
                 auto service = recv_string(*frontend_);
+                auto msg_type = recv_msg_type(*frontend_);
 
                 zmq::message_t request_payload;
                 frontend_->recv(&request_payload);
@@ -115,7 +116,7 @@ namespace krypto::network::rpc {
                         KRYP_LOG(info, "{} sending request to {}@{} with payload size {}",
                                  client_addr, service, worker_addr, request_payload.size());
                     }
-
+                    send_msg_type(*backend_, msg_type, ZMQ_SNDMORE);
                     backend_->send(request_payload);
                 } else {
                     KRYP_LOG(info, "Service not available");

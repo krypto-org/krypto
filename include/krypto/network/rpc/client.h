@@ -22,7 +22,7 @@ namespace krypto::network::rpc {
         std::string broker_;
         std::unique_ptr<zmq::socket_t> socket_;
 
-        bool send_impl(const std::string &, const RequestVariant &);
+        void send_impl(const std::string &, const RequestVariant &);
 
         void receive_impl(const std::string &);
 
@@ -73,26 +73,23 @@ namespace krypto::network::rpc {
     }
 
     template<typename Derived, typename RequestVariant, typename Parser,bool Verbose>
-    bool ClientBase<Derived, RequestVariant, Parser, Verbose>::send_impl(
+    void ClientBase<Derived, RequestVariant, Parser, Verbose>::send_impl(
             const std::string &service_name, const RequestVariant &request) {
-        std::bitset<2> status;
-
         send_empty_frame(*socket_, ZMQ_SNDMORE);
+        send_string(*socket_, service_name, ZMQ_SNDMORE);
 
-        zmq::message_t service_name_msg(service_name.size());
-        std::memcpy(service_name_msg.data(), service_name.data(), service_name.size());
-        status.set(0, socket_->send(service_name_msg, ZMQ_SNDMORE));
+        auto msg_type = std::visit([&](auto &&r) -> krypto::utils::MsgType
+                { return std::remove_reference<decltype(r)>::type::message_type ; }, request);
+
+        send_msg_type(*socket_, msg_type, ZMQ_SNDMORE);
 
         auto &derived = static_cast<Derived &>(*this);
-
         std::visit([&](auto &&r) { derived.serialize(r); }, request);
 
         zmq::message_t payload_msg(fb_builder_.GetSize());
         std::memcpy(payload_msg.data(), fb_builder_.GetBufferPointer(), fb_builder_.GetSize());
 
-        status.set(1, socket_->send(payload_msg));
-
-        return status.all();
+        socket_->send(payload_msg);
     }
 
     template<typename Derived, typename RequestVariant, typename Parser,bool Verbose>

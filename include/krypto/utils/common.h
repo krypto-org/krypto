@@ -73,7 +73,7 @@ namespace krypto::utils {
     using CurrencyEnum = Enum<Currency>;
 
     enum class MsgType : uint8_t {
-        ALL,
+        UNDEFINED,
         QUOTE,
         TRADE,
         HEARTBEAT,

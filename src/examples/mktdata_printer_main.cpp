@@ -43,7 +43,7 @@ int main(int argc, char **argv) {
 
     MktdataPrinter printer{config.at<std::string>("/services/publisher/mktdata/proxy/backend/client")};
     auto done = std::async(std::launch::async, [&printer]() {
-        printer.subscribe(krypto::utils::MsgType::ALL);
+        printer.subscribe(krypto::utils::MsgType::UNDEFINED);
         printer.start();
     });
 

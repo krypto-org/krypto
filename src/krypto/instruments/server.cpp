@@ -40,3 +40,10 @@ krypto::instruments::Server::Server(const krypto::Config &config, std::string se
         WorkerBase(config, std::move(service)), store_{config} {
     cache_ = store_.load();
 }
+
+krypto::utils::MsgType krypto::instruments::Server::response_type(const krypto::utils::MsgType msg_type) {
+    if (msg_type == krypto::utils::MsgType::INSTRUMENT_REQUEST) {
+        return krypto::utils::MsgType::INSTRUMENT_RESPONSE;
+    }
+    return krypto::utils::MsgType::UNDEFINED;
+}
