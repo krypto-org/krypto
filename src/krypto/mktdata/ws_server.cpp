@@ -2,6 +2,7 @@
 #include <krypto/mktdata/convert.h>
 #include <krypto/utils/date_time.h>
 #include <websocketpp/frame.hpp>
+#include <krypto/mktdata/protocol.h>
 
 
 krypto::mktdata::WebsocketServer::WebsocketServer(

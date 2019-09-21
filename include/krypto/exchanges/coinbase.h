@@ -33,6 +33,9 @@ namespace krypto::exchanges {
 
             for (auto&& product : insts_json) {
                 krypto::utils::Instrument inst{};
+
+                KRYP_LOG(info, product.dump());
+
                 auto base_currency = product.at("base_currency").get<std::string>();
                 auto quote_currency = product.at("quote_currency").get<std::string>();
                 auto symbol = krypto::utils::instrument_symbol(base_currency, quote_currency);

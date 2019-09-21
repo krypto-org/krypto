@@ -1,8 +1,8 @@
 #pragma once
 
 #include <krypto/network/publisher.h>
-#include <krypto/mktdata/book.h>
 #include <krypto/utils/common.h>
+#include <krypto/mktdata/protocol.h>
 
 
 namespace krypto::network::mktdata {

@@ -6,7 +6,7 @@
 #include <krypto/logger.h>
 #include <krypto/utils/common.h>
 #include <krypto/network/subscriber.h>
-#include <krypto/mktdata/parser.h>
+#include <krypto/mktdata/protocol.h>
 
 namespace {
 struct MktdataPrinter : public krypto::network::Subscriber<MktdataPrinter, krypto::mktdata::Parser , true> {

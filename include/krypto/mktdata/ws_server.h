@@ -11,10 +11,10 @@
 #include <websocketpp/config/asio_no_tls.hpp>
 #include <websocketpp/server.hpp>
 
-#include <krypto/mktdata/book.h>
+#include <krypto/mktdata/protocol.h>
 #include <krypto/network/subscriber.h>
-#include <krypto/mktdata/parser.h>
 #include <krypto/serialization/serialization_generated.h>
+#include <krypto/mktdata/protocol.h>
 
 using websocketpp::connection_hdl;
 using websocketpp::lib::placeholders::_1;

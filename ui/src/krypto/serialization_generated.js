@@ -34,13 +34,26 @@ krypto.serialization.OrderSide = {
  * @enum
  */
 krypto.serialization.OrderStatus = {
-  IN_FLIGHT: 0,
-  NEW: 1,
-  ACCEPTED: 2,
-  CANCELLED: 3,
-  REJECTED: 4,
-  FILLED: 5,
-  PARTIALLY_FILLED: 6
+  UNKNOWN: 0,
+  IN_FLIGHT: 1,
+  NEW: 2,
+  ACCEPTED: 3,
+  CANCELLED: 4,
+  REPLACED: 5,
+  REJECTED: 6,
+  FILLED: 7,
+  PARTIALLY_FILLED: 8
+};
+
+/**
+ * @enum
+ */
+krypto.serialization.TimeInForce = {
+  DAY: 0,
+  IOC: 1,
+  FOK: 2,
+  GTC: 3,
+  GTT: 4
 };
 
 /**
@@ -1474,10 +1487,18 @@ krypto.serialization.OrderRequest.prototype.orderId = function(optionalEncoding)
 };
 
 /**
+ * @returns {krypto.serialization.TimeInForce}
+ */
+krypto.serialization.OrderRequest.prototype.tif = function() {
+  var offset = this.bb.__offset(this.bb_pos, 16);
+  return offset ? /** @type {krypto.serialization.TimeInForce} */ (this.bb.readInt8(this.bb_pos + offset)) : krypto.serialization.TimeInForce.DAY;
+};
+
+/**
  * @param {flatbuffers.Builder} builder
  */
 krypto.serialization.OrderRequest.startOrderRequest = function(builder) {
-  builder.startObject(6);
+  builder.startObject(7);
 };
 
 /**
@@ -1530,9 +1551,233 @@ krypto.serialization.OrderRequest.addOrderId = function(builder, orderIdOffset) 
 
 /**
  * @param {flatbuffers.Builder} builder
+ * @param {krypto.serialization.TimeInForce} tif
+ */
+krypto.serialization.OrderRequest.addTif = function(builder, tif) {
+  builder.addFieldInt8(6, tif, krypto.serialization.TimeInForce.DAY);
+};
+
+/**
+ * @param {flatbuffers.Builder} builder
  * @returns {flatbuffers.Offset}
  */
 krypto.serialization.OrderRequest.endOrderRequest = function(builder) {
+  var offset = builder.endObject();
+  return offset;
+};
+
+/**
+ * @constructor
+ */
+krypto.serialization.OrderCancelRequest = function() {
+  /**
+   * @type {flatbuffers.ByteBuffer}
+   */
+  this.bb = null;
+
+  /**
+   * @type {number}
+   */
+  this.bb_pos = 0;
+};
+
+/**
+ * @param {number} i
+ * @param {flatbuffers.ByteBuffer} bb
+ * @returns {krypto.serialization.OrderCancelRequest}
+ */
+krypto.serialization.OrderCancelRequest.prototype.__init = function(i, bb) {
+  this.bb_pos = i;
+  this.bb = bb;
+  return this;
+};
+
+/**
+ * @param {flatbuffers.ByteBuffer} bb
+ * @param {krypto.serialization.OrderCancelRequest=} obj
+ * @returns {krypto.serialization.OrderCancelRequest}
+ */
+krypto.serialization.OrderCancelRequest.getRootAsOrderCancelRequest = function(bb, obj) {
+  return (obj || new krypto.serialization.OrderCancelRequest).__init(bb.readInt32(bb.position()) + bb.position(), bb);
+};
+
+/**
+ * @returns {flatbuffers.Long}
+ */
+krypto.serialization.OrderCancelRequest.prototype.timestamp = function() {
+  var offset = this.bb.__offset(this.bb_pos, 4);
+  return offset ? this.bb.readInt64(this.bb_pos + offset) : this.bb.createLong(0, 0);
+};
+
+/**
+ * @param {flatbuffers.Encoding=} optionalEncoding
+ * @returns {string|Uint8Array|null}
+ */
+krypto.serialization.OrderCancelRequest.prototype.orderId = function(optionalEncoding) {
+  var offset = this.bb.__offset(this.bb_pos, 6);
+  return offset ? this.bb.__string(this.bb_pos + offset, optionalEncoding) : null;
+};
+
+/**
+ * @param {flatbuffers.Builder} builder
+ */
+krypto.serialization.OrderCancelRequest.startOrderCancelRequest = function(builder) {
+  builder.startObject(2);
+};
+
+/**
+ * @param {flatbuffers.Builder} builder
+ * @param {flatbuffers.Long} timestamp
+ */
+krypto.serialization.OrderCancelRequest.addTimestamp = function(builder, timestamp) {
+  builder.addFieldInt64(0, timestamp, builder.createLong(0, 0));
+};
+
+/**
+ * @param {flatbuffers.Builder} builder
+ * @param {flatbuffers.Offset} orderIdOffset
+ */
+krypto.serialization.OrderCancelRequest.addOrderId = function(builder, orderIdOffset) {
+  builder.addFieldOffset(1, orderIdOffset, 0);
+};
+
+/**
+ * @param {flatbuffers.Builder} builder
+ * @returns {flatbuffers.Offset}
+ */
+krypto.serialization.OrderCancelRequest.endOrderCancelRequest = function(builder) {
+  var offset = builder.endObject();
+  return offset;
+};
+
+/**
+ * @constructor
+ */
+krypto.serialization.OrderReplaceRequest = function() {
+  /**
+   * @type {flatbuffers.ByteBuffer}
+   */
+  this.bb = null;
+
+  /**
+   * @type {number}
+   */
+  this.bb_pos = 0;
+};
+
+/**
+ * @param {number} i
+ * @param {flatbuffers.ByteBuffer} bb
+ * @returns {krypto.serialization.OrderReplaceRequest}
+ */
+krypto.serialization.OrderReplaceRequest.prototype.__init = function(i, bb) {
+  this.bb_pos = i;
+  this.bb = bb;
+  return this;
+};
+
+/**
+ * @param {flatbuffers.ByteBuffer} bb
+ * @param {krypto.serialization.OrderReplaceRequest=} obj
+ * @returns {krypto.serialization.OrderReplaceRequest}
+ */
+krypto.serialization.OrderReplaceRequest.getRootAsOrderReplaceRequest = function(bb, obj) {
+  return (obj || new krypto.serialization.OrderReplaceRequest).__init(bb.readInt32(bb.position()) + bb.position(), bb);
+};
+
+/**
+ * @returns {flatbuffers.Long}
+ */
+krypto.serialization.OrderReplaceRequest.prototype.timestamp = function() {
+  var offset = this.bb.__offset(this.bb_pos, 4);
+  return offset ? this.bb.readInt64(this.bb_pos + offset) : this.bb.createLong(0, 0);
+};
+
+/**
+ * @param {flatbuffers.Encoding=} optionalEncoding
+ * @returns {string|Uint8Array|null}
+ */
+krypto.serialization.OrderReplaceRequest.prototype.orderId = function(optionalEncoding) {
+  var offset = this.bb.__offset(this.bb_pos, 6);
+  return offset ? this.bb.__string(this.bb_pos + offset, optionalEncoding) : null;
+};
+
+/**
+ * @returns {flatbuffers.Long}
+ */
+krypto.serialization.OrderReplaceRequest.prototype.price = function() {
+  var offset = this.bb.__offset(this.bb_pos, 8);
+  return offset ? this.bb.readInt64(this.bb_pos + offset) : this.bb.createLong(0, 0);
+};
+
+/**
+ * @returns {flatbuffers.Long}
+ */
+krypto.serialization.OrderReplaceRequest.prototype.quantity = function() {
+  var offset = this.bb.__offset(this.bb_pos, 10);
+  return offset ? this.bb.readInt64(this.bb_pos + offset) : this.bb.createLong(0, 0);
+};
+
+/**
+ * @returns {krypto.serialization.Side}
+ */
+krypto.serialization.OrderReplaceRequest.prototype.side = function() {
+  var offset = this.bb.__offset(this.bb_pos, 12);
+  return offset ? /** @type {krypto.serialization.Side} */ (this.bb.readInt8(this.bb_pos + offset)) : krypto.serialization.Side.UNKNOWN;
+};
+
+/**
+ * @param {flatbuffers.Builder} builder
+ */
+krypto.serialization.OrderReplaceRequest.startOrderReplaceRequest = function(builder) {
+  builder.startObject(5);
+};
+
+/**
+ * @param {flatbuffers.Builder} builder
+ * @param {flatbuffers.Long} timestamp
+ */
+krypto.serialization.OrderReplaceRequest.addTimestamp = function(builder, timestamp) {
+  builder.addFieldInt64(0, timestamp, builder.createLong(0, 0));
+};
+
+/**
+ * @param {flatbuffers.Builder} builder
+ * @param {flatbuffers.Offset} orderIdOffset
+ */
+krypto.serialization.OrderReplaceRequest.addOrderId = function(builder, orderIdOffset) {
+  builder.addFieldOffset(1, orderIdOffset, 0);
+};
+
+/**
+ * @param {flatbuffers.Builder} builder
+ * @param {flatbuffers.Long} price
+ */
+krypto.serialization.OrderReplaceRequest.addPrice = function(builder, price) {
+  builder.addFieldInt64(2, price, builder.createLong(0, 0));
+};
+
+/**
+ * @param {flatbuffers.Builder} builder
+ * @param {flatbuffers.Long} quantity
+ */
+krypto.serialization.OrderReplaceRequest.addQuantity = function(builder, quantity) {
+  builder.addFieldInt64(3, quantity, builder.createLong(0, 0));
+};
+
+/**
+ * @param {flatbuffers.Builder} builder
+ * @param {krypto.serialization.Side} side
+ */
+krypto.serialization.OrderReplaceRequest.addSide = function(builder, side) {
+  builder.addFieldInt8(4, side, krypto.serialization.Side.UNKNOWN);
+};
+
+/**
+ * @param {flatbuffers.Builder} builder
+ * @returns {flatbuffers.Offset}
+ */
+krypto.serialization.OrderReplaceRequest.endOrderReplaceRequest = function(builder) {
   var offset = builder.endObject();
   return offset;
 };
@@ -1594,7 +1839,7 @@ krypto.serialization.OrderUpdate.prototype.orderId = function(optionalEncoding) 
  */
 krypto.serialization.OrderUpdate.prototype.status = function() {
   var offset = this.bb.__offset(this.bb_pos, 8);
-  return offset ? /** @type {krypto.serialization.OrderStatus} */ (this.bb.readInt8(this.bb_pos + offset)) : krypto.serialization.OrderStatus.IN_FLIGHT;
+  return offset ? /** @type {krypto.serialization.OrderStatus} */ (this.bb.readInt8(this.bb_pos + offset)) : krypto.serialization.OrderStatus.UNKNOWN;
 };
 
 /**
@@ -1633,7 +1878,7 @@ krypto.serialization.OrderUpdate.addOrderId = function(builder, orderIdOffset) {
  * @param {krypto.serialization.OrderStatus} status
  */
 krypto.serialization.OrderUpdate.addStatus = function(builder, status) {
-  builder.addFieldInt8(2, status, krypto.serialization.OrderStatus.IN_FLIGHT);
+  builder.addFieldInt8(2, status, krypto.serialization.OrderStatus.UNKNOWN);
 };
 
 /**
@@ -1954,4 +2199,5 @@ krypto.serialization.RiskSummary.endRiskSummary = function(builder) {
   return offset;
 };
 
-export default krypto;
+// Exports for Node.js and RequireJS
+this.krypto = krypto;

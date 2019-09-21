@@ -1,6 +1,7 @@
 #include <krypto/network/mktdata/top_of_book.h>
 #include <krypto/mktdata/convert.h>
 #include <krypto/logger.h>
+#include <krypto/mktdata/protocol.h>
 
 
 void krypto::network::mktdata::TopOfBookPublisher::serialize(

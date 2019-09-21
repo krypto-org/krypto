@@ -6,7 +6,9 @@ enum Side: byte {UNKNOWN, BUY, SELL}
 
 enum OrderSide: byte {UNKNOWN, BID, ASK}
 
-enum OrderStatus: byte {IN_FLIGHT, NEW, ACCEPTED, CANCELLED, REJECTED, FILLED, PARTIALLY_FILLED}
+enum OrderStatus: byte {UNKNOWN, IN_FLIGHT, NEW, ACCEPTED, CANCELLED, REPLACED, REJECTED, FILLED, PARTIALLY_FILLED}
+
+enum TimeInForce: byte {DAY, IOC, FOK, GTC, GTT}
 
 table SequenceNumber {
   value: long;
@@ -132,6 +134,20 @@ table OrderRequest {
   quantity: long;
   side: Side;
   order_id: string;
+  tif: TimeInForce;
+}
+
+table OrderCancelRequest {
+  timestamp: long;
+  order_id: string;
+}
+
+table OrderReplaceRequest {
+  timestamp: long;
+  order_id: string;
+  price: long;
+  quantity: long;
+  side: Side;
 }
 
 table OrderUpdate {

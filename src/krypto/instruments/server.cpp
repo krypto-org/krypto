@@ -1,8 +1,8 @@
 #include <utility>
 
-#include <utility>
 #include <krypto/instruments/server.h>
 #include <krypto/utils/enum.h>
+
 
 namespace {
     const auto convert_inst_type = krypto::utils::convert_compatible_enum<

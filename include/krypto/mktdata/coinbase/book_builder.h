@@ -7,10 +7,10 @@
 #include <nlohmann/json.hpp>
 
 #include <krypto/network/mktdata/top_of_book.h>
-#include <krypto/mktdata/book.h>
 #include <krypto/mktdata/convert.h>
 #include <krypto/instruments/client.h>
 #include <krypto/utils/date_time.h>
+#include <krypto/mktdata/protocol.h>
 
 
 namespace krypto::mktdata::coinbase {

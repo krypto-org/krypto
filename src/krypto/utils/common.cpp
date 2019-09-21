@@ -72,7 +72,14 @@ namespace krypto::utils {
                         "H",
                         "I_REQ",
                         "I_RES",
-                        "I_CACHE_REQ"
+                        "I_CACHE_REQ",
+                        "O",
+                        "OR",
+                        "OCR",
+                        "ORR",
+                        "OU",
+                        "P",
+                        "RS"
                 };
         return names;
     }
@@ -84,7 +91,7 @@ namespace krypto::utils {
         MsgTypeEnum::init();
     }
 
-    const std::string create_topic(const MsgType msg_type, const uint64_t id) {
+    std::string create_topic(const MsgType msg_type, const uint64_t id) {
         auto prefix = enum_names<MsgType>()[static_cast<uint8_t>(msg_type)];
         return prefix + std::to_string(id);
     }
