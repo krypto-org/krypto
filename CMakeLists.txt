@@ -107,7 +107,7 @@ add_library(krypto STATIC
         include/krypto/orders/sim/server.h
         include/krypto/orders/protocol.h
         src/krypto/orders/protocol.cpp
-        src/krypto/orders/sim/server.cpp include/krypto/orders/client.h)
+        src/krypto/orders/sim/server.cpp include/krypto/orders/client.h include/krypto/utils/id_gen.h)
 target_link_libraries(krypto Threads::Threads)
 
 add_library(crypto STATIC IMPORTED include/krypto/mktdata/coinbase/book_builder.h)
@@ -157,4 +157,7 @@ target_link_libraries(query-instruments krypto CONAN_PKG::boost ssl crypto dl CO
 
 add_executable(config-loader src/examples/config_loader_main.cpp)
 target_link_libraries(config-loader krypto)
+
+add_executable(sim-order-client src/examples/sim_order_client_main.cpp)
+target_link_libraries(sim-order-client krypto CONAN_PKG::boost ssl crypto dl CONAN_PKG::bzip2 CONAN_PKG::zlib CONAN_PKG::tbb CONAN_PKG::zmq CONAN_PKG::cppzmq Threads::Threads)
 

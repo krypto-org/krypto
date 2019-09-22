@@ -114,26 +114,34 @@ inline const char *EnumNameOrderSide(OrderSide e) {
 enum OrderStatus {
   OrderStatus_UNKNOWN = 0,
   OrderStatus_IN_FLIGHT = 1,
-  OrderStatus_NEW = 2,
-  OrderStatus_ACCEPTED = 3,
-  OrderStatus_CANCELLED = 4,
-  OrderStatus_REPLACED = 5,
-  OrderStatus_REJECTED = 6,
-  OrderStatus_FILLED = 7,
-  OrderStatus_PARTIALLY_FILLED = 8,
+  OrderStatus_CANCEL_IN_FLIGHT = 2,
+  OrderStatus_REPLACE_IN_FLIGHT = 3,
+  OrderStatus_NEW = 4,
+  OrderStatus_ACCEPTED = 5,
+  OrderStatus_CANCELLED = 6,
+  OrderStatus_REPLACED = 7,
+  OrderStatus_REJECTED = 8,
+  OrderStatus_CANCEL_REJECTED = 9,
+  OrderStatus_REPLACE_REJECTED = 10,
+  OrderStatus_FILLED = 11,
+  OrderStatus_PARTIALLY_FILLED = 12,
   OrderStatus_MIN = OrderStatus_UNKNOWN,
   OrderStatus_MAX = OrderStatus_PARTIALLY_FILLED
 };
 
-inline const OrderStatus (&EnumValuesOrderStatus())[9] {
+inline const OrderStatus (&EnumValuesOrderStatus())[13] {
   static const OrderStatus values[] = {
     OrderStatus_UNKNOWN,
     OrderStatus_IN_FLIGHT,
+    OrderStatus_CANCEL_IN_FLIGHT,
+    OrderStatus_REPLACE_IN_FLIGHT,
     OrderStatus_NEW,
     OrderStatus_ACCEPTED,
     OrderStatus_CANCELLED,
     OrderStatus_REPLACED,
     OrderStatus_REJECTED,
+    OrderStatus_CANCEL_REJECTED,
+    OrderStatus_REPLACE_REJECTED,
     OrderStatus_FILLED,
     OrderStatus_PARTIALLY_FILLED
   };
@@ -144,11 +152,15 @@ inline const char * const *EnumNamesOrderStatus() {
   static const char * const names[] = {
     "UNKNOWN",
     "IN_FLIGHT",
+    "CANCEL_IN_FLIGHT",
+    "REPLACE_IN_FLIGHT",
     "NEW",
     "ACCEPTED",
     "CANCELLED",
     "REPLACED",
     "REJECTED",
+    "CANCEL_REJECTED",
+    "REPLACE_REJECTED",
     "FILLED",
     "PARTIALLY_FILLED",
     nullptr

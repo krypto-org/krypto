@@ -38,8 +38,8 @@ krypto::utils::MsgType krypto::instruments::Server::process(const krypto::serial
     return krypto::utils::MsgType::INSTRUMENT_RESPONSE;
 }
 
-krypto::instruments::Server::Server(const krypto::Config &config, std::string service) :
-        WorkerBase(config, std::move(service)), store_{config} {
+krypto::instruments::Server::Server(zmq::context_t &context, const krypto::Config &config, std::string service) :
+        WorkerBase(context, config, std::move(service)), store_{config} {
     cache_ = store_.load();
 }
 

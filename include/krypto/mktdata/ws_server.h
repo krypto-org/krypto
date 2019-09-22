@@ -34,7 +34,7 @@ namespace krypto::mktdata {
 
     class WebsocketServer final : public krypto::network::Subscriber<WebsocketServer, Parser , false> {
     public:
-        explicit WebsocketServer(const krypto::Config& config);
+        explicit WebsocketServer(zmq::context_t& context, const krypto::Config& config);
         void ioc_run();
         void done();
         void on_open(const connection_hdl& hdl);

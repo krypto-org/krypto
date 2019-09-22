@@ -26,7 +26,9 @@ int main(int argc, char **argv) {
     krypto::utils::Startup::init();
     const krypto::Config config(argv[1]);
 
-    krypto::mktdata::WebsocketServer ws{config};
+    zmq::context_t context{1};
+
+    krypto::mktdata::WebsocketServer ws{context, config};
 
     std::thread mktdata_thread(std::bind(&krypto::mktdata::WebsocketServer::start, &ws));
     ws.subscribe(krypto::utils::MsgType::UNDEFINED);

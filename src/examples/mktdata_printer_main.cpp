@@ -41,7 +41,9 @@ int main(int argc, char **argv) {
     krypto::utils::Startup::init();
     const krypto::Config config(argv[1]);
 
-    MktdataPrinter printer{config.at<std::string>("/services/publisher/mktdata/proxy/backend/client")};
+    zmq::context_t context{1};
+
+    MktdataPrinter printer{context, config.at<std::string>("/services/publisher/mktdata/proxy/backend/client")};
     auto done = std::async(std::launch::async, [&printer]() {
         printer.subscribe(krypto::utils::MsgType::UNDEFINED);
         printer.start();

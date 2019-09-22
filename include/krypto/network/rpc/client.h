@@ -18,36 +18,33 @@ namespace krypto::network::rpc {
     template<typename Derived, typename RequestVariant, typename Parser, bool Verbose = false>
     class ClientBase {
     private:
-        zmq::context_t context_;
-        std::string broker_;
         std::unique_ptr<zmq::socket_t> socket_;
+        std::string broker_;
 
         void send_impl(const std::string &, const RequestVariant &);
 
     protected:
         flatbuffers::FlatBufferBuilder fb_builder_;
     public:
-        explicit ClientBase(const krypto::Config &config);
+        ClientBase(zmq::context_t &context, const krypto::Config &config);
 
         void connect();
 
-        void send(const std::string& service, const RequestVariant &);
+        void send(const std::string &service, const RequestVariant &);
 
-        bool receive(int timeout=-1);
+        bool receive(int timeout = -1);
     };
 
-    template<typename Derived, typename RequestVariant, typename Parser,bool Verbose>
-    ClientBase<Derived, RequestVariant, Parser,Verbose>::ClientBase(
+    template<typename Derived, typename RequestVariant, typename Parser, bool Verbose>
+    ClientBase<Derived, RequestVariant, Parser, Verbose>::ClientBase(
+            zmq::context_t &context,
             const krypto::Config &config) :
-            context_{1},
+            socket_{std::make_unique<zmq::socket_t>(context, ZMQ_DEALER)},
             broker_{config.at<std::string>("/services/rpc/broker/frontend/client")} {
-
-        socket_ = std::make_unique<zmq::socket_t>(context_, ZMQ_DEALER);
-
         connect();
     }
 
-    template<typename Derived, typename RequestVariant, typename Parser,bool Verbose>
+    template<typename Derived, typename RequestVariant, typename Parser, bool Verbose>
     void ClientBase<Derived, RequestVariant, Parser, Verbose>::connect() {
         if constexpr  (Verbose) {
             KRYP_LOG(info, "Connecting to broker @ {}", broker_);
@@ -60,22 +57,24 @@ namespace krypto::network::rpc {
         socket_->connect(broker_.c_str());
     }
 
-    template<typename Derived, typename RequestVariant,typename Parser, bool Verbose>
-    void ClientBase<Derived, RequestVariant, Parser, Verbose>::send(const std::string& service_name, const RequestVariant &request) {
+    template<typename Derived, typename RequestVariant, typename Parser, bool Verbose>
+    void ClientBase<Derived, RequestVariant, Parser, Verbose>::send(const std::string &service_name,
+                                                                    const RequestVariant &request) {
         send_impl(service_name, request);
         if constexpr  (Verbose) {
             KRYP_LOG(debug, "Sent message to {}", service_name);
         }
     }
 
-    template<typename Derived, typename RequestVariant, typename Parser,bool Verbose>
+    template<typename Derived, typename RequestVariant, typename Parser, bool Verbose>
     void ClientBase<Derived, RequestVariant, Parser, Verbose>::send_impl(
             const std::string &service_name, const RequestVariant &request) {
         send_empty_frame(*socket_, ZMQ_SNDMORE);
         send_string(*socket_, service_name, ZMQ_SNDMORE);
 
-        auto msg_type = std::visit([&](auto &&r) -> krypto::utils::MsgType
-                { return std::remove_reference<decltype(r)>::type::message_type ; }, request);
+        auto msg_type = std::visit(
+                [&](auto &&r) -> krypto::utils::MsgType { return std::remove_reference<decltype(r)>::type::message_type; },
+                request);
 
         send_msg_type(*socket_, msg_type, ZMQ_SNDMORE);
 
@@ -88,8 +87,8 @@ namespace krypto::network::rpc {
         socket_->send(payload_msg);
     }
 
-    template<typename Derived, typename RequestVariant, typename Parser,bool Verbose>
-    bool ClientBase<Derived, RequestVariant,Parser, Verbose>::receive(int timeout) {
+    template<typename Derived, typename RequestVariant, typename Parser, bool Verbose>
+    bool ClientBase<Derived, RequestVariant, Parser, Verbose>::receive(int timeout) {
 
         zmq::pollitem_t items[] = {
                 {*socket_, 0, ZMQ_POLLIN, 0},
@@ -135,4 +134,5 @@ namespace krypto::network::rpc {
 
         return false;
     }
+
 }

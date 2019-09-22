@@ -14,7 +14,7 @@ namespace krypto::instruments {
         InstrumentLoader store_;
         std::vector<krypto::utils::Instrument> cache_;
     public:
-        Server(const krypto::Config &config, std::string service);
+        Server(zmq::context_t& context, const krypto::Config &config, std::string service);
 
         using krypto::network::rpc::WorkerBase<Server, ServerParser,
                 ServerParser::receive_variant_t, true>::start;

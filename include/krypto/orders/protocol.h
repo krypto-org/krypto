@@ -9,64 +9,42 @@
 
 namespace krypto::orders {
 
-    enum class OrderStatus : uint8_t {
-        UNKNOWN,
-        IN_FLIGHT,
-        NEW,
-        ACCEPTED,
-        CANCELLED,
-        REPLACED,
-        REJECTED,
-        FILLED,
-        PARTIALLY_FILLED
-    };
-
-    static const constexpr char *OrderStatusNames[] = {
-            nullptr,
-            "IN_FLIGHT",
-            "NEW",
-            "ACCEPTED",
-            "CANCELLED",
-            "REPLACED",
-            "REJECTED",
-            "FILLED",
-            "PARTIALLY_FILLED"
-    };
-
-    template<OrderStatus status>
-    const constexpr char *order_status_name() {
-        return OrderStatusNames[static_cast<uint8_t>(status)];
-    }
-
-    krypto::serialization::OrderStatus serialize(OrderStatus status);
-
     struct OrderUpdate final {
+        static const constexpr krypto::utils::MsgType message_type =
+                krypto::utils::MsgType::ORDER_UPDATE;
         uint64_t timestamp;
         std::string order_id;
-        OrderStatus status;
+        krypto::serialization::OrderStatus status;
         uint64_t filled_quantity;
     };
 
     struct OrderRequest final {
+        static const constexpr krypto::utils::MsgType message_type =
+                krypto::utils::MsgType::ORDER_REQUEST;
         uint64_t timestamp;
         uint64_t security_id;
-        uint64_t price;
-        uint64_t quantity;
-        krypto::mktdata::Side side;
+        int64_t price;
+        int64_t quantity;
+        krypto::serialization::Side side;
         std::string order_id;
+        krypto::serialization::TimeInForce tif;
     };
 
     struct OrderCancelRequest final {
+        static const constexpr krypto::utils::MsgType message_type =
+                krypto::utils::MsgType::ORDER_CANCEL_REQUEST;
         uint64_t timestamp;
         std::string order_id;
     };
 
     struct OrderReplaceRequest final {
+        static const constexpr krypto::utils::MsgType message_type =
+                krypto::utils::MsgType::ORDER_REPLACE_REQUEST;
         uint64_t timestamp;
         std::string order_id;
-        uint64_t price;
-        uint64_t quantity;
-        krypto::mktdata::Side side;
+        int64_t price;
+        int64_t quantity;
+        krypto::serialization::Side side;
     };
 
     struct ClientParser final {

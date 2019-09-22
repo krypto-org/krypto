@@ -36,13 +36,17 @@ krypto.serialization.OrderSide = {
 krypto.serialization.OrderStatus = {
   UNKNOWN: 0,
   IN_FLIGHT: 1,
-  NEW: 2,
-  ACCEPTED: 3,
-  CANCELLED: 4,
-  REPLACED: 5,
-  REJECTED: 6,
-  FILLED: 7,
-  PARTIALLY_FILLED: 8
+  CANCEL_IN_FLIGHT: 2,
+  REPLACE_IN_FLIGHT: 3,
+  NEW: 4,
+  ACCEPTED: 5,
+  CANCELLED: 6,
+  REPLACED: 7,
+  REJECTED: 8,
+  CANCEL_REJECTED: 9,
+  REPLACE_REJECTED: 10,
+  FILLED: 11,
+  PARTIALLY_FILLED: 12
 };
 
 /**

@@ -6,8 +6,10 @@
 
 
 krypto::mktdata::WebsocketServer::WebsocketServer(
+        zmq::context_t& context,
         const krypto::Config &config) :
         WebsocketServer::Subscriber(
+                context,
                 config.at<std::string>("/services/publisher/mktdata/proxy/backend/client")),
         port_{config.at<uint16_t>("/services/publisher/mktdata/ws/port")},
         running_{false},

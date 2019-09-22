@@ -66,20 +66,20 @@ namespace krypto::utils {
         std::array<std::string, enum_size<MsgType>()> names =
                 {
                         "",
-                        "A",
-                        "Q",
-                        "T",
-                        "H",
-                        "I_REQ",
-                        "I_RES",
-                        "I_CACHE_REQ",
-                        "O",
+                        "AA",
+                        "MQ",
+                        "MT",
+                        "HH",
+                        "IQ",
+                        "IS",
+                        "IC",
+                        "O_",
+                        "OO",
+                        "OC",
                         "OR",
-                        "OCR",
-                        "ORR",
                         "OU",
-                        "P",
-                        "RS"
+                        "PP",
+                        "PR"
                 };
         return names;
     }

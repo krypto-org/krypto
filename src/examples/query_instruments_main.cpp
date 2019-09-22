@@ -11,7 +11,9 @@ int main(int argc, char ** argv) {
 
     const krypto::Config config(argv[1]);
 
-    krypto::instruments::InstrumentClient client{config};
+    zmq::context_t context{1};
+
+    krypto::instruments::InstrumentClient client{context, config};
     
     auto result = client.query_all();
     KRYP_LOG(info, "{}", result.size());

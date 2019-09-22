@@ -14,7 +14,7 @@ namespace krypto::network::mktdata {
 
         using krypto::network::PublisherBase<TopOfBookPublisher>::send;
 
-        using krypto::network::PublisherBase<TopOfBookPublisher>::start;
+        using krypto::network::PublisherBase<TopOfBookPublisher>::connect;
 
         void serialize(const krypto::mktdata::Quote& quote);
 

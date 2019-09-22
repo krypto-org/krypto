@@ -7,11 +7,15 @@
 #include <krypto/network/publisher.h>
 
 namespace krypto::orders::sim {
+    void serialize_order_update(
+            flatbuffers::FlatBufferBuilder& builder,
+            const krypto::orders::OrderUpdate&);
+
     class OrderUpdatePublisher final : public krypto::network::PublisherBase<OrderUpdatePublisher> {
     public:
         using krypto::network::PublisherBase<OrderUpdatePublisher>::PublisherBase;
         using krypto::network::PublisherBase<OrderUpdatePublisher>::send;
-        using krypto::network::PublisherBase<OrderUpdatePublisher>::start;
+        using krypto::network::PublisherBase<OrderUpdatePublisher>::connect;
 
         void serialize(const krypto::orders::OrderUpdate &order_update);
     };
@@ -25,6 +29,7 @@ namespace krypto::orders::sim {
             true> {
     private:
         OrderUpdatePublisher publisher_;
+        std::unordered_map<std::string, uint64_t> security_ids_by_oids_;
         std::unordered_map<uint64_t, krypto::mktdata::Quote> quotes_;
         std::unordered_map<uint64_t, uint64_t> last_hb_;
 
@@ -33,7 +38,7 @@ namespace krypto::orders::sim {
         friend MktdataSubscriber;
 
     public:
-        OrderServer(const krypto::Config &config, std::string&& service);
+        OrderServer(zmq::context_t& context, const krypto::Config &config, std::string&& service);
 
         krypto::utils::MsgType process(const krypto::serialization::OrderRequest *);
 
@@ -47,12 +52,11 @@ namespace krypto::orders::sim {
 
         OrderServer &parent_;
 
-        MktdataSubscriber(const krypto::Config &config, OrderServer &parent) :
-                Subscriber(config.at<std::string>("/services/publisher/mktdata/proxy/backend/client")),
+        MktdataSubscriber(zmq::context_t& context, const krypto::Config &config, OrderServer &parent) :
+                Subscriber(context, config.at<std::string>("/services/publisher/mktdata/proxy/backend/client")),
                 parent_(parent) {}
 
         void process(const krypto::serialization::Quote *quote) {
-            KRYP_LOG(info, "Got a quote");
             parent_.quotes_[quote->security_id()] = krypto::mktdata::Quote{
                     static_cast<uint64_t >(quote->timestamp()),
                     static_cast<uint64_t >(quote->security_id()),

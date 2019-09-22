@@ -26,10 +26,10 @@ int main(int argc, char **argv) {
     krypto::utils::Startup::init();
     const krypto::Config config(argv[1]);
 
-    krypto::orders::sim::OrderServer orders_server{config, "sim-orders"};
-    krypto::orders::sim::MktdataSubscriber mktdata_subscriber(config, orders_server);
+    zmq::context_t context{1};
 
-
+    krypto::orders::sim::OrderServer orders_server{context, config, "sim-orders"};
+    krypto::orders::sim::MktdataSubscriber mktdata_subscriber(context, config, orders_server);
 
     mktdata_subscriber.subscribe(krypto::utils::MsgType::UNDEFINED);
 

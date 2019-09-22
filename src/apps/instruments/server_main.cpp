@@ -18,8 +18,8 @@ std::function<void(int)> shutdown_handler;
 
 void signal_handler(int signal) { shutdown_handler(signal); }
 
-int main(int argc, char ** argv) {
-    if (argc <  2) {
+int main(int argc, char **argv) {
+    if (argc < 2) {
         KRYP_LOG(error, "Provide config file as parameter: {} <config>", argv[0]);
         return 1;
     }
@@ -27,8 +27,10 @@ int main(int argc, char ** argv) {
     krypto::utils::Startup::init();
     const krypto::Config config(argv[1]);
 
-    krypto::instruments::Server server{config, config.at<std::string>("/services/rpc/instruments/name")};
-    auto done = std::async(std::launch::async, [&server] () {server.start();});
+    zmq::context_t context{1};
+
+    krypto::instruments::Server server{context, config, config.at<std::string>("/services/rpc/instruments/name")};
+    auto done = std::async(std::launch::async, [&server]() { server.start(); });
 
     shutdown_handler = [&server](int signal) {
         SIGNAL_STATUS = signal;

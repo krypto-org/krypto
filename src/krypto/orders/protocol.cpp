@@ -1,10 +1,5 @@
 #include <krypto/orders/protocol.h>
 
-
-krypto::serialization::OrderStatus krypto::orders::serialize(OrderStatus status) {
-    return krypto::serialization::EnumValuesOrderStatus()[static_cast<uint8_t >(status)];
-}
-
 std::optional<krypto::orders::ServerParser::receive_variant_t>
 krypto::orders::ServerParser::parse(const zmq::message_t &msg, krypto::utils::MsgType msg_type) {
     if (msg_type == krypto::utils::MsgType::ORDER_REQUEST) {
