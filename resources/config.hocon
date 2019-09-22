@@ -80,5 +80,22 @@ services = {
                 throttle_frequency_nano = 250000000
             }
         }
+
+        orders = {
+            proxy = {
+                frontend = {
+                    port = 8696
+                    server = "tcp://*:"${services.publisher.orders.proxy.frontend.port}
+                    client = "tcp://"${global.ip}":"${services.publisher.orders.proxy.frontend.port}
+                }
+
+                backend = {
+                    port = 8697
+                    server = "tcp://*:"${services.publisher.orders.proxy.backend.port}
+                    client = "tcp://"${global.ip}":"${services.publisher.orders.proxy.backend.port}
+                }
+
+            }
+        }
     }
 }

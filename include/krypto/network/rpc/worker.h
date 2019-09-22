@@ -14,10 +14,9 @@ namespace krypto::network::rpc {
     template<typename Derived, typename ReceiveParser, typename ResponseVariant, bool Verbose = false>
     class WorkerBase {
     private:
-        zmq::context_t context_;
+        std::unique_ptr<zmq::socket_t> socket_;
         std::string broker_;
         std::string service_;
-        std::unique_ptr<zmq::socket_t> socket_;
         std::atomic_bool running_;
 
         void connect();
@@ -26,6 +25,7 @@ namespace krypto::network::rpc {
         flatbuffers::FlatBufferBuilder fb_builder_;
     public:
         WorkerBase(
+                zmq::context_t &context,
                 const krypto::Config &config,
                 std::string service);
 
@@ -40,13 +40,13 @@ namespace krypto::network::rpc {
 
     template<typename Derived, typename ReceiveParser, typename ResponseVariant, bool Verbose>
     WorkerBase<Derived, ReceiveParser, ResponseVariant, Verbose>::WorkerBase(
+            zmq::context_t &context,
             const krypto::Config &config,
             std::string service) :
-            context_{1},
+            socket_{std::make_unique<zmq::socket_t>(context, ZMQ_DEALER)},
             broker_{config.at<std::string>("/services/rpc/broker/backend/client")},
             service_{std::move(service)},
             running_{false} {
-        socket_ = std::make_unique<zmq::socket_t>(context_, ZMQ_DEALER);
     }
 
     template<typename Derived, typename ReceiveParser, typename ResponseVariant, bool Verbose>

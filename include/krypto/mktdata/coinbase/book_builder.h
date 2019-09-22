@@ -7,10 +7,10 @@
 #include <nlohmann/json.hpp>
 
 #include <krypto/network/mktdata/top_of_book.h>
-#include <krypto/mktdata/book.h>
 #include <krypto/mktdata/convert.h>
 #include <krypto/instruments/client.h>
 #include <krypto/utils/date_time.h>
+#include <krypto/mktdata/protocol.h>
 
 
 namespace krypto::mktdata::coinbase {
@@ -27,7 +27,7 @@ namespace krypto::mktdata::coinbase {
         void apply_incremental(const std::string &symbol, int64_t price, int64_t qty, OrderSide side);
         int64_t parse_time(const std::string& ts);
     public:
-        explicit BookBuilder(const krypto::Config &config);
+        BookBuilder(zmq::context_t& context, const krypto::Config &config);
 
         ~BookBuilder();
 
@@ -49,10 +49,10 @@ namespace krypto::mktdata::coinbase {
     };
 
     template<bool Verbose>
-    BookBuilder<Verbose>::BookBuilder(const krypto::Config &config) :
-            publisher_{config.at<std::string>("/services/publisher/mktdata/proxy/frontend/client")} {
+    BookBuilder<Verbose>::BookBuilder(zmq::context_t& context, const krypto::Config &config) :
+            publisher_{context, config.at<std::string>("/services/publisher/mktdata/proxy/frontend/client")} {
 
-        krypto::instruments::InstrumentClient client{config};
+        krypto::instruments::InstrumentClient client{context, config};
         auto instruments = client.query_all(1000);
 
         if (instruments.empty()) {
@@ -73,7 +73,7 @@ namespace krypto::mktdata::coinbase {
             }
         });
 
-        publisher_.start();
+        publisher_.connect();
     }
 
     template<bool Verbose>

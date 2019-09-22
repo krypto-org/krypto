@@ -15,14 +15,13 @@ namespace krypto::network {
     template<typename Derived>
     class PublisherBase {
     private:
-        zmq::context_t context_;
         std::unique_ptr<zmq::socket_t> socket_;
         const std::string endpoint_;
         bool connected_;
     protected:
         flatbuffers::FlatBufferBuilder fb_builder_;
     public:
-        explicit PublisherBase(std::string endpoint);
+        explicit PublisherBase(zmq::context_t& context, std::string endpoint);
 
         PublisherBase(const PublisherBase &other) = delete;
 
@@ -34,18 +33,17 @@ namespace krypto::network {
 
         ~PublisherBase();
 
-        void start();
+        void connect();
 
         template<typename... Args>
         bool send(const std::string &topic, Args... args);
     };
 
     template<typename Derived>
-    PublisherBase<Derived>::PublisherBase(std::string endpoint) :
-            context_(1),
+    PublisherBase<Derived>::PublisherBase(zmq::context_t& context, std::string endpoint) :
+            socket_{std::make_unique<zmq::socket_t>(context, ZMQ_PUB)},
             endpoint_(std::move(endpoint)),
             connected_(false) {
-        socket_ = std::make_unique<zmq::socket_t>(context_, ZMQ_PUB);
     }
 
     template<typename Derived>
@@ -55,7 +53,7 @@ namespace krypto::network {
     }
 
     template<typename Derived>
-    void PublisherBase<Derived>::start() {
+    void PublisherBase<Derived>::connect() {
         KRYP_LOG(info, "Connecting to proxy @ {}", endpoint_);
         socket_->connect(endpoint_);
         connected_ = true;
@@ -65,6 +63,8 @@ namespace krypto::network {
     template<typename... Args>
     bool PublisherBase<Derived>::send(const std::string &topic, Args... args) {
         std::bitset<2> status;
+
+        KRYP_LOG(info, "Sending message");
 
         zmq::message_t topic_nsg(topic.size());
         std::memcpy(topic_nsg.data(), topic.data(), topic.size());

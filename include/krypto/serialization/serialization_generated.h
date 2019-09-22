@@ -35,6 +35,10 @@ struct InstrumentResponse;
 
 struct OrderRequest;
 
+struct OrderCancelRequest;
+
+struct OrderReplaceRequest;
+
 struct OrderUpdate;
 
 struct Order;
@@ -108,24 +112,36 @@ inline const char *EnumNameOrderSide(OrderSide e) {
 }
 
 enum OrderStatus {
-  OrderStatus_IN_FLIGHT = 0,
-  OrderStatus_NEW = 1,
-  OrderStatus_ACCEPTED = 2,
-  OrderStatus_CANCELLED = 3,
-  OrderStatus_REJECTED = 4,
-  OrderStatus_FILLED = 5,
-  OrderStatus_PARTIALLY_FILLED = 6,
-  OrderStatus_MIN = OrderStatus_IN_FLIGHT,
+  OrderStatus_UNKNOWN = 0,
+  OrderStatus_IN_FLIGHT = 1,
+  OrderStatus_CANCEL_IN_FLIGHT = 2,
+  OrderStatus_REPLACE_IN_FLIGHT = 3,
+  OrderStatus_NEW = 4,
+  OrderStatus_ACCEPTED = 5,
+  OrderStatus_CANCELLED = 6,
+  OrderStatus_REPLACED = 7,
+  OrderStatus_REJECTED = 8,
+  OrderStatus_CANCEL_REJECTED = 9,
+  OrderStatus_REPLACE_REJECTED = 10,
+  OrderStatus_FILLED = 11,
+  OrderStatus_PARTIALLY_FILLED = 12,
+  OrderStatus_MIN = OrderStatus_UNKNOWN,
   OrderStatus_MAX = OrderStatus_PARTIALLY_FILLED
 };
 
-inline const OrderStatus (&EnumValuesOrderStatus())[7] {
+inline const OrderStatus (&EnumValuesOrderStatus())[13] {
   static const OrderStatus values[] = {
+    OrderStatus_UNKNOWN,
     OrderStatus_IN_FLIGHT,
+    OrderStatus_CANCEL_IN_FLIGHT,
+    OrderStatus_REPLACE_IN_FLIGHT,
     OrderStatus_NEW,
     OrderStatus_ACCEPTED,
     OrderStatus_CANCELLED,
+    OrderStatus_REPLACED,
     OrderStatus_REJECTED,
+    OrderStatus_CANCEL_REJECTED,
+    OrderStatus_REPLACE_REJECTED,
     OrderStatus_FILLED,
     OrderStatus_PARTIALLY_FILLED
   };
@@ -134,11 +150,17 @@ inline const OrderStatus (&EnumValuesOrderStatus())[7] {
 
 inline const char * const *EnumNamesOrderStatus() {
   static const char * const names[] = {
+    "UNKNOWN",
     "IN_FLIGHT",
+    "CANCEL_IN_FLIGHT",
+    "REPLACE_IN_FLIGHT",
     "NEW",
     "ACCEPTED",
     "CANCELLED",
+    "REPLACED",
     "REJECTED",
+    "CANCEL_REJECTED",
+    "REPLACE_REJECTED",
     "FILLED",
     "PARTIALLY_FILLED",
     nullptr
@@ -149,6 +171,44 @@ inline const char * const *EnumNamesOrderStatus() {
 inline const char *EnumNameOrderStatus(OrderStatus e) {
   const size_t index = static_cast<int>(e);
   return EnumNamesOrderStatus()[index];
+}
+
+enum TimeInForce {
+  TimeInForce_DAY = 0,
+  TimeInForce_IOC = 1,
+  TimeInForce_FOK = 2,
+  TimeInForce_GTC = 3,
+  TimeInForce_GTT = 4,
+  TimeInForce_MIN = TimeInForce_DAY,
+  TimeInForce_MAX = TimeInForce_GTT
+};
+
+inline const TimeInForce (&EnumValuesTimeInForce())[5] {
+  static const TimeInForce values[] = {
+    TimeInForce_DAY,
+    TimeInForce_IOC,
+    TimeInForce_FOK,
+    TimeInForce_GTC,
+    TimeInForce_GTT
+  };
+  return values;
+}
+
+inline const char * const *EnumNamesTimeInForce() {
+  static const char * const names[] = {
+    "DAY",
+    "IOC",
+    "FOK",
+    "GTC",
+    "GTT",
+    nullptr
+  };
+  return names;
+}
+
+inline const char *EnumNameTimeInForce(TimeInForce e) {
+  const size_t index = static_cast<int>(e);
+  return EnumNamesTimeInForce()[index];
 }
 
 enum InstrumentType {
@@ -1157,7 +1217,8 @@ struct OrderRequest FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
     VT_PRICE = 8,
     VT_QUANTITY = 10,
     VT_SIDE = 12,
-    VT_ORDER_ID = 14
+    VT_ORDER_ID = 14,
+    VT_TIF = 16
   };
   int64_t timestamp() const {
     return GetField<int64_t>(VT_TIMESTAMP, 0);
@@ -1177,6 +1238,9 @@ struct OrderRequest FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   const flatbuffers::String *order_id() const {
     return GetPointer<const flatbuffers::String *>(VT_ORDER_ID);
   }
+  TimeInForce tif() const {
+    return static_cast<TimeInForce>(GetField<int8_t>(VT_TIF, 0));
+  }
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
            VerifyField<int64_t>(verifier, VT_TIMESTAMP) &&
@@ -1186,6 +1250,7 @@ struct OrderRequest FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
            VerifyField<int8_t>(verifier, VT_SIDE) &&
            VerifyOffset(verifier, VT_ORDER_ID) &&
            verifier.Verify(order_id()) &&
+           VerifyField<int8_t>(verifier, VT_TIF) &&
            verifier.EndTable();
   }
 };
@@ -1211,6 +1276,9 @@ struct OrderRequestBuilder {
   void add_order_id(flatbuffers::Offset<flatbuffers::String> order_id) {
     fbb_.AddOffset(OrderRequest::VT_ORDER_ID, order_id);
   }
+  void add_tif(TimeInForce tif) {
+    fbb_.AddElement<int8_t>(OrderRequest::VT_TIF, static_cast<int8_t>(tif), 0);
+  }
   explicit OrderRequestBuilder(flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
@@ -1230,13 +1298,15 @@ inline flatbuffers::Offset<OrderRequest> CreateOrderRequest(
     int64_t price = 0,
     int64_t quantity = 0,
     Side side = Side_UNKNOWN,
-    flatbuffers::Offset<flatbuffers::String> order_id = 0) {
+    flatbuffers::Offset<flatbuffers::String> order_id = 0,
+    TimeInForce tif = TimeInForce_DAY) {
   OrderRequestBuilder builder_(_fbb);
   builder_.add_quantity(quantity);
   builder_.add_price(price);
   builder_.add_security_id(security_id);
   builder_.add_timestamp(timestamp);
   builder_.add_order_id(order_id);
+  builder_.add_tif(tif);
   builder_.add_side(side);
   return builder_.Finish();
 }
@@ -1248,7 +1318,8 @@ inline flatbuffers::Offset<OrderRequest> CreateOrderRequestDirect(
     int64_t price = 0,
     int64_t quantity = 0,
     Side side = Side_UNKNOWN,
-    const char *order_id = nullptr) {
+    const char *order_id = nullptr,
+    TimeInForce tif = TimeInForce_DAY) {
   return krypto::serialization::CreateOrderRequest(
       _fbb,
       timestamp,
@@ -1256,7 +1327,166 @@ inline flatbuffers::Offset<OrderRequest> CreateOrderRequestDirect(
       price,
       quantity,
       side,
+      order_id ? _fbb.CreateString(order_id) : 0,
+      tif);
+}
+
+struct OrderCancelRequest FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+  enum {
+    VT_TIMESTAMP = 4,
+    VT_ORDER_ID = 6
+  };
+  int64_t timestamp() const {
+    return GetField<int64_t>(VT_TIMESTAMP, 0);
+  }
+  const flatbuffers::String *order_id() const {
+    return GetPointer<const flatbuffers::String *>(VT_ORDER_ID);
+  }
+  bool Verify(flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyField<int64_t>(verifier, VT_TIMESTAMP) &&
+           VerifyOffset(verifier, VT_ORDER_ID) &&
+           verifier.Verify(order_id()) &&
+           verifier.EndTable();
+  }
+};
+
+struct OrderCancelRequestBuilder {
+  flatbuffers::FlatBufferBuilder &fbb_;
+  flatbuffers::uoffset_t start_;
+  void add_timestamp(int64_t timestamp) {
+    fbb_.AddElement<int64_t>(OrderCancelRequest::VT_TIMESTAMP, timestamp, 0);
+  }
+  void add_order_id(flatbuffers::Offset<flatbuffers::String> order_id) {
+    fbb_.AddOffset(OrderCancelRequest::VT_ORDER_ID, order_id);
+  }
+  explicit OrderCancelRequestBuilder(flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  OrderCancelRequestBuilder &operator=(const OrderCancelRequestBuilder &);
+  flatbuffers::Offset<OrderCancelRequest> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = flatbuffers::Offset<OrderCancelRequest>(end);
+    return o;
+  }
+};
+
+inline flatbuffers::Offset<OrderCancelRequest> CreateOrderCancelRequest(
+    flatbuffers::FlatBufferBuilder &_fbb,
+    int64_t timestamp = 0,
+    flatbuffers::Offset<flatbuffers::String> order_id = 0) {
+  OrderCancelRequestBuilder builder_(_fbb);
+  builder_.add_timestamp(timestamp);
+  builder_.add_order_id(order_id);
+  return builder_.Finish();
+}
+
+inline flatbuffers::Offset<OrderCancelRequest> CreateOrderCancelRequestDirect(
+    flatbuffers::FlatBufferBuilder &_fbb,
+    int64_t timestamp = 0,
+    const char *order_id = nullptr) {
+  return krypto::serialization::CreateOrderCancelRequest(
+      _fbb,
+      timestamp,
       order_id ? _fbb.CreateString(order_id) : 0);
+}
+
+struct OrderReplaceRequest FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+  enum {
+    VT_TIMESTAMP = 4,
+    VT_ORDER_ID = 6,
+    VT_PRICE = 8,
+    VT_QUANTITY = 10,
+    VT_SIDE = 12
+  };
+  int64_t timestamp() const {
+    return GetField<int64_t>(VT_TIMESTAMP, 0);
+  }
+  const flatbuffers::String *order_id() const {
+    return GetPointer<const flatbuffers::String *>(VT_ORDER_ID);
+  }
+  int64_t price() const {
+    return GetField<int64_t>(VT_PRICE, 0);
+  }
+  int64_t quantity() const {
+    return GetField<int64_t>(VT_QUANTITY, 0);
+  }
+  Side side() const {
+    return static_cast<Side>(GetField<int8_t>(VT_SIDE, 0));
+  }
+  bool Verify(flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyField<int64_t>(verifier, VT_TIMESTAMP) &&
+           VerifyOffset(verifier, VT_ORDER_ID) &&
+           verifier.Verify(order_id()) &&
+           VerifyField<int64_t>(verifier, VT_PRICE) &&
+           VerifyField<int64_t>(verifier, VT_QUANTITY) &&
+           VerifyField<int8_t>(verifier, VT_SIDE) &&
+           verifier.EndTable();
+  }
+};
+
+struct OrderReplaceRequestBuilder {
+  flatbuffers::FlatBufferBuilder &fbb_;
+  flatbuffers::uoffset_t start_;
+  void add_timestamp(int64_t timestamp) {
+    fbb_.AddElement<int64_t>(OrderReplaceRequest::VT_TIMESTAMP, timestamp, 0);
+  }
+  void add_order_id(flatbuffers::Offset<flatbuffers::String> order_id) {
+    fbb_.AddOffset(OrderReplaceRequest::VT_ORDER_ID, order_id);
+  }
+  void add_price(int64_t price) {
+    fbb_.AddElement<int64_t>(OrderReplaceRequest::VT_PRICE, price, 0);
+  }
+  void add_quantity(int64_t quantity) {
+    fbb_.AddElement<int64_t>(OrderReplaceRequest::VT_QUANTITY, quantity, 0);
+  }
+  void add_side(Side side) {
+    fbb_.AddElement<int8_t>(OrderReplaceRequest::VT_SIDE, static_cast<int8_t>(side), 0);
+  }
+  explicit OrderReplaceRequestBuilder(flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  OrderReplaceRequestBuilder &operator=(const OrderReplaceRequestBuilder &);
+  flatbuffers::Offset<OrderReplaceRequest> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = flatbuffers::Offset<OrderReplaceRequest>(end);
+    return o;
+  }
+};
+
+inline flatbuffers::Offset<OrderReplaceRequest> CreateOrderReplaceRequest(
+    flatbuffers::FlatBufferBuilder &_fbb,
+    int64_t timestamp = 0,
+    flatbuffers::Offset<flatbuffers::String> order_id = 0,
+    int64_t price = 0,
+    int64_t quantity = 0,
+    Side side = Side_UNKNOWN) {
+  OrderReplaceRequestBuilder builder_(_fbb);
+  builder_.add_quantity(quantity);
+  builder_.add_price(price);
+  builder_.add_timestamp(timestamp);
+  builder_.add_order_id(order_id);
+  builder_.add_side(side);
+  return builder_.Finish();
+}
+
+inline flatbuffers::Offset<OrderReplaceRequest> CreateOrderReplaceRequestDirect(
+    flatbuffers::FlatBufferBuilder &_fbb,
+    int64_t timestamp = 0,
+    const char *order_id = nullptr,
+    int64_t price = 0,
+    int64_t quantity = 0,
+    Side side = Side_UNKNOWN) {
+  return krypto::serialization::CreateOrderReplaceRequest(
+      _fbb,
+      timestamp,
+      order_id ? _fbb.CreateString(order_id) : 0,
+      price,
+      quantity,
+      side);
 }
 
 struct OrderUpdate FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
@@ -1320,7 +1550,7 @@ inline flatbuffers::Offset<OrderUpdate> CreateOrderUpdate(
     flatbuffers::FlatBufferBuilder &_fbb,
     int64_t timestamp = 0,
     flatbuffers::Offset<flatbuffers::String> order_id = 0,
-    OrderStatus status = OrderStatus_IN_FLIGHT,
+    OrderStatus status = OrderStatus_UNKNOWN,
     int64_t filled_quantity = 0) {
   OrderUpdateBuilder builder_(_fbb);
   builder_.add_filled_quantity(filled_quantity);
@@ -1334,7 +1564,7 @@ inline flatbuffers::Offset<OrderUpdate> CreateOrderUpdateDirect(
     flatbuffers::FlatBufferBuilder &_fbb,
     int64_t timestamp = 0,
     const char *order_id = nullptr,
-    OrderStatus status = OrderStatus_IN_FLIGHT,
+    OrderStatus status = OrderStatus_UNKNOWN,
     int64_t filled_quantity = 0) {
   return krypto::serialization::CreateOrderUpdate(
       _fbb,

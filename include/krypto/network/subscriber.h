@@ -17,16 +17,10 @@ namespace krypto::network {
     template<typename Derived, typename Parser, bool Verbose = false>
     class Subscriber {
     private:
-        using receive_variant_t = std::variant<
-                const krypto::serialization::Quote *,
-                const krypto::serialization::Trade *,
-                const krypto::serialization::Heartbeat *>;
-
-        zmq::context_t context_;
+        std::unique_ptr<zmq::socket_t> socket_;
         std::string endpoint_;
         bool connected_;
         std::atomic_bool running_;
-        std::unique_ptr<zmq::socket_t> socket_;
 
         void connect();
 
@@ -35,7 +29,7 @@ namespace krypto::network {
         void recv();
 
     public:
-        explicit Subscriber(std::string);
+        Subscriber(zmq::context_t& context, std::string);
 
         Subscriber(const Subscriber<Derived, Parser, Verbose> &other) = delete;
 
@@ -63,12 +57,12 @@ namespace krypto::network {
     };
 
     template<typename Consumer, typename Parser, bool Verbose>
-    Subscriber<Consumer, Parser, Verbose>::Subscriber(std::string endpoint) :
-            context_{1},
+    Subscriber<Consumer, Parser, Verbose>::Subscriber(zmq::context_t& context, std::string endpoint) :
+            socket_ {std::make_unique<zmq::socket_t>(context, ZMQ_SUB)},
             endpoint_(std::move(endpoint)),
             connected_(false),
             running_{false} {
-        socket_ = std::make_unique<zmq::socket_t>(context_, ZMQ_SUB);
+
         connect();
     }
 
@@ -79,6 +73,7 @@ namespace krypto::network {
 
     template<typename Consumer, typename Parser, bool Verbose>
     void Subscriber<Consumer, Parser, Verbose>::subscribe(const std::string &topic) {
+        KRYP_LOG(info, "Subscribing to topic: {}", topic);
         socket_->setsockopt(ZMQ_SUBSCRIBE, &topic[0], topic.length());
     }
 
@@ -124,7 +119,7 @@ namespace krypto::network {
         socket_->recv(&topic_msg);
         auto topic = std::string(static_cast<char *>(topic_msg.data()), topic_msg.size());
 
-        auto topic_prefix = topic.substr(0, 1);
+        auto topic_prefix = topic.substr(0, 2);
         auto msg_type = krypto::utils::MsgTypeEnum::names_to_enums.at(topic_prefix);
 
         zmq::message_t payload_msg;
@@ -145,6 +140,7 @@ namespace krypto::network {
 
     template<typename Consumer, typename Parser, bool Verbose>
     void Subscriber<Consumer, Parser, Verbose>::start() {
+        KRYP_LOG(info, "Starting subscriber thread");
         running_ = true;
         while (running_) {
             recv();
@@ -153,6 +149,7 @@ namespace krypto::network {
 
     template<typename Consumer, typename Parser, bool Verbose>
     void Subscriber<Consumer, Parser, Verbose>::stop() {
+        KRYP_LOG(info, "Stopping subscriber thread");
         running_ = false;
     }
 }

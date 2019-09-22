@@ -1,8 +1,8 @@
 #pragma once
 
 #include <krypto/network/publisher.h>
-#include <krypto/mktdata/book.h>
 #include <krypto/utils/common.h>
+#include <krypto/mktdata/protocol.h>
 
 
 namespace krypto::network::mktdata {
@@ -14,7 +14,7 @@ namespace krypto::network::mktdata {
 
         using krypto::network::PublisherBase<TopOfBookPublisher>::send;
 
-        using krypto::network::PublisherBase<TopOfBookPublisher>::start;
+        using krypto::network::PublisherBase<TopOfBookPublisher>::connect;
 
         void serialize(const krypto::mktdata::Quote& quote);
 

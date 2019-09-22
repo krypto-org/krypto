@@ -15,7 +15,7 @@ namespace krypto::mktdata::coinbase {
         WsConnection ws_;
         BookBuilder<Verbose> book_builder_;
     public:
-        explicit Server(const krypto::Config &config);
+        explicit Server(zmq::context_t& context, const krypto::Config &config);
 
         void start();
 
@@ -23,11 +23,10 @@ namespace krypto::mktdata::coinbase {
     };
 
     template<bool Verbose>
-    Server<Verbose>::Server(const krypto::Config &config) :
+    Server<Verbose>::Server(zmq::context_t& context, const krypto::Config &config) :
             update_channel_{2},
-            ws_{config, update_channel_},
-            book_builder_{config} {
-
+            ws_{context,config, update_channel_},
+            book_builder_{context, config} {
     }
 
     template<bool Verbose>

@@ -82,6 +82,13 @@ namespace krypto::utils {
         INSTRUMENT_REQUEST,
         INSTRUMENT_RESPONSE,
         INSTRUMENT_CACHE_REFRESH_REQUEST,
+        ORDER,
+        ORDER_REQUEST,
+        ORDER_CANCEL_REQUEST,
+        ORDER_REPLACE_REQUEST,
+        ORDER_UPDATE,
+        POSITION,
+        RISK_SUMMARY,
         SIZE
     };
 
@@ -115,7 +122,7 @@ namespace krypto::utils {
 
     std::string instrument_symbol(const std::string& base, const std::string& quote);
 
-    const std::string create_topic(MsgType msg_type, uint64_t id);
+    std::string create_topic(MsgType msg_type, uint64_t id);
 
     struct Startup {
         static void init();
