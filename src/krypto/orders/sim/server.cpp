@@ -2,8 +2,8 @@
 #include <krypto/utils/date_time.h>
 
 void krypto::orders::sim::serialize_order_update(
-        flatbuffers::FlatBufferBuilder& builder,
-        const krypto::orders::OrderUpdate& order_update) {
+        flatbuffers::FlatBufferBuilder &builder,
+        const krypto::orders::OrderUpdate &order_update) {
     builder.Clear();
     auto oid_offset = builder.CreateString(order_update.order_id);
     krypto::serialization::OrderUpdateBuilder ou_builder{builder};
@@ -15,7 +15,8 @@ void krypto::orders::sim::serialize_order_update(
     builder.Finish(ou);
 }
 
-krypto::orders::sim::OrderServer::OrderServer(zmq::context_t& context, const krypto::Config &config, std::string&& service) :
+krypto::orders::sim::OrderServer::OrderServer(zmq::context_t &context, const krypto::Config &config,
+                                              std::string &&service) :
         OrderServer::WorkerBase(context, config, std::move(service)),
         publisher_{context, config.at<std::string>(
                 "/services/publisher/orders/proxy/frontend/client")} {
@@ -23,22 +24,95 @@ krypto::orders::sim::OrderServer::OrderServer(zmq::context_t& context, const kry
 }
 
 
-krypto::utils::MsgType krypto::orders::sim::OrderServer::process(const krypto::serialization::OrderRequest * request) {
+krypto::utils::MsgType krypto::orders::sim::OrderServer::process(const krypto::serialization::OrderRequest *request) {
     KRYP_LOG(info, "Processing new order request : {}", request->order_id()->str());
     const OrderUpdate in_flight{
-        krypto::utils::current_time_in_nanoseconds(),
-        request->order_id()->str(),
-        krypto::serialization::OrderStatus::OrderStatus_IN_FLIGHT,
-        0};
-    security_ids_by_oids_[request->order_id()->str()] = request->security_id();
+            krypto::utils::current_time_in_nanoseconds(),
+            request->order_id()->str(),
+            krypto::serialization::OrderStatus::OrderStatus_IN_FLIGHT,
+            0};
     std::string topic = krypto::utils::create_topic(
             krypto::utils::MsgType::ORDER_UPDATE,
             request->security_id());
     publisher_.send(topic, in_flight);
+
+    const OrderUpdate accept{
+            krypto::utils::current_time_in_nanoseconds(),
+            request->order_id()->str(),
+            krypto::serialization::OrderStatus::OrderStatus_ACCEPTED,
+            0
+    };
+    publisher_.send(topic, accept);
+
+    quotes_accessor_t a;
+    if (quotes_.find(a, request->security_id())) {
+        auto q = a->second;
+        if ((request->side() == krypto::serialization::Side_BUY &&
+             request->price() >= q.ask) ||
+            (request->side() == krypto::serialization::Side_SELL &&
+             request->price() <= q.bid)) {
+
+            KRYP_LOG(info, "=> {} -- filled", request->order_id()->str());
+            const OrderUpdate fill{
+                    krypto::utils::current_time_in_nanoseconds(),
+                    request->order_id()->str(),
+                    krypto::serialization::OrderStatus::OrderStatus_FILLED,
+                    request->quantity()
+            };
+            publisher_.send(topic, fill);
+            return krypto::utils::MsgType::NO_PAYLOAD;
+        } else {
+            if (request->tif() == krypto::serialization::TimeInForce::TimeInForce_IOC) {
+                const OrderUpdate expired{
+                        krypto::utils::current_time_in_nanoseconds(),
+                        request->order_id()->str(),
+                        krypto::serialization::OrderStatus::OrderStatus_EXPIRED,
+                        0
+                };
+                publisher_.send(topic, expired);
+                return krypto::utils::MsgType::NO_PAYLOAD;
+            } else {
+                day_orders_accessor_t acc;
+                if (!day_orders_.find(acc, request->security_id())) {
+                    day_orders_.insert(acc, request->security_id());
+                }
+
+                OrderRequest r{
+                        static_cast<uint64_t >(request->timestamp()),
+                        static_cast<uint64_t >(request->security_id()),
+                        request->price(),
+                        request->quantity(),
+                        request->side(),
+                        request->order_id()->str(),
+                        request->tif()
+                };
+
+                acc->second.push_back(r);
+
+                const OrderUpdate new_order{
+                        krypto::utils::current_time_in_nanoseconds(),
+                        request->order_id()->str(),
+                        krypto::serialization::OrderStatus::OrderStatus_NEW,
+                        0
+                };
+                publisher_.send(topic, new_order);
+            }
+        }
+    }
+
+    const OrderUpdate rejected{
+            krypto::utils::current_time_in_nanoseconds(),
+            request->order_id()->str(),
+            krypto::serialization::OrderStatus::OrderStatus_REJECTED,
+            request->quantity()
+    };
+    publisher_.send(topic, rejected);
+
     return krypto::utils::MsgType::NO_PAYLOAD;
 }
 
-krypto::utils::MsgType krypto::orders::sim::OrderServer::process(const krypto::serialization::OrderCancelRequest * request) {
+krypto::utils::MsgType
+krypto::orders::sim::OrderServer::process(const krypto::serialization::OrderCancelRequest *request) {
     KRYP_LOG(info, "Processing cancel order request : {}", request->order_id()->str());
     const OrderUpdate in_flight{
             krypto::utils::current_time_in_nanoseconds(),
@@ -52,7 +126,8 @@ krypto::utils::MsgType krypto::orders::sim::OrderServer::process(const krypto::s
     return krypto::utils::MsgType::NO_PAYLOAD;
 }
 
-krypto::utils::MsgType krypto::orders::sim::OrderServer::process(const krypto::serialization::OrderReplaceRequest * request) {
+krypto::utils::MsgType
+krypto::orders::sim::OrderServer::process(const krypto::serialization::OrderReplaceRequest *request) {
     KRYP_LOG(info, "Processing replace order request : {}", request->order_id()->str());
     const OrderUpdate in_flight{
             krypto::utils::current_time_in_nanoseconds(),

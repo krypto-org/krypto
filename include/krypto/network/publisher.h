@@ -64,8 +64,6 @@ namespace krypto::network {
     bool PublisherBase<Derived>::send(const std::string &topic, Args... args) {
         std::bitset<2> status;
 
-        KRYP_LOG(info, "Sending message");
-
         zmq::message_t topic_nsg(topic.size());
         std::memcpy(topic_nsg.data(), topic.data(), topic.size());
 

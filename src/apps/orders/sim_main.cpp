@@ -50,7 +50,10 @@ int main(int argc, char **argv) {
 
     std::signal(SIGINT, signal_handler);
 
+    KRYP_LOG(info, "Joining md server thread");
     mktdata_thread.join();
+
+    KRYP_LOG(info, "Joining server thread");
     server_thread.join();
 
     KRYP_LOG(info, "Shutdown Server");

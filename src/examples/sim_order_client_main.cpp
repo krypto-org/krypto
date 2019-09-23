@@ -6,12 +6,9 @@
 
 #include <krypto/utils/common.h>
 #include <krypto/orders/client.h>
+#include <krypto/mktdata/convert.h>
 
 namespace {
-    struct Client : public krypto::orders::OrderClient<Client> {
-        using krypto::orders::OrderClient<Client>::OrderClient;
-    };
-
     volatile std::sig_atomic_t SIGNAL_STATUS;
 }
 
@@ -31,31 +28,58 @@ int main(int argc, char **argv) {
 
     zmq::context_t context{1};
 
-    Client client{context, config};
+    krypto::orders::OrderClient client{context, config};
     auto done = std::async(std::launch::async, [&client]() {
         client.subscribe(krypto::utils::MsgType::UNDEFINED);
         client.start();
     });
+
+    std::this_thread::sleep_for(std::chrono::seconds{1});
 
     shutdown_handler = [&client](int signal) {
         SIGNAL_STATUS = signal;
         client.stop();
     };
 
+    std::atomic_bool send_cancel = true;
+
+    client.register_listener([&] (auto&& update) {
+        KRYP_LOG(info, "Received Order Update: {}", update->order_id()->str());
+        if (update->status() == krypto::serialization::OrderStatus_IN_FLIGHT) {
+            KRYP_LOG(info, "{} In Flight", update->order_id()->str());
+        } else if (update->status() == krypto::serialization::OrderStatus_FILLED) {
+            KRYP_LOG(info, "{} Filled", update->order_id()->str());
+            send_cancel = false;
+        } else if (update->status() == krypto::serialization::OrderStatus_ACCEPTED) {
+            KRYP_LOG(info, "{} Accepted", update->order_id()->str());
+        } else if (update->status() == krypto::serialization::OrderStatus_REJECTED) {
+            KRYP_LOG(info, "{} Rejected", update->order_id()->str());
+            send_cancel = false;
+        }
+    });
+
     std::signal(SIGINT, signal_handler);
 
-    client.new_order("sim-orders",
-                     1,
-                     1230982312,
-                     1239871,
+    int64_t security_id = 10100030018;
+    int64_t price = krypto::mktdata::convert_price(12000.0);
+    int64_t qty = krypto::mktdata::convert_price(0.01);
+
+    auto order_id = client.new_order("sim-orders",
+                     security_id,
+                     price,
+                     qty,
                      krypto::serialization::Side::Side_BUY,
-                     krypto::serialization::TimeInForce_DAY);
+                     krypto::serialization::TimeInForce_IOC);
 
-    client.cancel_order("sim-orders", "sim_order");
+    KRYP_LOG(info, "Order Id: {}", order_id);
 
-    client.replace_order("sim-orders", "sim_order", 1230982312,
-                         1239871,
-                         krypto::serialization::Side::Side_BUY);
+    std::this_thread::sleep_for(std::chrono::seconds{5});
+
+    if (send_cancel) {
+        client.cancel_order("sim-orders", order_id);
+    }
+
+    std::this_thread::sleep_for(std::chrono::seconds{2});
 
     done.wait();
 

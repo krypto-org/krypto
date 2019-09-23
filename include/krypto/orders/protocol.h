@@ -15,7 +15,7 @@ namespace krypto::orders {
         uint64_t timestamp;
         std::string order_id;
         krypto::serialization::OrderStatus status;
-        uint64_t filled_quantity;
+        int64_t filled_quantity;
     };
 
     struct OrderRequest final {

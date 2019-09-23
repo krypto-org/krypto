@@ -11,8 +11,8 @@ namespace krypto::utils {
     class OrderIdGenerator final {
     private:
         static const constexpr int64_t MULTIPLIER = std::pow(10, size - 6);
-        int base_id_;
-        static int generate_base_id();
+        uint64_t base_id_;
+        static uint64_t generate_base_id();
     public:
         OrderIdGenerator();
         std::string new_id();
@@ -27,7 +27,7 @@ namespace krypto::utils {
     }
 
     template<size_t size>
-    int OrderIdGenerator<size>::generate_base_id() {
+    uint64_t OrderIdGenerator<size>::generate_base_id() {
         static_assert(size >= 7);
         std::time_t t = std::time(nullptr);
         char buffer[7];

@@ -21,4 +21,7 @@ int main(int argc, char ** argv) {
     client.refresh_cache();
     result = client.query_all();
     KRYP_LOG(info, "{}", result.size());
+    for (auto&& inst: result) {
+        KRYP_LOG(info, "{} : {}", inst.symbol, inst.id);
+    }
 }

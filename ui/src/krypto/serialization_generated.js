@@ -46,7 +46,8 @@ krypto.serialization.OrderStatus = {
   CANCEL_REJECTED: 9,
   REPLACE_REJECTED: 10,
   FILLED: 11,
-  PARTIALLY_FILLED: 12
+  PARTIALLY_FILLED: 12,
+  EXPIRED: 13
 };
 
 /**

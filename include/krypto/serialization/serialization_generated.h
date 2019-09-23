@@ -125,11 +125,12 @@ enum OrderStatus {
   OrderStatus_REPLACE_REJECTED = 10,
   OrderStatus_FILLED = 11,
   OrderStatus_PARTIALLY_FILLED = 12,
+  OrderStatus_EXPIRED = 13,
   OrderStatus_MIN = OrderStatus_UNKNOWN,
-  OrderStatus_MAX = OrderStatus_PARTIALLY_FILLED
+  OrderStatus_MAX = OrderStatus_EXPIRED
 };
 
-inline const OrderStatus (&EnumValuesOrderStatus())[13] {
+inline const OrderStatus (&EnumValuesOrderStatus())[14] {
   static const OrderStatus values[] = {
     OrderStatus_UNKNOWN,
     OrderStatus_IN_FLIGHT,
@@ -143,7 +144,8 @@ inline const OrderStatus (&EnumValuesOrderStatus())[13] {
     OrderStatus_CANCEL_REJECTED,
     OrderStatus_REPLACE_REJECTED,
     OrderStatus_FILLED,
-    OrderStatus_PARTIALLY_FILLED
+    OrderStatus_PARTIALLY_FILLED,
+    OrderStatus_EXPIRED
   };
   return values;
 }
@@ -163,6 +165,7 @@ inline const char * const *EnumNamesOrderStatus() {
     "REPLACE_REJECTED",
     "FILLED",
     "PARTIALLY_FILLED",
+    "EXPIRED",
     nullptr
   };
   return names;
