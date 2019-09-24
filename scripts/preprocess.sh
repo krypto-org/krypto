@@ -5,14 +5,16 @@
 # GENERATE FLATBUFFERS SOURCES
 
 BLUE='\033[0;34m'
+# shellcheck disable=SC2034
 RED='\033[0;31m'
 NC='\033[0m' # No Color
 
 SCRIPT_PATH=$(realpath $0)
-SCRIPT_DIR=$(dirname ${SCRIPT_PATH})
+SCRIPT_DIR=$(dirname "${SCRIPT_PATH}")
 
-KRYPTO_DIR=$(realpath ${SCRIPT_DIR}/..)
+KRYPTO_DIR=$(realpath "${SCRIPT_DIR}"/..)
 
+# shellcheck disable=SC2034
 GCC_VERSION=8.2
 FLAT_BUFFERS_VERSION=1.9.0
 FLAT_BUFFERS_BINARY_PACKAGE=flatbuffers/${FLAT_BUFFERS_VERSION}@kapilsh/release
@@ -37,7 +39,7 @@ cd ..
 echo -e "${BLUE}Using $(flatc --version)${NC}" || exit
 
 echo -e "${BLUE}"--- COMPILE C++ FLATBUFFERS SOURCES ---"${NC}"
-flatc --cpp -o "${KRYPTO_DIR}"/include/krypto/serialization serialization.fbs || exit
-flatc --js -o "${KRYPTO_DIR}"/ui/src/krypto serialization.fbs || exit
+flatc --cpp -o "${KRYPTO_DIR}"/cpp/include/krypto/serialization serialization.fbs || exit
+# flatc --js -o "${KRYPTO_DIR}"/ui/src/krypto serialization.fbs || exit
 
 rm -r build
