@@ -43,3 +43,6 @@ ui/yarn-error.log
 ui/package-lock.json
 ui/dist/*
 ui/release/*
+
+java/.idea
+java/.gradle
