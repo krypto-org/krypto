@@ -1,5 +1,6 @@
 #include <krypto/network/helper.h>
 #include <krypto/logger.h>
+#include <krypto/utils/types.h>
 
 namespace krypto::network {
 

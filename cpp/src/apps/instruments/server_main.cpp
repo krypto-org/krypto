@@ -4,9 +4,7 @@
 
 #include <krypto/network/rpc/broker.h>
 #include <krypto/config.h>
-#include <krypto/instruments/loader.h>
 #include <krypto/logger.h>
-#include <krypto/utils/common.h>
 #include <krypto/instruments/server.h>
 
 
@@ -24,7 +22,6 @@ int main(int argc, char **argv) {
         return 1;
     }
 
-    krypto::utils::Startup::init();
     const krypto::Config config(argv[1]);
 
     zmq::context_t context{1};

@@ -4,8 +4,8 @@
 namespace krypto::network::mktdata {
 
     void IncrementalPublisher::serialize(
-            krypto::secid_t id, krypto::timestamp_t posix_time,
-            const std::vector<std::tuple<krypto::price_t, krypto::quantity_t, krypto::serialization::OrderSide>> &updates) {
+            krypto::utils::secid_t id, krypto::utils::timestamp_t posix_time,
+            const std::vector<std::tuple<krypto::utils::price_t, krypto::utils::quantity_t, krypto::serialization::OrderSide>> &updates) {
         std::vector<krypto::serialization::IncrementalPriceLevel> incrs;
         incrs.reserve(updates.size());
 

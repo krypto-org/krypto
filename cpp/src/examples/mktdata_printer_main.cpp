@@ -7,6 +7,7 @@
 #include <krypto/utils/common.h>
 #include <krypto/network/subscriber.h>
 #include <krypto/mktdata/protocol.h>
+#include <krypto/utils/types.h>
 
 namespace {
 struct MktdataPrinter : public krypto::network::Subscriber<MktdataPrinter, krypto::mktdata::Parser , true> {
@@ -38,7 +39,6 @@ int main(int argc, char **argv) {
         return 1;
     }
 
-    krypto::utils::Startup::init();
     const krypto::Config config(argv[1]);
 
     zmq::context_t context{1};

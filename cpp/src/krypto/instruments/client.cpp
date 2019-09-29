@@ -3,28 +3,28 @@
 
 namespace {
     const auto convert_inst_type = krypto::utils::convert_compatible_enum<
-            krypto::serialization::InstrumentType, krypto::utils::InstrumentType>;
+            krypto::serialization::InstrumentType, krypto::serialization::InstrumentType>;
 
     const auto convert_currency = krypto::utils::convert_compatible_enum<
-            krypto::serialization::Currency, krypto::utils::Currency>;
+            krypto::serialization::Currency, krypto::serialization::Currency>;
 }
 
 
 std::vector<krypto::utils::Instrument> krypto::instruments::InstrumentClient::query_all(int timeout) {
-    InstrumentRequest request{krypto::serialization::RequestType::RequestType_ALL};
+    krypto::utils::InstrumentRequest request{krypto::serialization::RequestType::RequestType_ALL};
     send("instruments", request);
     receive(timeout);
     return instruments_;
 }
 
 void krypto::instruments::InstrumentClient::refresh_cache() {
-    InstrumentCacheRefreshRequest request;
+    krypto::utils::InstrumentCacheRefreshRequest request;
     send("instruments", request);
     receive(-1);
 }
 
 
-void krypto::instruments::InstrumentClient::serialize(const krypto::instruments::InstrumentRequest &request) {
+void krypto::instruments::InstrumentClient::serialize(const krypto::utils::InstrumentRequest &request) {
     krypto::serialization::InstrumentRequestBuilder builder{fb_builder_};
     builder.add_type(request.request_type);
     auto req = builder.Finish();
@@ -32,7 +32,7 @@ void krypto::instruments::InstrumentClient::serialize(const krypto::instruments:
 }
 
 void
-krypto::instruments::InstrumentClient::serialize(const krypto::instruments::InstrumentCacheRefreshRequest &request) {
+krypto::instruments::InstrumentClient::serialize(const krypto::utils::InstrumentCacheRefreshRequest &request) {
     krypto::serialization::InstrumentCacheRefreshRequestBuilder builder{fb_builder_};
     auto req = builder.Finish();
     fb_builder_.Finish(req);
@@ -46,10 +46,10 @@ void krypto::instruments::InstrumentClient::process(const krypto::serialization:
         for (size_t i = 0; i < insts->Length(); ++i) {
             auto inst = insts->Get(i);
             krypto::utils::Instrument to_insert{
-                    static_cast<uint64_t>(inst->id()),
+                    static_cast<int64_t>(inst->id()),
                     convert_inst_type(inst->type()),
                     inst->symbol()->str(),
-                    krypto::utils::ExchangeTypeEnum::names_to_enums.at(inst->exchange()->str()),
+                    inst->exchange(),
                     inst->exchange_symbol()->str(),
                     inst->tick_size(),
                     inst->min_size(),

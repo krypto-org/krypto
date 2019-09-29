@@ -52,7 +52,7 @@ namespace krypto::mktdata {
         server_t server_;
         con_list_t connections_;
         tbb::concurrent_bounded_queue<std::string> message_queue_;
-        std::unordered_map<uint64_t, Quote> quotes_;
+        std::unordered_map<uint64_t, krypto::utils::Quote> quotes_;
         std::mutex connection_lock_;
         std::atomic_bool running_;
         int64_t next_update_ts_;

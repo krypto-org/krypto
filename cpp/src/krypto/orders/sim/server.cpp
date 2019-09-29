@@ -1,9 +1,11 @@
 #include <krypto/orders/sim/server.h>
 #include <krypto/utils/date_time.h>
+#include <krypto/utils/types.h>
+#include <krypto/utils/common.h>
 
 void krypto::orders::sim::serialize_order_update(
         flatbuffers::FlatBufferBuilder &builder,
-        const krypto::orders::OrderUpdate &order_update) {
+        const krypto::utils::OrderUpdate &order_update) {
     builder.Clear();
     auto oid_offset = builder.CreateString(order_update.order_id);
     krypto::serialization::OrderUpdateBuilder ou_builder{builder};
@@ -26,7 +28,7 @@ krypto::orders::sim::OrderServer::OrderServer(zmq::context_t &context, const kry
 
 krypto::utils::MsgType krypto::orders::sim::OrderServer::process(const krypto::serialization::OrderRequest *request) {
     KRYP_LOG(info, "Processing new order request : {}", request->order_id()->str());
-    const OrderUpdate in_flight{
+    const krypto::utils::OrderUpdate in_flight{
             krypto::utils::current_time_in_nanoseconds(),
             request->order_id()->str(),
             krypto::serialization::OrderStatus::OrderStatus_IN_FLIGHT,
@@ -36,7 +38,7 @@ krypto::utils::MsgType krypto::orders::sim::OrderServer::process(const krypto::s
             request->security_id());
     publisher_.send(topic, in_flight);
 
-    const OrderUpdate accept{
+    const krypto::utils::OrderUpdate accept{
             krypto::utils::current_time_in_nanoseconds(),
             request->order_id()->str(),
             krypto::serialization::OrderStatus::OrderStatus_ACCEPTED,
@@ -53,7 +55,7 @@ krypto::utils::MsgType krypto::orders::sim::OrderServer::process(const krypto::s
              request->price() <= q.bid)) {
 
             KRYP_LOG(info, "=> {} -- filled", request->order_id()->str());
-            const OrderUpdate fill{
+            const krypto::utils::OrderUpdate fill{
                     krypto::utils::current_time_in_nanoseconds(),
                     request->order_id()->str(),
                     krypto::serialization::OrderStatus::OrderStatus_FILLED,
@@ -63,7 +65,7 @@ krypto::utils::MsgType krypto::orders::sim::OrderServer::process(const krypto::s
             return krypto::utils::MsgType::NO_PAYLOAD;
         } else {
             if (request->tif() == krypto::serialization::TimeInForce::TimeInForce_IOC) {
-                const OrderUpdate expired{
+                const krypto::utils::OrderUpdate expired{
                         krypto::utils::current_time_in_nanoseconds(),
                         request->order_id()->str(),
                         krypto::serialization::OrderStatus::OrderStatus_EXPIRED,
@@ -77,9 +79,9 @@ krypto::utils::MsgType krypto::orders::sim::OrderServer::process(const krypto::s
                     day_orders_.insert(acc, request->security_id());
                 }
 
-                OrderRequest r{
-                        static_cast<uint64_t >(request->timestamp()),
-                        static_cast<uint64_t >(request->security_id()),
+                krypto::utils::OrderRequest r{
+                        request->timestamp(),
+                        request->security_id(),
                         request->price(),
                         request->quantity(),
                         request->side(),
@@ -89,7 +91,7 @@ krypto::utils::MsgType krypto::orders::sim::OrderServer::process(const krypto::s
 
                 acc->second.push_back(r);
 
-                const OrderUpdate new_order{
+                const krypto::utils::OrderUpdate new_order{
                         krypto::utils::current_time_in_nanoseconds(),
                         request->order_id()->str(),
                         krypto::serialization::OrderStatus::OrderStatus_NEW,
@@ -100,7 +102,7 @@ krypto::utils::MsgType krypto::orders::sim::OrderServer::process(const krypto::s
         }
     }
 
-    const OrderUpdate rejected{
+    const krypto::utils::OrderUpdate rejected{
             krypto::utils::current_time_in_nanoseconds(),
             request->order_id()->str(),
             krypto::serialization::OrderStatus::OrderStatus_REJECTED,
@@ -114,7 +116,7 @@ krypto::utils::MsgType krypto::orders::sim::OrderServer::process(const krypto::s
 krypto::utils::MsgType
 krypto::orders::sim::OrderServer::process(const krypto::serialization::OrderCancelRequest *request) {
     KRYP_LOG(info, "Processing cancel order request : {}", request->order_id()->str());
-    const OrderUpdate in_flight{
+    const krypto::utils::OrderUpdate in_flight{
             krypto::utils::current_time_in_nanoseconds(),
             request->order_id()->str(),
             krypto::serialization::OrderStatus::OrderStatus_CANCEL_IN_FLIGHT,
@@ -129,7 +131,7 @@ krypto::orders::sim::OrderServer::process(const krypto::serialization::OrderCanc
 krypto::utils::MsgType
 krypto::orders::sim::OrderServer::process(const krypto::serialization::OrderReplaceRequest *request) {
     KRYP_LOG(info, "Processing replace order request : {}", request->order_id()->str());
-    const OrderUpdate in_flight{
+    const krypto::utils::OrderUpdate in_flight{
             krypto::utils::current_time_in_nanoseconds(),
             request->order_id()->str(),
             krypto::serialization::OrderStatus::OrderStatus_REPLACE_IN_FLIGHT,
@@ -149,6 +151,6 @@ void krypto::orders::sim::OrderServer::fill_price(
 
 
 void krypto::orders::sim::OrderUpdatePublisher::serialize(
-        const krypto::orders::OrderUpdate &order_update) {
+        const krypto::utils::OrderUpdate &order_update) {
     serialize_order_update(fb_builder_, order_update);
 }

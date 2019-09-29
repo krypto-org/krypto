@@ -67,9 +67,9 @@ void krypto::mktdata::WebsocketServer::process_messages() {
 }
 
 void krypto::mktdata::WebsocketServer::process(const krypto::serialization::Quote *quote) {
-    quotes_[quote->security_id()] = Quote{
-            static_cast<uint64_t >(quote->timestamp()),
-            static_cast<uint64_t >(quote->security_id()),
+    quotes_[quote->security_id()] = krypto::utils::Quote{
+            static_cast<int64_t >(quote->timestamp()),
+            static_cast<int64_t >(quote->security_id()),
             quote->bid(),
             quote->ask(),
             quote->bid_quantity(),

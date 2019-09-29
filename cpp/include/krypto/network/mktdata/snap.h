@@ -1,7 +1,7 @@
 #pragma once
 
 #include <krypto/network/publisher.h>
-#include <krypto/types.h>
+#include <krypto/utils/types.h>
 
 
 namespace krypto::network::mktdata {
@@ -10,9 +10,11 @@ namespace krypto::network::mktdata {
     public:
         using krypto::network::PublisherBase<SnapshotPublisher>::PublisherBase;
 
-        void serialize(krypto::secid_t id, krypto::timestamp_t timestamp,
-                             const std::vector<std::tuple<krypto::price_t, krypto::quantity_t >> & bids,
-                             const std::vector<std::tuple<krypto::price_t, krypto::quantity_t >> & asks);
+        void serialize(krypto::utils::secid_t id, krypto::utils::timestamp_t timestamp,
+                       const std::vector<std::tuple<krypto::utils::price_t,
+                               krypto::utils::quantity_t >> &bids,
+                       const std::vector<std::tuple<krypto::utils::price_t,
+                               krypto::utils::quantity_t >> &asks);
     };
 }
 

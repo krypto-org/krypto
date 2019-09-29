@@ -4,6 +4,7 @@
 #include <zmq.hpp>
 
 #include <krypto/utils/common.h>
+#include <krypto/utils/types.h>
 
 namespace krypto::network {
 

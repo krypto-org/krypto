@@ -7,11 +7,13 @@
 #include <krypto/network/publisher.h>
 
 #include <tbb/concurrent_hash_map.h>
+#include <krypto/utils/types.h>
+#include <krypto/utils/message_types.h>
 
 namespace krypto::orders::sim {
     void serialize_order_update(
             flatbuffers::FlatBufferBuilder& builder,
-            const krypto::orders::OrderUpdate&);
+            const krypto::utils::OrderUpdate&);
 
     class OrderUpdatePublisher final : public krypto::network::PublisherBase<OrderUpdatePublisher> {
     public:
@@ -19,7 +21,7 @@ namespace krypto::orders::sim {
         using krypto::network::PublisherBase<OrderUpdatePublisher>::send;
         using krypto::network::PublisherBase<OrderUpdatePublisher>::connect;
 
-        void serialize(const krypto::orders::OrderUpdate &order_update);
+        void serialize(const krypto::utils::OrderUpdate &order_update);
     };
 
     struct MktdataSubscriber;
@@ -30,11 +32,11 @@ namespace krypto::orders::sim {
             ServerParser::receive_variant_t,
             true> {
     private:
-        using quotes_accessor_t = tbb::concurrent_hash_map<uint64_t, krypto::mktdata::Quote>::accessor;
-        using day_orders_accessor_t = tbb::concurrent_hash_map<uint64_t, std::vector<krypto::orders::OrderRequest>>::accessor;
+        using quotes_accessor_t = tbb::concurrent_hash_map<uint64_t, krypto::utils::Quote>::accessor;
+        using day_orders_accessor_t = tbb::concurrent_hash_map<uint64_t, std::vector<krypto::utils::OrderRequest>>::accessor;
         OrderUpdatePublisher publisher_;
-        tbb::concurrent_hash_map<uint64_t, krypto::mktdata::Quote> quotes_;
-        tbb::concurrent_hash_map<uint64_t, std::vector<krypto::orders::OrderRequest>> day_orders_;
+        tbb::concurrent_hash_map<uint64_t, krypto::utils::Quote> quotes_;
+        tbb::concurrent_hash_map<uint64_t, std::vector<krypto::utils::OrderRequest>> day_orders_;
         std::unordered_map<uint64_t, uint64_t> last_hb_;
 
         void fill_price(int64_t security_id, const krypto::serialization::Side &side, int64_t price);
@@ -63,9 +65,9 @@ namespace krypto::orders::sim {
         void process(const krypto::serialization::Quote *quote) {
             OrderServer::quotes_accessor_t a;
             parent_.quotes_.insert(a, quote->security_id());
-            a->second = krypto::mktdata::Quote{
-                    static_cast<uint64_t >(quote->timestamp()),
-                    static_cast<uint64_t >(quote->security_id()),
+            a->second = krypto::utils::Quote{
+                    static_cast<int64_t >(quote->timestamp()),
+                    static_cast<int64_t >(quote->security_id()),
                     quote->bid(),
                     quote->ask(),
                     quote->bid_quantity(),

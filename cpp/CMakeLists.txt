@@ -54,7 +54,6 @@ include_directories(include)
 include_directories(${CONAN_INCLUDE_DIRS})
 
 add_library(krypto STATIC
-        include/krypto/types.h
         include/krypto/serialization/serialization_generated.h
         include/krypto/logger.h
         include/krypto/mktdata/coinbase/ws.h
@@ -85,9 +84,8 @@ add_library(krypto STATIC
         include/krypto/network/helper.h
         include/krypto/network/rpc/worker.h
         include/krypto/network/rpc/broker.h
-        include/krypto/instruments/message_types.h
+        include/krypto/utils/message_types.h
         include/krypto/instruments/protocol.h
-        src/krypto/network/rpc/broker.cpp
         src/krypto/instruments/client.cpp
         include/krypto/instruments/client.h
         include/krypto/instruments/server.h
@@ -102,7 +100,6 @@ add_library(krypto STATIC
         src/krypto/utils/date_time.cpp
         include/krypto/mktdata/protocol.h
         src/krypto/mktdata/protocol.cpp
-        src/krypto/instruments/message_types.cpp
         src/krypto/instruments/protocol.cpp
         include/krypto/orders/sim/server.h
         include/krypto/orders/protocol.h
@@ -158,7 +155,7 @@ target_link_libraries(mktdata-printer krypto CONAN_PKG::boost ssl crypto dl CONA
 add_executable(query-instruments src/examples/query_instruments_main.cpp)
 target_link_libraries(query-instruments krypto CONAN_PKG::boost ssl crypto dl CONAN_PKG::bzip2 CONAN_PKG::zlib CONAN_PKG::tbb CONAN_PKG::zmq CONAN_PKG::cppzmq Threads::Threads)
 
-add_executable(config-loader src/examples/config_loader_main.cpp)
+add_executable(config-loader src/examples/config_loader_main.cpp include/krypto/utils/types.h)
 target_link_libraries(config-loader krypto)
 
 add_executable(sim-order-client src/examples/sim_order_client_main.cpp)

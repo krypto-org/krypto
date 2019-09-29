@@ -5,6 +5,7 @@
 
 #include <krypto/utils/common.h>
 #include <krypto/serialization/serialization_generated.h>
+#include <krypto/utils/types.h>
 
 namespace krypto::instruments {
     struct ClientParser final {

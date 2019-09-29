@@ -9,6 +9,7 @@
 #include <krypto/network/helper.h>
 #include <krypto/logger.h>
 #include <krypto/config.h>
+#include <krypto/utils/types.h>
 
 namespace krypto::network::rpc {
     template<typename Derived, typename ReceiveParser, typename ResponseVariant, bool Verbose = false>

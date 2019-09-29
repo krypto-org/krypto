@@ -2,6 +2,8 @@ namespace krypto.serialization;
 
 // general
 
+enum Exchange: byte {COINBASE}
+
 enum Side: byte {UNKNOWN, BUY, SELL}
 
 enum OrderSide: byte {UNKNOWN, BID, ASK}
@@ -59,7 +61,7 @@ table Instrument {
   id: long;
   type: InstrumentType;
   symbol: string;
-  exchange: string;
+  exchange: Exchange;
   exchange_symbol: string;
   tick_size: double;
   min_size: double;
