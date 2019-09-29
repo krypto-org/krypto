@@ -42,8 +42,8 @@ void krypto::instruments::InstrumentClient::process(const krypto::serialization:
     if (response) {
         instruments_.clear();
         auto insts = response->instruments();
-        KRYP_LOG(info, "Received {} instruments", insts->Length());
-        for (size_t i = 0; i < insts->Length(); ++i) {
+        KRYP_LOG(info, "Received {} instruments", insts->size());
+        for (size_t i = 0; i < insts->size(); ++i) {
             auto inst = insts->Get(i);
             krypto::utils::Instrument to_insert{
                     static_cast<int64_t>(inst->id()),

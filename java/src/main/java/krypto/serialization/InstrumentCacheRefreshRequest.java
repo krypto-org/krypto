@@ -11,7 +11,7 @@ import com.google.flatbuffers.*;
 public final class InstrumentCacheRefreshRequest extends Table {
   public static InstrumentCacheRefreshRequest getRootAsInstrumentCacheRefreshRequest(ByteBuffer _bb) { return getRootAsInstrumentCacheRefreshRequest(_bb, new InstrumentCacheRefreshRequest()); }
   public static InstrumentCacheRefreshRequest getRootAsInstrumentCacheRefreshRequest(ByteBuffer _bb, InstrumentCacheRefreshRequest obj) { _bb.order(ByteOrder.LITTLE_ENDIAN); return (obj.__assign(_bb.getInt(_bb.position()) + _bb.position(), _bb)); }
-  public void __init(int _i, ByteBuffer _bb) { bb_pos = _i; bb = _bb; }
+  public void __init(int _i, ByteBuffer _bb) { bb_pos = _i; bb = _bb; vtable_start = bb_pos - bb.getInt(bb_pos); vtable_size = bb.getShort(vtable_start); }
   public InstrumentCacheRefreshRequest __assign(int _i, ByteBuffer _bb) { __init(_i, _bb); return this; }
 
 

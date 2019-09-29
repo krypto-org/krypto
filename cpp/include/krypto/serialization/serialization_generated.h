@@ -69,7 +69,8 @@ inline const char * const *EnumNamesExchange() {
 }
 
 inline const char *EnumNameExchange(Exchange e) {
-  const size_t index = static_cast<int>(e);
+  if (e < Exchange_COINBASE || e > Exchange_COINBASE) return "";
+  const size_t index = static_cast<size_t>(e);
   return EnumNamesExchange()[index];
 }
 
@@ -101,7 +102,8 @@ inline const char * const *EnumNamesSide() {
 }
 
 inline const char *EnumNameSide(Side e) {
-  const size_t index = static_cast<int>(e);
+  if (e < Side_UNKNOWN || e > Side_SELL) return "";
+  const size_t index = static_cast<size_t>(e);
   return EnumNamesSide()[index];
 }
 
@@ -133,7 +135,8 @@ inline const char * const *EnumNamesOrderSide() {
 }
 
 inline const char *EnumNameOrderSide(OrderSide e) {
-  const size_t index = static_cast<int>(e);
+  if (e < OrderSide_UNKNOWN || e > OrderSide_ASK) return "";
+  const size_t index = static_cast<size_t>(e);
   return EnumNamesOrderSide()[index];
 }
 
@@ -198,7 +201,8 @@ inline const char * const *EnumNamesOrderStatus() {
 }
 
 inline const char *EnumNameOrderStatus(OrderStatus e) {
-  const size_t index = static_cast<int>(e);
+  if (e < OrderStatus_UNKNOWN || e > OrderStatus_EXPIRED) return "";
+  const size_t index = static_cast<size_t>(e);
   return EnumNamesOrderStatus()[index];
 }
 
@@ -236,7 +240,8 @@ inline const char * const *EnumNamesTimeInForce() {
 }
 
 inline const char *EnumNameTimeInForce(TimeInForce e) {
-  const size_t index = static_cast<int>(e);
+  if (e < TimeInForce_DAY || e > TimeInForce_GTT) return "";
+  const size_t index = static_cast<size_t>(e);
   return EnumNamesTimeInForce()[index];
 }
 
@@ -277,7 +282,8 @@ inline const char * const *EnumNamesInstrumentType() {
 }
 
 inline const char *EnumNameInstrumentType(InstrumentType e) {
-  const size_t index = static_cast<int>(e);
+  if (e < InstrumentType_UNKNOWN || e > InstrumentType_CRYPTO) return "";
+  const size_t index = static_cast<size_t>(e);
   return EnumNamesInstrumentType()[index];
 }
 
@@ -381,7 +387,8 @@ inline const char * const *EnumNamesCurrency() {
 }
 
 inline const char *EnumNameCurrency(Currency e) {
-  const size_t index = static_cast<int>(e);
+  if (e < Currency_UNKNOWN || e > Currency_DASH) return "";
+  const size_t index = static_cast<size_t>(e);
   return EnumNamesCurrency()[index];
 }
 
@@ -419,18 +426,19 @@ inline const char * const *EnumNamesRequestType() {
 }
 
 inline const char *EnumNameRequestType(RequestType e) {
-  const size_t index = static_cast<int>(e);
+  if (e < RequestType_INVALID || e > RequestType_PRODUCT) return "";
+  const size_t index = static_cast<size_t>(e);
   return EnumNamesRequestType()[index];
 }
 
-MANUALLY_ALIGNED_STRUCT(8) SnapshotPriceLevel FLATBUFFERS_FINAL_CLASS {
+FLATBUFFERS_MANUALLY_ALIGNED_STRUCT(8) SnapshotPriceLevel FLATBUFFERS_FINAL_CLASS {
  private:
   int64_t price_;
   int64_t quantity_;
 
  public:
   SnapshotPriceLevel() {
-    memset(this, 0, sizeof(SnapshotPriceLevel));
+    memset(static_cast<void *>(this), 0, sizeof(SnapshotPriceLevel));
   }
   SnapshotPriceLevel(int64_t _price, int64_t _quantity)
       : price_(flatbuffers::EndianScalar(_price)),
@@ -443,9 +451,9 @@ MANUALLY_ALIGNED_STRUCT(8) SnapshotPriceLevel FLATBUFFERS_FINAL_CLASS {
     return flatbuffers::EndianScalar(quantity_);
   }
 };
-STRUCT_END(SnapshotPriceLevel, 16);
+FLATBUFFERS_STRUCT_END(SnapshotPriceLevel, 16);
 
-MANUALLY_ALIGNED_STRUCT(8) IncrementalPriceLevel FLATBUFFERS_FINAL_CLASS {
+FLATBUFFERS_MANUALLY_ALIGNED_STRUCT(8) IncrementalPriceLevel FLATBUFFERS_FINAL_CLASS {
  private:
   int64_t price_;
   int64_t quantity_;
@@ -453,7 +461,7 @@ MANUALLY_ALIGNED_STRUCT(8) IncrementalPriceLevel FLATBUFFERS_FINAL_CLASS {
 
  public:
   IncrementalPriceLevel() {
-    memset(this, 0, sizeof(IncrementalPriceLevel));
+    memset(static_cast<void *>(this), 0, sizeof(IncrementalPriceLevel));
   }
   IncrementalPriceLevel(int64_t _price, int64_t _quantity, int64_t _side)
       : price_(flatbuffers::EndianScalar(_price)),
@@ -470,16 +478,16 @@ MANUALLY_ALIGNED_STRUCT(8) IncrementalPriceLevel FLATBUFFERS_FINAL_CLASS {
     return flatbuffers::EndianScalar(side_);
   }
 };
-STRUCT_END(IncrementalPriceLevel, 24);
+FLATBUFFERS_STRUCT_END(IncrementalPriceLevel, 24);
 
-MANUALLY_ALIGNED_STRUCT(8) Position FLATBUFFERS_FINAL_CLASS {
+FLATBUFFERS_MANUALLY_ALIGNED_STRUCT(8) Position FLATBUFFERS_FINAL_CLASS {
  private:
   int64_t security_id_;
   int64_t position_;
 
  public:
   Position() {
-    memset(this, 0, sizeof(Position));
+    memset(static_cast<void *>(this), 0, sizeof(Position));
   }
   Position(int64_t _security_id, int64_t _position)
       : security_id_(flatbuffers::EndianScalar(_security_id)),
@@ -492,10 +500,10 @@ MANUALLY_ALIGNED_STRUCT(8) Position FLATBUFFERS_FINAL_CLASS {
     return flatbuffers::EndianScalar(position_);
   }
 };
-STRUCT_END(Position, 16);
+FLATBUFFERS_STRUCT_END(Position, 16);
 
 struct SequenceNumber FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
-  enum {
+  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
     VT_VALUE = 4
   };
   int64_t value() const {
@@ -535,7 +543,7 @@ inline flatbuffers::Offset<SequenceNumber> CreateSequenceNumber(
 }
 
 struct Heartbeat FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
-  enum {
+  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
     VT_SECURITY_ID = 4,
     VT_TIMESTAMP = 6
   };
@@ -585,7 +593,7 @@ inline flatbuffers::Offset<Heartbeat> CreateHeartbeat(
 }
 
 struct Instrument FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
-  enum {
+  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
     VT_ID = 4,
     VT_TYPE = 6,
     VT_SYMBOL = 8,
@@ -632,10 +640,10 @@ struct Instrument FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
            VerifyField<int64_t>(verifier, VT_ID) &&
            VerifyField<int8_t>(verifier, VT_TYPE) &&
            VerifyOffset(verifier, VT_SYMBOL) &&
-           verifier.Verify(symbol()) &&
+           verifier.VerifyString(symbol()) &&
            VerifyField<int8_t>(verifier, VT_EXCHANGE) &&
            VerifyOffset(verifier, VT_EXCHANGE_SYMBOL) &&
-           verifier.Verify(exchange_symbol()) &&
+           verifier.VerifyString(exchange_symbol()) &&
            VerifyField<double>(verifier, VT_TICK_SIZE) &&
            VerifyField<double>(verifier, VT_MIN_SIZE) &&
            VerifyField<double>(verifier, VT_MAX_SIZE) &&
@@ -728,13 +736,15 @@ inline flatbuffers::Offset<Instrument> CreateInstrumentDirect(
     double max_size = 0.0,
     Currency crypto_base = Currency_UNKNOWN,
     Currency crypto_quote = Currency_UNKNOWN) {
+  auto symbol__ = symbol ? _fbb.CreateString(symbol) : 0;
+  auto exchange_symbol__ = exchange_symbol ? _fbb.CreateString(exchange_symbol) : 0;
   return krypto::serialization::CreateInstrument(
       _fbb,
       id,
       type,
-      symbol ? _fbb.CreateString(symbol) : 0,
+      symbol__,
       exchange,
-      exchange_symbol ? _fbb.CreateString(exchange_symbol) : 0,
+      exchange_symbol__,
       tick_size,
       min_size,
       max_size,
@@ -743,7 +753,7 @@ inline flatbuffers::Offset<Instrument> CreateInstrumentDirect(
 }
 
 struct Quote FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
-  enum {
+  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
     VT_TIMESTAMP = 4,
     VT_SECURITY_ID = 6,
     VT_BID = 8,
@@ -853,7 +863,7 @@ inline flatbuffers::Offset<Quote> CreateQuote(
 }
 
 struct Snapshot FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
-  enum {
+  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
     VT_TIMESTAMP = 4,
     VT_SECURITY_ID = 6,
     VT_BIDS = 8,
@@ -876,9 +886,9 @@ struct Snapshot FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
            VerifyField<int64_t>(verifier, VT_TIMESTAMP) &&
            VerifyField<int64_t>(verifier, VT_SECURITY_ID) &&
            VerifyOffset(verifier, VT_BIDS) &&
-           verifier.Verify(bids()) &&
+           verifier.VerifyVector(bids()) &&
            VerifyOffset(verifier, VT_ASKS) &&
-           verifier.Verify(asks()) &&
+           verifier.VerifyVector(asks()) &&
            verifier.EndTable();
   }
 };
@@ -930,16 +940,18 @@ inline flatbuffers::Offset<Snapshot> CreateSnapshotDirect(
     int64_t security_id = 0,
     const std::vector<SnapshotPriceLevel> *bids = nullptr,
     const std::vector<SnapshotPriceLevel> *asks = nullptr) {
+  auto bids__ = bids ? _fbb.CreateVectorOfStructs<SnapshotPriceLevel>(*bids) : 0;
+  auto asks__ = asks ? _fbb.CreateVectorOfStructs<SnapshotPriceLevel>(*asks) : 0;
   return krypto::serialization::CreateSnapshot(
       _fbb,
       timestamp,
       security_id,
-      bids ? _fbb.CreateVectorOfStructs<SnapshotPriceLevel>(*bids) : 0,
-      asks ? _fbb.CreateVectorOfStructs<SnapshotPriceLevel>(*asks) : 0);
+      bids__,
+      asks__);
 }
 
 struct Incremental FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
-  enum {
+  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
     VT_TIMESTAMP = 4,
     VT_SECURITY_ID = 6,
     VT_UPDATES = 8
@@ -958,7 +970,7 @@ struct Incremental FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
            VerifyField<int64_t>(verifier, VT_TIMESTAMP) &&
            VerifyField<int64_t>(verifier, VT_SECURITY_ID) &&
            VerifyOffset(verifier, VT_UPDATES) &&
-           verifier.Verify(updates()) &&
+           verifier.VerifyVector(updates()) &&
            verifier.EndTable();
   }
 };
@@ -1004,15 +1016,16 @@ inline flatbuffers::Offset<Incremental> CreateIncrementalDirect(
     int64_t timestamp = 0,
     int64_t security_id = 0,
     const std::vector<IncrementalPriceLevel> *updates = nullptr) {
+  auto updates__ = updates ? _fbb.CreateVectorOfStructs<IncrementalPriceLevel>(*updates) : 0;
   return krypto::serialization::CreateIncremental(
       _fbb,
       timestamp,
       security_id,
-      updates ? _fbb.CreateVectorOfStructs<IncrementalPriceLevel>(*updates) : 0);
+      updates__);
 }
 
 struct Trade FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
-  enum {
+  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
     VT_TIMESTAMP = 4,
     VT_SECURITY_ID = 6,
     VT_PRICE = 8,
@@ -1046,7 +1059,7 @@ struct Trade FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
            VerifyField<int64_t>(verifier, VT_QUANTITY) &&
            VerifyField<int8_t>(verifier, VT_SIDE) &&
            VerifyOffset(verifier, VT_TRADE_ID) &&
-           verifier.Verify(trade_id()) &&
+           verifier.VerifyString(trade_id()) &&
            verifier.EndTable();
   }
 };
@@ -1110,6 +1123,7 @@ inline flatbuffers::Offset<Trade> CreateTradeDirect(
     int64_t quantity = 0,
     Side side = Side_UNKNOWN,
     const char *trade_id = nullptr) {
+  auto trade_id__ = trade_id ? _fbb.CreateString(trade_id) : 0;
   return krypto::serialization::CreateTrade(
       _fbb,
       timestamp,
@@ -1117,11 +1131,11 @@ inline flatbuffers::Offset<Trade> CreateTradeDirect(
       price,
       quantity,
       side,
-      trade_id ? _fbb.CreateString(trade_id) : 0);
+      trade_id__);
 }
 
 struct InstrumentRequest FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
-  enum {
+  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
     VT_TYPE = 4
   };
   RequestType type() const {
@@ -1189,7 +1203,7 @@ inline flatbuffers::Offset<InstrumentCacheRefreshRequest> CreateInstrumentCacheR
 }
 
 struct InstrumentResponse FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
-  enum {
+  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
     VT_INSTRUMENTS = 4
   };
   const flatbuffers::Vector<flatbuffers::Offset<Instrument>> *instruments() const {
@@ -1198,7 +1212,7 @@ struct InstrumentResponse FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
            VerifyOffset(verifier, VT_INSTRUMENTS) &&
-           verifier.Verify(instruments()) &&
+           verifier.VerifyVector(instruments()) &&
            verifier.VerifyVectorOfTables(instruments()) &&
            verifier.EndTable();
   }
@@ -1233,13 +1247,14 @@ inline flatbuffers::Offset<InstrumentResponse> CreateInstrumentResponse(
 inline flatbuffers::Offset<InstrumentResponse> CreateInstrumentResponseDirect(
     flatbuffers::FlatBufferBuilder &_fbb,
     const std::vector<flatbuffers::Offset<Instrument>> *instruments = nullptr) {
+  auto instruments__ = instruments ? _fbb.CreateVector<flatbuffers::Offset<Instrument>>(*instruments) : 0;
   return krypto::serialization::CreateInstrumentResponse(
       _fbb,
-      instruments ? _fbb.CreateVector<flatbuffers::Offset<Instrument>>(*instruments) : 0);
+      instruments__);
 }
 
 struct OrderRequest FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
-  enum {
+  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
     VT_TIMESTAMP = 4,
     VT_SECURITY_ID = 6,
     VT_PRICE = 8,
@@ -1277,7 +1292,7 @@ struct OrderRequest FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
            VerifyField<int64_t>(verifier, VT_QUANTITY) &&
            VerifyField<int8_t>(verifier, VT_SIDE) &&
            VerifyOffset(verifier, VT_ORDER_ID) &&
-           verifier.Verify(order_id()) &&
+           verifier.VerifyString(order_id()) &&
            VerifyField<int8_t>(verifier, VT_TIF) &&
            verifier.EndTable();
   }
@@ -1348,6 +1363,7 @@ inline flatbuffers::Offset<OrderRequest> CreateOrderRequestDirect(
     Side side = Side_UNKNOWN,
     const char *order_id = nullptr,
     TimeInForce tif = TimeInForce_DAY) {
+  auto order_id__ = order_id ? _fbb.CreateString(order_id) : 0;
   return krypto::serialization::CreateOrderRequest(
       _fbb,
       timestamp,
@@ -1355,12 +1371,12 @@ inline flatbuffers::Offset<OrderRequest> CreateOrderRequestDirect(
       price,
       quantity,
       side,
-      order_id ? _fbb.CreateString(order_id) : 0,
+      order_id__,
       tif);
 }
 
 struct OrderCancelRequest FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
-  enum {
+  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
     VT_TIMESTAMP = 4,
     VT_ORDER_ID = 6
   };
@@ -1374,7 +1390,7 @@ struct OrderCancelRequest FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
     return VerifyTableStart(verifier) &&
            VerifyField<int64_t>(verifier, VT_TIMESTAMP) &&
            VerifyOffset(verifier, VT_ORDER_ID) &&
-           verifier.Verify(order_id()) &&
+           verifier.VerifyString(order_id()) &&
            verifier.EndTable();
   }
 };
@@ -1414,14 +1430,15 @@ inline flatbuffers::Offset<OrderCancelRequest> CreateOrderCancelRequestDirect(
     flatbuffers::FlatBufferBuilder &_fbb,
     int64_t timestamp = 0,
     const char *order_id = nullptr) {
+  auto order_id__ = order_id ? _fbb.CreateString(order_id) : 0;
   return krypto::serialization::CreateOrderCancelRequest(
       _fbb,
       timestamp,
-      order_id ? _fbb.CreateString(order_id) : 0);
+      order_id__);
 }
 
 struct OrderReplaceRequest FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
-  enum {
+  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
     VT_TIMESTAMP = 4,
     VT_ORDER_ID = 6,
     VT_PRICE = 8,
@@ -1447,7 +1464,7 @@ struct OrderReplaceRequest FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table 
     return VerifyTableStart(verifier) &&
            VerifyField<int64_t>(verifier, VT_TIMESTAMP) &&
            VerifyOffset(verifier, VT_ORDER_ID) &&
-           verifier.Verify(order_id()) &&
+           verifier.VerifyString(order_id()) &&
            VerifyField<int64_t>(verifier, VT_PRICE) &&
            VerifyField<int64_t>(verifier, VT_QUANTITY) &&
            VerifyField<int8_t>(verifier, VT_SIDE) &&
@@ -1508,17 +1525,18 @@ inline flatbuffers::Offset<OrderReplaceRequest> CreateOrderReplaceRequestDirect(
     int64_t price = 0,
     int64_t quantity = 0,
     Side side = Side_UNKNOWN) {
+  auto order_id__ = order_id ? _fbb.CreateString(order_id) : 0;
   return krypto::serialization::CreateOrderReplaceRequest(
       _fbb,
       timestamp,
-      order_id ? _fbb.CreateString(order_id) : 0,
+      order_id__,
       price,
       quantity,
       side);
 }
 
 struct OrderUpdate FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
-  enum {
+  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
     VT_TIMESTAMP = 4,
     VT_ORDER_ID = 6,
     VT_STATUS = 8,
@@ -1540,7 +1558,7 @@ struct OrderUpdate FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
     return VerifyTableStart(verifier) &&
            VerifyField<int64_t>(verifier, VT_TIMESTAMP) &&
            VerifyOffset(verifier, VT_ORDER_ID) &&
-           verifier.Verify(order_id()) &&
+           verifier.VerifyString(order_id()) &&
            VerifyField<int8_t>(verifier, VT_STATUS) &&
            VerifyField<int64_t>(verifier, VT_FILLED_QUANTITY) &&
            verifier.EndTable();
@@ -1594,16 +1612,17 @@ inline flatbuffers::Offset<OrderUpdate> CreateOrderUpdateDirect(
     const char *order_id = nullptr,
     OrderStatus status = OrderStatus_UNKNOWN,
     int64_t filled_quantity = 0) {
+  auto order_id__ = order_id ? _fbb.CreateString(order_id) : 0;
   return krypto::serialization::CreateOrderUpdate(
       _fbb,
       timestamp,
-      order_id ? _fbb.CreateString(order_id) : 0,
+      order_id__,
       status,
       filled_quantity);
 }
 
 struct Order FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
-  enum {
+  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
     VT_REQUEST = 4,
     VT_UPDATES = 6,
     VT_FEES = 8
@@ -1622,7 +1641,7 @@ struct Order FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
            VerifyOffset(verifier, VT_REQUEST) &&
            verifier.VerifyTable(request()) &&
            VerifyOffset(verifier, VT_UPDATES) &&
-           verifier.Verify(updates()) &&
+           verifier.VerifyVector(updates()) &&
            verifier.VerifyVectorOfTables(updates()) &&
            VerifyField<double>(verifier, VT_FEES) &&
            verifier.EndTable();
@@ -1670,15 +1689,16 @@ inline flatbuffers::Offset<Order> CreateOrderDirect(
     flatbuffers::Offset<OrderRequest> request = 0,
     const std::vector<flatbuffers::Offset<OrderUpdate>> *updates = nullptr,
     double fees = 0.0) {
+  auto updates__ = updates ? _fbb.CreateVector<flatbuffers::Offset<OrderUpdate>>(*updates) : 0;
   return krypto::serialization::CreateOrder(
       _fbb,
       request,
-      updates ? _fbb.CreateVector<flatbuffers::Offset<OrderUpdate>>(*updates) : 0,
+      updates__,
       fees);
 }
 
 struct RiskSummary FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
-  enum {
+  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
     VT_TIMESTAMP = 4,
     VT_POSITIONS = 6,
     VT_PNL = 8
@@ -1696,7 +1716,7 @@ struct RiskSummary FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
     return VerifyTableStart(verifier) &&
            VerifyField<int64_t>(verifier, VT_TIMESTAMP) &&
            VerifyOffset(verifier, VT_POSITIONS) &&
-           verifier.Verify(positions()) &&
+           verifier.VerifyVector(positions()) &&
            VerifyField<double>(verifier, VT_PNL) &&
            verifier.EndTable();
   }
@@ -1743,10 +1763,11 @@ inline flatbuffers::Offset<RiskSummary> CreateRiskSummaryDirect(
     int64_t timestamp = 0,
     const std::vector<Position> *positions = nullptr,
     double pnl = 0.0) {
+  auto positions__ = positions ? _fbb.CreateVectorOfStructs<Position>(*positions) : 0;
   return krypto::serialization::CreateRiskSummary(
       _fbb,
       timestamp,
-      positions ? _fbb.CreateVectorOfStructs<Position>(*positions) : 0,
+      positions__,
       pnl);
 }
 
