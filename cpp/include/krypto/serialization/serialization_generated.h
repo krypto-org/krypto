@@ -47,6 +47,32 @@ struct Position;
 
 struct RiskSummary;
 
+enum Exchange {
+  Exchange_COINBASE = 0,
+  Exchange_MIN = Exchange_COINBASE,
+  Exchange_MAX = Exchange_COINBASE
+};
+
+inline const Exchange (&EnumValuesExchange())[1] {
+  static const Exchange values[] = {
+    Exchange_COINBASE
+  };
+  return values;
+}
+
+inline const char * const *EnumNamesExchange() {
+  static const char * const names[] = {
+    "COINBASE",
+    nullptr
+  };
+  return names;
+}
+
+inline const char *EnumNameExchange(Exchange e) {
+  const size_t index = static_cast<int>(e);
+  return EnumNamesExchange()[index];
+}
+
 enum Side {
   Side_UNKNOWN = 0,
   Side_BUY = 1,
@@ -580,8 +606,8 @@ struct Instrument FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   const flatbuffers::String *symbol() const {
     return GetPointer<const flatbuffers::String *>(VT_SYMBOL);
   }
-  const flatbuffers::String *exchange() const {
-    return GetPointer<const flatbuffers::String *>(VT_EXCHANGE);
+  Exchange exchange() const {
+    return static_cast<Exchange>(GetField<int8_t>(VT_EXCHANGE, 0));
   }
   const flatbuffers::String *exchange_symbol() const {
     return GetPointer<const flatbuffers::String *>(VT_EXCHANGE_SYMBOL);
@@ -607,8 +633,7 @@ struct Instrument FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
            VerifyField<int8_t>(verifier, VT_TYPE) &&
            VerifyOffset(verifier, VT_SYMBOL) &&
            verifier.Verify(symbol()) &&
-           VerifyOffset(verifier, VT_EXCHANGE) &&
-           verifier.Verify(exchange()) &&
+           VerifyField<int8_t>(verifier, VT_EXCHANGE) &&
            VerifyOffset(verifier, VT_EXCHANGE_SYMBOL) &&
            verifier.Verify(exchange_symbol()) &&
            VerifyField<double>(verifier, VT_TICK_SIZE) &&
@@ -632,8 +657,8 @@ struct InstrumentBuilder {
   void add_symbol(flatbuffers::Offset<flatbuffers::String> symbol) {
     fbb_.AddOffset(Instrument::VT_SYMBOL, symbol);
   }
-  void add_exchange(flatbuffers::Offset<flatbuffers::String> exchange) {
-    fbb_.AddOffset(Instrument::VT_EXCHANGE, exchange);
+  void add_exchange(Exchange exchange) {
+    fbb_.AddElement<int8_t>(Instrument::VT_EXCHANGE, static_cast<int8_t>(exchange), 0);
   }
   void add_exchange_symbol(flatbuffers::Offset<flatbuffers::String> exchange_symbol) {
     fbb_.AddOffset(Instrument::VT_EXCHANGE_SYMBOL, exchange_symbol);
@@ -670,7 +695,7 @@ inline flatbuffers::Offset<Instrument> CreateInstrument(
     int64_t id = 0,
     InstrumentType type = InstrumentType_UNKNOWN,
     flatbuffers::Offset<flatbuffers::String> symbol = 0,
-    flatbuffers::Offset<flatbuffers::String> exchange = 0,
+    Exchange exchange = Exchange_COINBASE,
     flatbuffers::Offset<flatbuffers::String> exchange_symbol = 0,
     double tick_size = 0.0,
     double min_size = 0.0,
@@ -683,10 +708,10 @@ inline flatbuffers::Offset<Instrument> CreateInstrument(
   builder_.add_tick_size(tick_size);
   builder_.add_id(id);
   builder_.add_exchange_symbol(exchange_symbol);
-  builder_.add_exchange(exchange);
   builder_.add_symbol(symbol);
   builder_.add_crypto_quote(crypto_quote);
   builder_.add_crypto_base(crypto_base);
+  builder_.add_exchange(exchange);
   builder_.add_type(type);
   return builder_.Finish();
 }
@@ -696,7 +721,7 @@ inline flatbuffers::Offset<Instrument> CreateInstrumentDirect(
     int64_t id = 0,
     InstrumentType type = InstrumentType_UNKNOWN,
     const char *symbol = nullptr,
-    const char *exchange = nullptr,
+    Exchange exchange = Exchange_COINBASE,
     const char *exchange_symbol = nullptr,
     double tick_size = 0.0,
     double min_size = 0.0,
@@ -708,7 +733,7 @@ inline flatbuffers::Offset<Instrument> CreateInstrumentDirect(
       id,
       type,
       symbol ? _fbb.CreateString(symbol) : 0,
-      exchange ? _fbb.CreateString(exchange) : 0,
+      exchange,
       exchange_symbol ? _fbb.CreateString(exchange_symbol) : 0,
       tick_size,
       min_size,

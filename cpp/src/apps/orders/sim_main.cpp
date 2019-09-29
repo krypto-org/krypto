@@ -7,6 +7,7 @@
 #include <krypto/utils/common.h>
 
 #include <krypto/orders/sim/server.h>
+#include <krypto/utils/types.h>
 
 namespace {
     volatile std::sig_atomic_t SIGNAL_STATUS;
@@ -23,7 +24,6 @@ int main(int argc, char **argv) {
         return 1;
     }
 
-    krypto::utils::Startup::init();
     const krypto::Config config(argv[1]);
 
     zmq::context_t context{1};

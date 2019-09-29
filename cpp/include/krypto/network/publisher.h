@@ -6,7 +6,7 @@
 #include <zmq.hpp>
 
 #include <krypto/serialization/serialization_generated.h>
-#include <krypto/types.h>
+#include <krypto/utils/types.h>
 #include <krypto/logger.h>
 #include <krypto/config.h>
 

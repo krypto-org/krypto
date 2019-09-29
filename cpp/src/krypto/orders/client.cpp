@@ -13,7 +13,7 @@ void krypto::orders::OrderClient::process(const krypto::serialization::OrderUpda
     });
 }
 
-void krypto::orders::OrderClient::serialize(const OrderRequest &request) {
+void krypto::orders::OrderClient::serialize(const krypto::utils::OrderRequest &request) {
     auto oid_offset = krypto::orders::OrderClient::ClientBase::fb_builder_.CreateString(
             request.order_id);
 
@@ -31,7 +31,7 @@ void krypto::orders::OrderClient::serialize(const OrderRequest &request) {
     krypto::orders::OrderClient::ClientBase::fb_builder_.Finish(req);
 }
 
-void krypto::orders::OrderClient::serialize(const OrderCancelRequest &request) {
+void krypto::orders::OrderClient::serialize(const krypto::utils::OrderCancelRequest &request) {
     auto oid_offset = krypto::orders::OrderClient::ClientBase::fb_builder_.CreateString(
             request.order_id);
     krypto::serialization::OrderCancelRequestBuilder builder{
@@ -42,7 +42,7 @@ void krypto::orders::OrderClient::serialize(const OrderCancelRequest &request) {
     krypto::orders::OrderClient::ClientBase::fb_builder_.Finish(req);
 }
 
-void krypto::orders::OrderClient::serialize(const OrderReplaceRequest &request) {
+void krypto::orders::OrderClient::serialize(const krypto::utils::OrderReplaceRequest &request) {
     auto oid_offset = krypto::orders::OrderClient::ClientBase::fb_builder_.CreateString(
             request.order_id);
 
@@ -60,7 +60,7 @@ void krypto::orders::OrderClient::serialize(const OrderReplaceRequest &request) 
 
 void krypto::orders::OrderClient::cancel_order(
         const std::string& service, const std::string &order_id) {
-    OrderCancelRequest cancel{
+    krypto::utils::OrderCancelRequest cancel{
             krypto::utils::current_time_in_nanoseconds(),
             order_id};
     send(service, cancel);
@@ -71,7 +71,7 @@ void krypto::orders::OrderClient::replace_order(
         const std::string& service,
         const std::string &order_id, int64_t price, int64_t size,
         krypto::serialization::Side side) {
-    OrderReplaceRequest replace_request{
+    krypto::utils::OrderReplaceRequest replace_request{
             krypto::utils::current_time_in_nanoseconds(),
             order_id,
             price,
@@ -89,7 +89,7 @@ std::string krypto::orders::OrderClient::new_order(
         krypto::serialization::Side side,
         krypto::serialization::TimeInForce tif) {
     auto oid = order_id_generator_.new_id();
-    OrderRequest order_request{
+    krypto::utils::OrderRequest order_request{
             krypto::utils::current_time_in_nanoseconds(),
             security_id,
             price,

@@ -9,5 +9,5 @@
 namespace krypto::utils {
     std::chrono::microseconds parse_8601(const std::string &str);
 
-    uint64_t current_time_in_nanoseconds();
+    int64_t current_time_in_nanoseconds();
 }

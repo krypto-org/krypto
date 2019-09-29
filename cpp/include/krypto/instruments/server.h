@@ -6,6 +6,7 @@
 #include <krypto/instruments/loader.h>
 #include <krypto/serialization/serialization_generated.h>
 #include <krypto/instruments/protocol.h>
+#include <krypto/utils/types.h>
 
 namespace krypto::instruments {
     class Server final : public krypto::network::rpc::WorkerBase<Server, ServerParser,

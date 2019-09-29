@@ -7,6 +7,7 @@
 #include <krypto/utils/common.h>
 #include <krypto/orders/client.h>
 #include <krypto/mktdata/convert.h>
+#include <krypto/utils/types.h>
 
 namespace {
     volatile std::sig_atomic_t SIGNAL_STATUS;
@@ -17,8 +18,6 @@ std::function<void(int)> shutdown_handler;
 void signal_handler(int signal) { shutdown_handler(signal); }
 
 int main(int argc, char **argv) {
-    krypto::utils::Startup::init();
-
     if (argc < 2) {
         KRYP_LOG(error, "Provide config file as parameter: {} <config>", argv[0]);
         return 1;

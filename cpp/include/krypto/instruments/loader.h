@@ -3,6 +3,7 @@
 #include <vector>
 #include <krypto/config.h>
 #include <krypto/utils/common.h>
+#include <krypto/utils/types.h>
 
 namespace krypto::instruments {
     class InstrumentLoader final {

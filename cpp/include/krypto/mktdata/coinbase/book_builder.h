@@ -11,20 +11,21 @@
 #include <krypto/instruments/client.h>
 #include <krypto/utils/date_time.h>
 #include <krypto/mktdata/protocol.h>
+#include <krypto/utils/types.h>
 
 
 namespace krypto::mktdata::coinbase {
     template<bool Verbose = false>
     class BookBuilder final {
     private:
-        std::unordered_map<std::string, uint64_t> id_by_symbol_;
-        std::unordered_map<std::string, std::unique_ptr<OrderBook>> books;
+        std::unordered_map<std::string, int64_t> id_by_symbol_;
+        std::unordered_map<std::string, std::unique_ptr<krypto::utils::OrderBook>> books;
         std::unordered_map<std::string, std::queue<nlohmann::json>> incr_queue_;
         std::unordered_map<std::string, bool> snapshot_received_;
 
         krypto::network::mktdata::TopOfBookPublisher publisher_;
 
-        void apply_incremental(const std::string &symbol, int64_t price, int64_t qty, OrderSide side);
+        void apply_incremental(const std::string &symbol, int64_t price, int64_t qty, krypto::utils::OrderSide side);
         int64_t parse_time(const std::string& ts);
     public:
         BookBuilder(zmq::context_t& context, const krypto::Config &config);
@@ -60,9 +61,9 @@ namespace krypto::mktdata::coinbase {
         }
 
         std::for_each(instruments.cbegin(), instruments.cend(), [=](auto &&instr) {
-            if (instr.exchange == krypto::utils::ExchangeType::COINBASE) {
+            if (instr.exchange == krypto::serialization::Exchange::Exchange_COINBASE) {
                 id_by_symbol_[instr.exchange_symbol] = instr.id;
-                books[instr.exchange_symbol] = std::make_unique<OrderBook>();
+                books[instr.exchange_symbol] = std::make_unique<krypto::utils::OrderBook>();
                 books.at(instr.exchange_symbol)->security_id = instr.id;
                 books.at(instr.exchange_symbol)->quote = {0, instr.id, 0, std::numeric_limits<int64_t>::max(), 0, 0, 0,
                                                           0};
@@ -85,7 +86,7 @@ namespace krypto::mktdata::coinbase {
             auto incrs = incremental.at("changes").get<std::vector<std::vector<std::string>>>();
 
             for (auto &incr: incrs) {
-                OrderSide side = incr[0] == "buy" ? OrderSide::BID : OrderSide::ASK;
+                krypto::utils::OrderSide side = incr[0] == "buy" ? krypto::utils::OrderSide::BID : krypto::utils::OrderSide::ASK;
                 auto price = krypto::mktdata::convert_price(std::stod(incr[1]));
                 auto qty = krypto::mktdata::convert_quantity(std::stod(incr[2]));
 
@@ -125,7 +126,7 @@ namespace krypto::mktdata::coinbase {
             if (send) {
                 auto id = id_by_symbol_.at(symbol);
                 auto topic = krypto::utils::create_topic(krypto::utils::MsgType::QUOTE, id);
-                publisher_.send<krypto::mktdata::Quote>(topic, books.at(symbol)->quote);
+                publisher_.send<krypto::utils::Quote>(topic, books.at(symbol)->quote);
             }
 
         } else {
@@ -139,14 +140,14 @@ namespace krypto::mktdata::coinbase {
             const std::string &symbol,
             int64_t price,
             int64_t qty,
-            krypto::mktdata::OrderSide side) {
-        if (side == OrderSide::BID) {
+            krypto::utils::OrderSide side) {
+        if (side == krypto::utils::OrderSide::BID) {
             if (qty == 0) {
                 books.at(symbol)->bids.erase(price);
             } else {
                 books.at(symbol)->bids[price] = qty;
             }
-        } else if (side == OrderSide::ASK) {
+        } else if (side == krypto::utils::OrderSide::ASK) {
             if (qty == 0) {
                 books.at(symbol)->asks.erase(price);
             } else {
@@ -174,7 +175,7 @@ namespace krypto::mktdata::coinbase {
                 auto price = krypto::mktdata::convert_price(std::stod(bid[0]));
                 auto qty = krypto::mktdata::convert_quantity(std::stod(bid[1]));
 
-                apply_incremental(symbol, price, qty, OrderSide::BID);
+                apply_incremental(symbol, price, qty, krypto::utils::OrderSide::BID);
             }
 
             for (auto &ask: asks) {
@@ -182,7 +183,7 @@ namespace krypto::mktdata::coinbase {
                 auto price = krypto::mktdata::convert_price(std::stod(ask[0]));
                 auto qty = krypto::mktdata::convert_quantity(std::stod(ask[1]));
 
-                apply_incremental(symbol, price, qty, OrderSide::ASK);
+                apply_incremental(symbol, price, qty, krypto::utils::OrderSide::ASK);
             }
 
             while (!incr_queue_.at(symbol).empty()) {
@@ -192,7 +193,7 @@ namespace krypto::mktdata::coinbase {
                 auto incrs = incremental.at("changes").get<std::vector<std::vector<std::string>>>();
 
                 for (auto &incr: incrs) {
-                    OrderSide side = incr[0] == "buy" ? OrderSide::BID : OrderSide::ASK;
+                    krypto::utils::OrderSide side = incr[0] == "buy" ? krypto::utils::OrderSide::BID :krypto::utils:: OrderSide::ASK;
                     auto price = krypto::mktdata::convert_price(std::stod(incr[1]));
                     auto qty = krypto::mktdata::convert_quantity(std::stod(incr[2]));
 
@@ -224,11 +225,11 @@ namespace krypto::mktdata::coinbase {
         books.at(symbol)->quote.last_qty = qty;
 
         auto side = trade.at("side").get<std::string>() == "sell" ?
-                    Side::BUY : Side::SELL;
+                    krypto::utils::Side::BUY : krypto::utils::Side::SELL;
 
         auto trade_id = trade.at("trade_id").get<int64_t>();
 
-        krypto::mktdata::Trade to_send{
+        krypto::utils::Trade to_send{
                 books.at(symbol)->timestamp, id, price, qty, side, std::to_string(trade_id)};
 
         auto topic = krypto::utils::create_topic(krypto::utils::MsgType::TRADE, id);

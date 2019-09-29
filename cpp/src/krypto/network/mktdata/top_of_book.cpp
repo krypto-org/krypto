@@ -1,11 +1,10 @@
 #include <krypto/network/mktdata/top_of_book.h>
 #include <krypto/mktdata/convert.h>
-#include <krypto/logger.h>
-#include <krypto/mktdata/protocol.h>
+#include <krypto/utils/types.h>
 
 
 void krypto::network::mktdata::TopOfBookPublisher::serialize(
-        const krypto::mktdata::Quote &quote) {
+        const krypto::utils::Quote &quote) {
     krypto::serialization::QuoteBuilder quote_builder{fb_builder_};
     quote_builder.add_timestamp(quote.timestamp);
     quote_builder.add_security_id(quote.security_id);
@@ -19,7 +18,7 @@ void krypto::network::mktdata::TopOfBookPublisher::serialize(
     fb_builder_.Finish(q);
 }
 
-void krypto::network::mktdata::TopOfBookPublisher::serialize(const krypto::mktdata::Trade &trade) {
+void krypto::network::mktdata::TopOfBookPublisher::serialize(const krypto::utils::Trade &trade) {
     auto tid_offset = fb_builder_.CreateString(trade.trade_id);
     krypto::serialization::TradeBuilder trade_builder{fb_builder_};
     trade_builder.add_trade_id(tid_offset);
@@ -29,7 +28,7 @@ void krypto::network::mktdata::TopOfBookPublisher::serialize(const krypto::mktda
     trade_builder.add_quantity(trade.quantity);
     trade_builder.add_side(
             krypto::serialization::EnumValuesSide()[
-                    typename std::underlying_type<krypto::mktdata::Side>::type(
+                    typename std::underlying_type<krypto::utils::Side>::type(
                             trade.side)]);
     auto t = trade_builder.Finish();
     fb_builder_.Finish(t);

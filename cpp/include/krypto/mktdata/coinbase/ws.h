@@ -10,7 +10,7 @@
 #include <nlohmann/json.hpp>
 
 #include <krypto/config.h>
-#include <krypto/types.h>
+#include <krypto/utils/types.h>
 #include <krypto/utils/common.h>
 
 namespace wpp = websocketpp;

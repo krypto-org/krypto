@@ -23,7 +23,7 @@ std::chrono::microseconds krypto::utils::parse_8601(const std::string &str) {
     return std::chrono::microseconds{diff.ticks()};
 }
 
-uint64_t krypto::utils::current_time_in_nanoseconds() {
+int64_t krypto::utils::current_time_in_nanoseconds() {
     std::chrono::time_point<std::chrono::system_clock> now = std::chrono::system_clock::now();
     auto duration = now.time_since_epoch();
     return std::chrono::duration_cast<std::chrono::nanoseconds>(duration).count();

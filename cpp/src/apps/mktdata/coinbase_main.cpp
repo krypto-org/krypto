@@ -20,7 +20,6 @@ int main(int argc, char **argv) {
         return 1;
     }
 
-    krypto::utils::Startup::init();
     const krypto::Config config(argv[1]);
 
     zmq::context_t context{1};

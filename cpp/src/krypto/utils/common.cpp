@@ -1,98 +1,32 @@
 #include <krypto/utils/common.h>
 
 namespace krypto::utils {
+
     std::string instrument_symbol(const std::string &base, const std::string &quote) {
         return fmt::format("{0}_{1}", base, quote);
     }
 
-    template<>
-    std::array<std::string, enum_size<ExchangeType>()> enum_names<ExchangeType>() {
-        std::array<std::string, enum_size<ExchangeType>()> names =
-                {"COINBASE"};
-        return names;
-    }
 
-    template<>
-    std::array<std::string, enum_size<InstrumentType>()> enum_names<InstrumentType>() {
-        std::array<std::string, enum_size<InstrumentType>()> names =
-                {
-                        "UNKNOWN",
-                        "STOCK",
-                        "FUTURE",
-                        "OPTION",
-                        "FOREX",
-                        "CRYPTO"
-                };
-        return names;
-    }
-
-    template<>
-    std::array<std::string, enum_size<Currency>()> enum_names<Currency>() {
-        std::array<std::string, enum_size<Currency>()> names =
-                {
-                        "UNKNOWN",
-                        "BAT",
-                        "BCH",
-                        "BTC",
-                        "CVC",
-                        "DAI",
-                        "DNT",
-                        "EOS",
-                        "ETC",
-                        "ETH",
-                        "EUR",
-                        "GBP",
-                        "GNT",
-                        "LINK",
-                        "LOOM",
-                        "LTC",
-                        "MANA",
-                        "REP",
-                        "USD",
-                        "USDC",
-                        "XLM",
-                        "XRP",
-                        "ZEC",
-                        "ZRX",
-                        "XTZ",
-                        "ALGO",
-                        "DASH"
-                };
-        return names;
-    }
-
-    template<>
-    std::array<std::string, enum_size<MsgType>()> enum_names<MsgType>() {
-        std::array<std::string, enum_size<MsgType>()> names =
-                {
-                        "",
-                        "AA",
-                        "MQ",
-                        "MT",
-                        "HH",
-                        "IQ",
-                        "IS",
-                        "IC",
-                        "O_",
-                        "OO",
-                        "OC",
-                        "OR",
-                        "OU",
-                        "PP",
-                        "PR"
-                };
-        return names;
-    }
-
-    void Startup::init() {
-        ExchangeTypeEnum::init();
-        InstrumentTypeEnum::init();
-        CurrencyEnum::init();
-        MsgTypeEnum::init();
-    }
-
-    std::string create_topic(const MsgType msg_type, const uint64_t id) {
-        auto prefix = enum_names<MsgType>()[static_cast<uint8_t>(msg_type)];
+    std::string create_topic(const MsgType msg_type, const int64_t id) {
+        auto prefix = MsgTypeNames[static_cast<uint8_t>(msg_type)];
         return prefix + std::to_string(id);
+    }
+
+    std::unordered_map<std::string, krypto::serialization::Currency> name_to_currency() {
+        auto values = krypto::serialization::EnumValuesCurrency();
+        std::unordered_map<std::string, krypto::serialization::Currency> result;
+        for (int i = 0; i <= static_cast<int>(krypto::serialization::Currency::Currency_MAX); ++i) {
+            result[krypto::serialization::EnumNameCurrency(values[i])] = values[i];
+        }
+        return result;
+    }
+
+    std::unordered_map<std::string, krypto::utils::MsgType > name_to_msg_type() {
+        auto values = krypto::utils::MsgTypes;
+        std::unordered_map<std::string, krypto::utils::MsgType > result;
+        for (int i = 0; i < enum_size<MsgType>(); ++i) {
+            result[krypto::utils::MsgTypeNames[i]] = values[i];
+        }
+        return result;
     }
 }

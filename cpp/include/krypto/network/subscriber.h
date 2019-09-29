@@ -10,6 +10,7 @@
 
 #include <krypto/logger.h>
 #include "krypto/utils/common.h"
+#include <krypto/utils/types.h>
 
 
 namespace krypto::network {
@@ -21,6 +22,7 @@ namespace krypto::network {
         std::string endpoint_;
         bool connected_;
         std::atomic_bool running_;
+        std::unordered_map<std::string, krypto::utils::MsgType> msg_type_ref_;
 
         void connect();
 
@@ -29,7 +31,7 @@ namespace krypto::network {
         void recv();
 
     public:
-        Subscriber(zmq::context_t& context, std::string);
+        Subscriber(zmq::context_t &context, std::string);
 
         Subscriber(const Subscriber<Derived, Parser, Verbose> &other) = delete;
 
@@ -57,11 +59,12 @@ namespace krypto::network {
     };
 
     template<typename Consumer, typename Parser, bool Verbose>
-    Subscriber<Consumer, Parser, Verbose>::Subscriber(zmq::context_t& context, std::string endpoint) :
-            socket_ {std::make_unique<zmq::socket_t>(context, ZMQ_SUB)},
+    Subscriber<Consumer, Parser, Verbose>::Subscriber(zmq::context_t &context, std::string endpoint) :
+            socket_{std::make_unique<zmq::socket_t>(context, ZMQ_SUB)},
             endpoint_(std::move(endpoint)),
             connected_(false),
-            running_{false} {
+            running_{false},
+            msg_type_ref_{krypto::utils::name_to_msg_type()} {
 
         connect();
     }
@@ -86,7 +89,7 @@ namespace krypto::network {
 
     template<typename Consumer, typename Parser, bool Verbose>
     void Subscriber<Consumer, Parser, Verbose>::subscribe(const krypto::utils::MsgType msg_type) {
-        auto topic = krypto::utils::MsgTypeEnum::enum_to_names.at(msg_type);
+        auto topic = krypto::utils::MsgTypeNames[static_cast<uint8_t>(msg_type)];
         subscribe(topic);
     }
 
@@ -120,7 +123,7 @@ namespace krypto::network {
         auto topic = std::string(static_cast<char *>(topic_msg.data()), topic_msg.size());
 
         auto topic_prefix = topic.substr(0, 2);
-        auto msg_type = krypto::utils::MsgTypeEnum::names_to_enums.at(topic_prefix);
+        auto msg_type = msg_type_ref_.at(topic_prefix);
 
         zmq::message_t payload_msg;
         socket_->recv(&payload_msg);

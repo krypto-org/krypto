@@ -1,4 +1,5 @@
 #include <krypto/orders/protocol.h>
+#include <krypto/utils/types.h>
 
 std::optional<krypto::orders::ServerParser::receive_variant_t>
 krypto::orders::ServerParser::parse(const zmq::message_t &msg, krypto::utils::MsgType msg_type) {
