@@ -46,3 +46,4 @@ ui/release/*
 
 java/.idea
 java/.gradle
+*.class
