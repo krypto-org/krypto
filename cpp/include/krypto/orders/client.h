@@ -32,7 +32,7 @@ namespace krypto::orders {
         void process(const krypto::serialization::OrderUpdate *order_update);
 
         std::string new_order(const std::string& service,
-                uint64_t security_id, int64_t price, int64_t size,
+                int64_t security_id, int64_t price, int64_t size,
                        krypto::serialization::Side,
                        krypto::serialization::TimeInForce = krypto::serialization::TimeInForce::TimeInForce_DAY);
 

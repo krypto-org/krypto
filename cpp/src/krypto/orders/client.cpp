@@ -83,7 +83,7 @@ void krypto::orders::OrderClient::replace_order(
 
 std::string krypto::orders::OrderClient::new_order(
         const std::string &service,
-        uint64_t security_id,
+        int64_t security_id,
         int64_t price,
         int64_t size,
         krypto::serialization::Side side,
