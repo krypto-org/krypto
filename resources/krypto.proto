@@ -22,11 +22,29 @@ enum OrderSide {
 }
 
 enum OrderStatus {
-
+    UNKNOWN = 0;
+    IN_FLIGHT = 1;
+    CANCEL_IN_FLIGHT = 2;
+    REPLACE_IN_FLIGHT = 3;
+    NEW = 4;
+    ACCEPTED = 5;
+    CANCELLED = 6;
+    REPLACED = 7;
+    REJECTED = 8;
+    CANCEL_REJECTED = 9;
+    REPLACE_REJECTED = 10;
+    FILLED = 11;
+    PARTIALLY_FILLED = 12;
+    EXPIRED = 13;
 }
 
 enum TimeInForce {
-
+    UNKNOWN = 0;
+    DAY = 1;
+    IOC = 2;
+    FOK = 3;
+    GTC = 4;
+    GTT = 5;
 }
 
 enum Currency {
@@ -61,13 +79,137 @@ enum Currency {
 
 enum RequestType {
     INVALID = 0;
-    ALL = 1;
-    ID = 2;
-    EXCHANGE = 3;
-    PRODUCT = 4;
+    EMPTY = 1;
+    ALL = 2;
+    ID = 3;
+    EXCHANGE = 4;
+    PRODUCT = 5;
+}
+
+enum InstrumentType {
+    UNKNOWN = 0;
+    STOCK = 1;
+    FUTURE = 2;
+    OPTION = 3;
+    FOREX = 4;
+    CRYPTO = 5;
 }
 
 message Instrument {
     int64 id = 1;
+    InstrumentType type = 2;
+    string symbol = 3;
+    Exchange exchange = 4;
+    string exchange_symbol = 5;
+    double tick_size = 6;
+    double min_size = 7;
+    double max_size = 8;
+    Currency crypto_base = 9;
+    Currency crypto_quote = 10;
+}
 
+message Quote {
+    int64 timestamp = 1;
+    int64 security_id = 2;
+    int64 bid = 3;
+    int64 ask = 4;
+    int64 last = 5;
+    int64 bid_quantity = 6;
+    int64 ask_quantity = 7;
+    int64 last_quantity = 8;
+}
+
+
+message OrderRequest {
+    int64 timestamp = 1;
+    int64 security_id = 2;
+    int64 price = 3;
+    int64 quantity = 4;
+    Side side = 5;
+    string order_id = 6;
+    TimeInForce tif = 7;
+}
+
+message OrderCancelRequest {
+    int64 timestamp = 1;
+    string order_id = 2;
+}
+
+message OrderReplaceRequest {
+    int64 timestamp = 1;
+    string order_id = 2;
+    int64 price = 3;
+    int64 quantity = 4;
+    Side side = 5;
+}
+
+message OrderUpdate {
+    int64 timestamp = 1;
+    string order_id = 2;
+    OrderStatus status = 3;
+    int64 filled_quantity = 4;
+}
+
+message Order {
+    int64 timestamp = 1;
+    OrderRequest request = 2;
+    repeated OrderUpdate updates = 3;
+    double fees = 4;
+}
+
+message Position {
+    int64 timestamp = 1;
+    int64 security_id = 2;
+    int64 position = 3;
+}
+
+message RiskSummary {
+    int64 timestamp = 1;
+    repeated Position positions = 2;
+    double pnl = 3;
+}
+
+message Request {
+    RequestType type = 1;
+    int64 id = 2;
+    string exchange = 3;
+    string symbol = 4;
+    InstrumentType instrument_type = 5;
+}
+
+// services
+
+service InstrumentService {
+    rpc GetInstruments (Request) returns (stream Instrument) {
+    }
+}
+
+service OrderService {
+    rpc NewOrder (OrderRequest) returns (OrderUpdate) {
+    }
+
+    rpc CancelOrder (OrderCancelRequest) returns (OrderUpdate) {
+    }
+
+    rpc ReplaceOrder (OrderReplaceRequest) returns (OrderUpdate) {
+    }
+
+    rpc GetOrders(Request) returns (stream Order) {
+    }
+}
+
+service PriceCacheService {
+    rpc GetQuotes (Request) returns (stream Quote) {
+    }
+}
+
+service RiskService {
+    rpc GetPositions(Request) returns (stream Position) {
+    }
+
+    rpc GetRiskSummary(Request) returns (RiskSummary) {
+    }
+
+    rpc GetRiskSummaries(Request) returns (stream RiskSummary) {
+    }
 }
