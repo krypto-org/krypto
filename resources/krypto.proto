@@ -1,0 +1,73 @@
+syntax = "proto3";
+
+package krypto.network.rpc;
+
+// general
+
+enum Exchange {
+    UNKNOWN = 0;
+    COINBASE = 1;
+}
+
+enum Side {
+    UNKNOWN = 0;
+    BUY = 1;
+    SELL = 2;
+}
+
+enum OrderSide {
+    UNKNOWN = 0;
+    BID = 1;
+    ASK = 2;
+}
+
+enum OrderStatus {
+
+}
+
+enum TimeInForce {
+
+}
+
+enum Currency {
+    UNKNOWN = 0;
+    BAT = 1;
+    BCH = 2;
+    BTC = 3;
+    CVC = 4;
+    DAI = 5;
+    DNT = 6;
+    EOS = 7;
+    ETC = 8;
+    ETH = 9;
+    EUR = 10;
+    GBP = 11;
+    GNT = 12;
+    LINK = 13;
+    LOOM = 14;
+    LTC = 15;
+    MANA = 16;
+    REP = 17;
+    USD = 18;
+    USDC = 19;
+    XLM = 20;
+    XRP = 21;
+    ZEC = 22;
+    ZRX = 23;
+    XTZ = 24;
+    ALGO = 25;
+    DAS = 26;
+}
+
+enum RequestType {
+    INVALID = 0;
+    ALL = 1;
+    ID = 2;
+    EXCHANGE = 3;
+    PRODUCT = 4;
+}
+
+message Instrument {
+    int64 id = 1;
+
+}
