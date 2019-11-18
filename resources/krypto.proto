@@ -5,24 +5,24 @@ package krypto.network.rpc;
 // general
 
 enum Exchange {
-    UNKNOWN = 0;
+    UNKNOWN_EXCHANGE = 0;
     COINBASE = 1;
 }
 
 enum Side {
-    UNKNOWN = 0;
+    UNKNOWN_SIDE = 0;
     BUY = 1;
     SELL = 2;
 }
 
 enum OrderSide {
-    UNKNOWN = 0;
+    UNKNOWN_ORDER_SIDE = 0;
     BID = 1;
     ASK = 2;
 }
 
 enum OrderStatus {
-    UNKNOWN = 0;
+    UNKNOWN_ORDER_STATUS = 0;
     IN_FLIGHT = 1;
     CANCEL_IN_FLIGHT = 2;
     REPLACE_IN_FLIGHT = 3;
@@ -39,7 +39,7 @@ enum OrderStatus {
 }
 
 enum TimeInForce {
-    UNKNOWN = 0;
+    UNKNOWN_TIF = 0;
     DAY = 1;
     IOC = 2;
     FOK = 3;
@@ -48,7 +48,7 @@ enum TimeInForce {
 }
 
 enum Currency {
-    UNKNOWN = 0;
+    UNKNOWN_CURRENCY = 0;
     BAT = 1;
     BCH = 2;
     BTC = 3;
@@ -87,7 +87,7 @@ enum RequestType {
 }
 
 enum InstrumentType {
-    UNKNOWN = 0;
+    UNKNOWN_INSTRUMENT_TYPE = 0;
     STOCK = 1;
     FUTURE = 2;
     OPTION = 3;
