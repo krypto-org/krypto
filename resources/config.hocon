@@ -46,22 +46,16 @@ services = {
         polling_millis = 50
     }
 
-    rpc = {
-        broker = {
-            frontend = {
-                port = 8686
-                server = "tcp://*:"${services.rpc.broker.frontend.port}
-                client = "tcp://"${global.ip}":"${services.rpc.broker.frontend.port}
-            }
-            backend = {
-                port = 8687
-                server = "tcp://*:"${services.rpc.broker.backend.port}
-                client = "tcp://"${global.ip}":"${services.rpc.broker.backend.port}
-            }
+    order_gateway = {
+        frontend = {
+            port = 12010
+            server = "tcp://*:"${services.order_gateway.frontend.port}
+            client = "tcp://"${global.ip}":"${services.order_gateway.frontend.port}
         }
-
-        instruments = {
-            name = "instruments"
+        backend = {
+            port = 12011
+            server = "tcp://*:"${services.order_gateway.backend.port}
+            client = "tcp://"${global.ip}":"${services.order_gateway.backend.port}
         }
     }
 
