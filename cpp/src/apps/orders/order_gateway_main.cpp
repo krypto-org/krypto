@@ -2,7 +2,7 @@
 #include <csignal>
 #include <future>
 
-#include <krypto/network/rpc/broker.h>
+#include <krypto/orders/gateway.h>
 #include <krypto/logger.h>
 
 
@@ -20,14 +20,15 @@ int main(int argc, char ** argv) {
         return 1;
     }
 
+    zmq::context_t context{1};
     const krypto::Config config(argv[1]);
 
-    krypto::network::rpc::Broker<true> broker{config};
-    auto done = std::async(std::launch::async, [&broker] () {broker.start();});
+    krypto::orders::OrderGateway<true> order_gateway{context, config};
+    auto done = std::async(std::launch::async, [&order_gateway] () {order_gateway.start();});
 
-    shutdown_handler = [&broker](int signal) {
+    shutdown_handler = [&order_gateway](int signal) {
         SIGNAL_STATUS = signal;
-        broker.stop();
+        order_gateway.stop();
     };
 
     std::signal(SIGINT, signal_handler);
