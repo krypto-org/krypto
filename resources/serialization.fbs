@@ -12,6 +12,9 @@ enum OrderStatus: byte {UNKNOWN, IN_FLIGHT, CANCEL_IN_FLIGHT, REPLACE_IN_FLIGHT,
 
 enum TimeInForce: byte {DAY, IOC, FOK, GTC, GTT}
 
+table Empty {
+}
+
 table SequenceNumber {
   value: long;
 }
@@ -120,11 +123,11 @@ table InstrumentRequest {
   type: RequestType;
 }
 
-table InstrumentCacheRefreshRequest {
-}
-
 table InstrumentResponse {
   instruments: [Instrument];
+}
+
+table InstrumentRefreshRequest {
 }
 
 // orders

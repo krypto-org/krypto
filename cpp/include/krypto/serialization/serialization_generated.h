@@ -9,6 +9,8 @@
 namespace krypto {
 namespace serialization {
 
+struct Empty;
+
 struct SequenceNumber;
 
 struct Heartbeat;
@@ -29,9 +31,9 @@ struct Trade;
 
 struct InstrumentRequest;
 
-struct InstrumentCacheRefreshRequest;
-
 struct InstrumentResponse;
+
+struct InstrumentRefreshRequest;
 
 struct OrderRequest;
 
@@ -501,6 +503,34 @@ FLATBUFFERS_MANUALLY_ALIGNED_STRUCT(8) Position FLATBUFFERS_FINAL_CLASS {
   }
 };
 FLATBUFFERS_STRUCT_END(Position, 16);
+
+struct Empty FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+  bool Verify(flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           verifier.EndTable();
+  }
+};
+
+struct EmptyBuilder {
+  flatbuffers::FlatBufferBuilder &fbb_;
+  flatbuffers::uoffset_t start_;
+  explicit EmptyBuilder(flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  EmptyBuilder &operator=(const EmptyBuilder &);
+  flatbuffers::Offset<Empty> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = flatbuffers::Offset<Empty>(end);
+    return o;
+  }
+};
+
+inline flatbuffers::Offset<Empty> CreateEmpty(
+    flatbuffers::FlatBufferBuilder &_fbb) {
+  EmptyBuilder builder_(_fbb);
+  return builder_.Finish();
+}
 
 struct SequenceNumber FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
@@ -1174,34 +1204,6 @@ inline flatbuffers::Offset<InstrumentRequest> CreateInstrumentRequest(
   return builder_.Finish();
 }
 
-struct InstrumentCacheRefreshRequest FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
-  bool Verify(flatbuffers::Verifier &verifier) const {
-    return VerifyTableStart(verifier) &&
-           verifier.EndTable();
-  }
-};
-
-struct InstrumentCacheRefreshRequestBuilder {
-  flatbuffers::FlatBufferBuilder &fbb_;
-  flatbuffers::uoffset_t start_;
-  explicit InstrumentCacheRefreshRequestBuilder(flatbuffers::FlatBufferBuilder &_fbb)
-        : fbb_(_fbb) {
-    start_ = fbb_.StartTable();
-  }
-  InstrumentCacheRefreshRequestBuilder &operator=(const InstrumentCacheRefreshRequestBuilder &);
-  flatbuffers::Offset<InstrumentCacheRefreshRequest> Finish() {
-    const auto end = fbb_.EndTable(start_);
-    auto o = flatbuffers::Offset<InstrumentCacheRefreshRequest>(end);
-    return o;
-  }
-};
-
-inline flatbuffers::Offset<InstrumentCacheRefreshRequest> CreateInstrumentCacheRefreshRequest(
-    flatbuffers::FlatBufferBuilder &_fbb) {
-  InstrumentCacheRefreshRequestBuilder builder_(_fbb);
-  return builder_.Finish();
-}
-
 struct InstrumentResponse FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
     VT_INSTRUMENTS = 4
@@ -1251,6 +1253,34 @@ inline flatbuffers::Offset<InstrumentResponse> CreateInstrumentResponseDirect(
   return krypto::serialization::CreateInstrumentResponse(
       _fbb,
       instruments__);
+}
+
+struct InstrumentRefreshRequest FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+  bool Verify(flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           verifier.EndTable();
+  }
+};
+
+struct InstrumentRefreshRequestBuilder {
+  flatbuffers::FlatBufferBuilder &fbb_;
+  flatbuffers::uoffset_t start_;
+  explicit InstrumentRefreshRequestBuilder(flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  InstrumentRefreshRequestBuilder &operator=(const InstrumentRefreshRequestBuilder &);
+  flatbuffers::Offset<InstrumentRefreshRequest> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = flatbuffers::Offset<InstrumentRefreshRequest>(end);
+    return o;
+  }
+};
+
+inline flatbuffers::Offset<InstrumentRefreshRequest> CreateInstrumentRefreshRequest(
+    flatbuffers::FlatBufferBuilder &_fbb) {
+  InstrumentRefreshRequestBuilder builder_(_fbb);
+  return builder_.Finish();
 }
 
 struct OrderRequest FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {

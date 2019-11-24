@@ -85,11 +85,8 @@ add_library(krypto STATIC
         include/krypto/network/rpc/worker.h
         include/krypto/network/rpc/broker.h
         include/krypto/utils/message_types.h
-        include/krypto/instruments/protocol.h
-        src/krypto/instruments/client.cpp
         include/krypto/instruments/client.h
         include/krypto/instruments/server.h
-        src/krypto/instruments/server.cpp
         include/krypto/utils/common.h
         src/krypto/utils/common.cpp
         include/krypto/exchanges/coinbase.h
@@ -100,7 +97,6 @@ add_library(krypto STATIC
         src/krypto/utils/date_time.cpp
         include/krypto/mktdata/protocol.h
         src/krypto/mktdata/protocol.cpp
-        src/krypto/instruments/protocol.cpp
         include/krypto/orders/sim/server.h
         include/krypto/orders/protocol.h
         src/krypto/orders/protocol.cpp

@@ -13,13 +13,14 @@ int main(int argc, char ** argv) {
 
     krypto::instruments::InstrumentClient client{context, config};
     
-    auto result = client.query_all();
-    KRYP_LOG(info, "{}", result.size());
+    auto result = client.query();
+    KRYP_LOG(info, "Sent query waiting for result");
+    KRYP_LOG(info, "Received {} instruments", result.get().size());
     KRYP_LOG(info, "Refresh Cache");
     client.refresh_cache();
-    result = client.query_all();
-    KRYP_LOG(info, "{}", result.size());
-    for (auto&& inst: result) {
+    auto insts = client.query().get();
+    KRYP_LOG(info, "{}", insts.size());
+    for (auto&& inst: insts) {
         KRYP_LOG(info, "{} : {}", inst.symbol, inst.id);
     }
 }

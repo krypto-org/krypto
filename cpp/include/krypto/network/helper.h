@@ -27,6 +27,10 @@ namespace krypto::network {
 
     std::string generate_id();
 
+    void connect(zmq::socket_t &socket,
+            const std::string& endpoint,
+            const std::string& identity);
+
     void send_string(zmq::socket_t &socket, std::string &&value, int flags_ = 0);
 
     void send_string(zmq::socket_t &socket, const std::string &value, int flags_ = 0);

@@ -26,7 +26,7 @@ int main(int argc, char **argv) {
 
     zmq::context_t context{1};
 
-    krypto::instruments::Server server{context, config, config.at<std::string>("/services/rpc/instruments/name")};
+    krypto::instruments::Server<true> server{context, config};
     auto done = std::async(std::launch::async, [&server]() { server.start(); });
 
     shutdown_handler = [&server](int signal) {

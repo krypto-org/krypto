@@ -11,6 +11,13 @@ namespace krypto::network {
         return std::to_string(nanoseconds.count());
     }
 
+    void connect(zmq::socket_t &socket, const std::string &endpoint, const std::string &identity) {
+        int linger = 0;
+        socket.setsockopt(ZMQ_LINGER, &linger, sizeof(linger));
+        socket.setsockopt(ZMQ_IDENTITY, identity.c_str(), identity.size());
+        socket.connect(endpoint);
+    }
+
     void send_string(zmq::socket_t &socket, std::string &&value, int flags_) {
         zmq::message_t message(value.size());
         std::memcpy(message.data(), value.data(), value.size());

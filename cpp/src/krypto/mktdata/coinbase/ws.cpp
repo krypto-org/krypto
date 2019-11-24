@@ -16,7 +16,7 @@ krypto::mktdata::coinbase::WsConnection::WsConnection(
         update_channel_{update_channel} {
 
     krypto::instruments::InstrumentClient client{context, config};
-    auto query = client.query_all();
+    auto query = client.query().get();
     instruments_.insert(instruments_.end(), std::begin(query), std::end(query));
 
     client_.init_asio();

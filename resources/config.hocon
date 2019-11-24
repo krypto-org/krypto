@@ -39,6 +39,13 @@ exchanges = {
 
 
 services = {
+    instruments = {
+        port = 12000
+        server = "tcp://*:"${services.instruments.port}
+        client = "tcp://"${global.ip}":"${services.instruments.port}
+        polling_millis = 50
+    }
+
     rpc = {
         broker = {
             frontend = {
