@@ -50,7 +50,7 @@ namespace krypto::instruments {
             server_endpoint_{
                     config.at<std::string>("/services/instruments/client")} {
         if constexpr  (Verbose) {
-            KRYP_LOG(info, "Connecting to broker @ {}", server_endpoint_);
+            KRYP_LOG(info, "Connecting to server @ {}", server_endpoint_);
         }
         auto identity = "instruments-" + krypto::network::generate_id();
         krypto::network::connect(*socket_, server_endpoint_, identity);

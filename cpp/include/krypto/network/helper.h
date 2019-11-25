@@ -41,6 +41,9 @@ namespace krypto::network {
 
     void send_msg_type(zmq::socket_t &socket, const krypto::utils::MsgType &msg_type, int flags_ = 0);
 
+    void send_fb_buffer(zmq::socket_t &socket,
+            const flatbuffers::FlatBufferBuilder& fb_builder, int flags_ = 0);
+
     std::string recv_string(zmq::socket_t &socket);
 
     void recv_empty_frame(zmq::socket_t &socket);

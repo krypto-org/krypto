@@ -28,12 +28,7 @@ int main(int argc, char **argv) {
     zmq::context_t context{1};
 
     krypto::orders::OrderClient client{context, config};
-    auto done = std::async(std::launch::async, [&client]() {
-        client.subscribe(krypto::utils::MsgType::UNDEFINED);
-        client.start();
-    });
-
-    std::this_thread::sleep_for(std::chrono::seconds{1});
+    auto start_thread = client.start();
 
     shutdown_handler = [&client](int signal) {
         SIGNAL_STATUS = signal;
@@ -78,9 +73,8 @@ int main(int argc, char **argv) {
         client.cancel_order("sim-orders", order_id);
     }
 
-    std::this_thread::sleep_for(std::chrono::seconds{2});
-
-    done.wait();
+    client.stop();
+    start_thread.join();
 
     KRYP_LOG(info, "Shutdown Client");
     return 0;
