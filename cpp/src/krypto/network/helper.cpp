@@ -83,4 +83,13 @@ namespace krypto::network {
         auto result = static_cast<krypto::utils::MsgType *>(msg.data());
         return *result;
     }
+
+    void send_fb_buffer(zmq::socket_t &socket,
+                        const flatbuffers::FlatBufferBuilder &fb_builder, int flags_) {
+        zmq::message_t request_msg(fb_builder.GetSize());
+        std::memcpy(request_msg.data(),
+                    fb_builder.GetBufferPointer(),
+                    fb_builder.GetSize());
+        socket.send(request_msg, flags_);
+    }
 }

@@ -103,7 +103,7 @@ add_library(krypto STATIC
         src/krypto/orders/sim/server.cpp
         include/krypto/orders/client.h
         include/krypto/utils/id_gen.h
-        src/krypto/orders/client.cpp include/krypto/orders/gateway.h)
+        include/krypto/orders/gateway.h)
 target_link_libraries(krypto Threads::Threads)
 
 add_library(crypto STATIC IMPORTED include/krypto/mktdata/coinbase/book_builder.h)

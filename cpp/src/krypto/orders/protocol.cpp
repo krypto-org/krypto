@@ -12,11 +12,3 @@ krypto::orders::ServerParser::parse(const zmq::message_t &msg, krypto::utils::Ms
     }
     return std::nullopt;
 }
-
-std::optional<krypto::orders::ClientParser::receive_variant_t>
-krypto::orders::ClientParser::parse(const zmq::message_t &msg, krypto::utils::MsgType msg_type) {
-    if (msg_type == krypto::utils::MsgType::ORDER_UPDATE) {
-        return flatbuffers::GetRoot<krypto::serialization::OrderUpdate>(msg.data());
-    }
-    return std::nullopt;
-}
