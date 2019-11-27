@@ -100,7 +100,6 @@ add_library(krypto STATIC
         include/krypto/orders/sim/server.h
         include/krypto/orders/protocol.h
         src/krypto/orders/protocol.cpp
-        src/krypto/orders/sim/server.cpp
         include/krypto/orders/client.h
         include/krypto/utils/id_gen.h
         include/krypto/orders/gateway.h)
