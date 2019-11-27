@@ -100,7 +100,6 @@ namespace krypto::orders {
                     workers_.erase(exchange);
                 } else if (status == krypto::network::SocketStatus::REPLY) {
                     auto client_addr = krypto::network::recv_string(*backend_);
-                    krypto::network::recv_empty_frame(*backend_);
                     auto msg_type = krypto::network::recv_msg_type(*backend_);
                     krypto::network::send_string(*frontend_, client_addr, ZMQ_SNDMORE);
                     krypto::network::send_empty_frame(*frontend_, ZMQ_SNDMORE);
@@ -138,7 +137,6 @@ namespace krypto::orders {
                     krypto::network::send_string(*backend_, worker_addr, ZMQ_SNDMORE);
                     krypto::network::send_empty_frame(*backend_, ZMQ_SNDMORE);
                     krypto::network::send_string(*backend_, client_addr, ZMQ_SNDMORE);
-                    krypto::network::send_empty_frame(*backend_, ZMQ_SNDMORE);
                     if constexpr (Verbose) {
                         KRYP_LOG(info, "{} sending request to {}@{} with payload size {}",
                                  client_addr, exchange, worker_addr, request_payload.size());

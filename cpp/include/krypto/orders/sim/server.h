@@ -34,9 +34,11 @@ namespace krypto::orders::sim {
 
         void fill_price(int64_t security_id, const krypto::serialization::Side &, int64_t price);
 
-        void send(const krypto::utils::OrderUpdate &order_update);
+        void send(const krypto::utils::OrderUpdate &order_update,
+                  const std::string &client_identity);
 
-        void send_reject(krypto::serialization::OrderStatus, const std::string &order_id);
+        void send_reject(krypto::serialization::OrderStatus, const std::string &order_id,
+                         const std::string &client_identity);
 
         void send_ready(const std::string &identity);
 
@@ -45,11 +47,11 @@ namespace krypto::orders::sim {
     public:
         OrderServer(zmq::context_t &, const krypto::Config &);
 
-        void process(const krypto::serialization::OrderRequest *);
+        void process(const krypto::serialization::OrderRequest *, const std::string &client_identity);
 
-        void process(const krypto::serialization::OrderCancelRequest *);
+        void process(const krypto::serialization::OrderCancelRequest *, const std::string &client_identity);
 
-        void process(const krypto::serialization::OrderReplaceRequest *);
+        void process(const krypto::serialization::OrderReplaceRequest *, const std::string &client_identity);
 
         void process(const krypto::serialization::Quote *quote);
 
@@ -110,14 +112,15 @@ namespace krypto::orders::sim {
     }
 
     template<krypto::serialization::Exchange Exchange, bool Verbose>
-    void OrderServer<Exchange, Verbose>::process(const krypto::serialization::OrderRequest *request) {
+    void OrderServer<Exchange, Verbose>::process(const krypto::serialization::OrderRequest *request,
+                                                 const std::string &client_identity) {
         KRYP_LOG(info, "Processing new order request : {}", request->order_id()->str());
         const krypto::utils::OrderUpdate in_flight{
                 krypto::utils::current_time_in_nanoseconds(),
                 request->order_id()->str(),
                 krypto::serialization::OrderStatus::OrderStatus_IN_FLIGHT,
                 0};
-        send(in_flight);
+        send(in_flight, client_identity);
 
         const krypto::utils::OrderUpdate accept{
                 krypto::utils::current_time_in_nanoseconds(),
@@ -125,7 +128,7 @@ namespace krypto::orders::sim {
                 krypto::serialization::OrderStatus::OrderStatus_ACCEPTED,
                 0
         };
-        send(accept);
+        send(accept, client_identity);
 
         if (quotes_.find(request->security_id()) != std::end(quotes_)) {
             if ((request->side() == krypto::serialization::Side_BUY &&
@@ -140,7 +143,7 @@ namespace krypto::orders::sim {
                         krypto::serialization::OrderStatus::OrderStatus_FILLED,
                         request->quantity()
                 };
-                send(fill);
+                send(fill, client_identity);
             } else {
                 if (request->tif() == krypto::serialization::TimeInForce::TimeInForce_IOC) {
                     const krypto::utils::OrderUpdate expired{
@@ -149,7 +152,7 @@ namespace krypto::orders::sim {
                             krypto::serialization::OrderStatus::OrderStatus_EXPIRED,
                             0
                     };
-                    send(expired);
+                    send(expired, client_identity);
                 } else {
                     if (day_orders_.find(request->security_id()) == std::end(day_orders_)) {
                         day_orders_[request->security_id()] = {};
@@ -174,31 +177,33 @@ namespace krypto::orders::sim {
                             krypto::serialization::OrderStatus::OrderStatus_NEW,
                             0
                     };
-                    send(new_order);
+                    send(new_order, client_identity);
                 }
             }
         }
 
         send_reject(
                 krypto::serialization::OrderStatus::OrderStatus_REJECTED,
-                request->order_id()->str());
+                request->order_id()->str(), client_identity);
     }
 
     template<krypto::serialization::Exchange Exchange, bool Verbose>
-    void OrderServer<Exchange, Verbose>::process(const krypto::serialization::OrderCancelRequest *request) {
+    void OrderServer<Exchange, Verbose>::process(
+            const krypto::serialization::OrderCancelRequest *request,
+            const std::string &client_identity) {
         KRYP_LOG(info, "Processing cancel order request : {}", request->order_id()->str());
         const krypto::utils::OrderUpdate in_flight{
                 krypto::utils::current_time_in_nanoseconds(),
                 request->order_id()->str(),
                 krypto::serialization::OrderStatus::OrderStatus_CANCEL_IN_FLIGHT,
                 0};
-        send(in_flight);
+        send(in_flight, client_identity);
 
         if (order_id_to_security_id_map_.find(request->order_id()->str()) ==
             std::cend(order_id_to_security_id_map_)) {
             KRYP_LOG(info, "Order id {} not found", request->order_id()->str());
             send_reject(krypto::serialization::OrderStatus::OrderStatus_CANCEL_REJECTED,
-                        request->order_id()->str());
+                        request->order_id()->str(), client_identity);
             return;
         }
 
@@ -210,24 +215,26 @@ namespace krypto::orders::sim {
                 request->order_id()->str(),
                 krypto::serialization::OrderStatus::OrderStatus_CANCELLED,
                 0};
-        send(cancelled);
+        send(cancelled, client_identity);
     }
 
     template<krypto::serialization::Exchange Exchange, bool Verbose>
-    void OrderServer<Exchange, Verbose>::process(const krypto::serialization::OrderReplaceRequest *request) {
+    void OrderServer<Exchange, Verbose>::process(
+            const krypto::serialization::OrderReplaceRequest *request,
+            const std::string &client_identity) {
         KRYP_LOG(info, "Processing replace order request : {}", request->order_id()->str());
         const krypto::utils::OrderUpdate in_flight{
                 krypto::utils::current_time_in_nanoseconds(),
                 request->order_id()->str(),
                 krypto::serialization::OrderStatus::OrderStatus_REPLACE_IN_FLIGHT,
                 0};
-        send(in_flight);
+        send(in_flight, client_identity);
 
         if (order_id_to_security_id_map_.find(request->order_id()->str()) ==
             std::cend(order_id_to_security_id_map_)) {
             KRYP_LOG(info, "Order id {} not found", request->order_id()->str());
             send_reject(krypto::serialization::OrderStatus::OrderStatus_REPLACE_REJECTED,
-                        request->order_id()->str());
+                        request->order_id()->str(), client_identity);
             return;
         }
 
@@ -242,7 +249,7 @@ namespace krypto::orders::sim {
                 request->order_id()->str(),
                 krypto::serialization::OrderStatus::OrderStatus_REPLACED,
                 request->quantity()};
-        send(replaced);
+        send(replaced, client_identity);
     }
 
     template<krypto::serialization::Exchange Exchange, bool Verbose>
@@ -319,13 +326,15 @@ namespace krypto::orders::sim {
 
                 switch (msg_type) {
                     case krypto::utils::MsgType::ORDER_REQUEST: {
-                        process(flatbuffers::GetRoot<krypto::serialization::OrderRequest>(payload_msg.data()));
+                        process(flatbuffers::GetRoot<krypto::serialization::OrderRequest>(payload_msg.data()), address);
                     }
                     case krypto::utils::MsgType::ORDER_CANCEL_REQUEST: {
-                        process(flatbuffers::GetRoot<krypto::serialization::OrderCancelRequest>(payload_msg.data()));
+                        process(flatbuffers::GetRoot<krypto::serialization::OrderCancelRequest>(payload_msg.data()),
+                                address);
                     }
                     case krypto::utils::MsgType::ORDER_REPLACE_REQUEST: {
-                        process(flatbuffers::GetRoot<krypto::serialization::OrderReplaceRequest>(payload_msg.data()));
+                        process(flatbuffers::GetRoot<krypto::serialization::OrderReplaceRequest>(payload_msg.data()),
+                                address);
                     }
                     default: {
                         KRYP_LOG(info, "Ignoring unknown message type. ");
@@ -346,19 +355,34 @@ namespace krypto::orders::sim {
     template<krypto::serialization::Exchange Exchange, bool Verbose>
     void OrderServer<Exchange, Verbose>::send_reject(
             const krypto::serialization::OrderStatus order_status,
-            const std::string &order_id) {
-        send({
-                     krypto::utils::current_time_in_nanoseconds(),
-                     order_id,
-                     order_status,
-                     0
-             });
+            const std::string &order_id,
+            const std::string &client_identity) {
+        const krypto::utils::OrderUpdate rejected{
+                krypto::utils::current_time_in_nanoseconds(),
+                order_id,
+                order_status,
+                0
+        };
+        send(rejected, client_identity);
     }
 
     template<krypto::serialization::Exchange Exchange, bool Verbose>
-    void OrderServer<Exchange, Verbose>::send(const krypto::utils::OrderUpdate &order_update) {
+    void OrderServer<Exchange, Verbose>::send(const krypto::utils::OrderUpdate &order_update,
+                                              const std::string &client_identity) {
+        if constexpr (Verbose) {
+            KRYP_LOG(info, "Sending order update {} for {} ... ",
+                     krypto::serialization::EnumNameOrderStatus(
+                             order_update.status), order_update.order_id);
+        }
+        krypto::network::send_empty_frame(*receiver_, ZMQ_SNDMORE);
+        krypto::network::send_status(*receiver_, krypto::network::SocketStatus::REPLY, ZMQ_SNDMORE);
+        krypto::network::send_string(*receiver_, client_identity, ZMQ_SNDMORE);
+        krypto::network::send_msg_type(*receiver_, krypto::utils::MsgType::ORDER_UPDATE, ZMQ_SNDMORE);
         serialize(order_update);
         krypto::network::send_fb_buffer(*receiver_, fb_builder_);
+        if constexpr (Verbose) {
+            KRYP_LOG(info, "Sent!");
+        }
     }
 
     template<krypto::serialization::Exchange Exchange, bool Verbose>
@@ -370,6 +394,7 @@ namespace krypto::orders::sim {
         krypto::network::send_empty_frame(*receiver_, ZMQ_SNDMORE);
         krypto::network::send_status(*receiver_, krypto::network::SocketStatus::READY, ZMQ_SNDMORE);
         krypto::network::send_string(*receiver_, identity);
+
     }
 
     template<krypto::serialization::Exchange Exchange, bool Verbose>

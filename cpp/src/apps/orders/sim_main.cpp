@@ -29,7 +29,7 @@ int main(int argc, char **argv) {
     zmq::context_t context{1};
 
     using order_server_t = krypto::orders::sim::OrderServer<
-            krypto::serialization::Exchange::Exchange_COINBASE, true>;
+            krypto::serialization::Exchange::Exchange_SIM, true>;
     order_server_t orders_server{context, config};
 
     std::thread server_thread(
