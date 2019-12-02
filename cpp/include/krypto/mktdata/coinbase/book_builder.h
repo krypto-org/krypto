@@ -26,9 +26,11 @@ namespace krypto::mktdata::coinbase {
         krypto::network::mktdata::TopOfBookPublisher publisher_;
 
         void apply_incremental(const std::string &symbol, int64_t price, int64_t qty, krypto::utils::OrderSide side);
-        int64_t parse_time(const std::string& ts);
+
+        int64_t parse_time(const std::string &ts);
+
     public:
-        BookBuilder(zmq::context_t& context, const krypto::Config &config);
+        BookBuilder(zmq::context_t &context, const krypto::Config &config);
 
         ~BookBuilder();
 
@@ -50,8 +52,8 @@ namespace krypto::mktdata::coinbase {
     };
 
     template<bool Verbose>
-    BookBuilder<Verbose>::BookBuilder(zmq::context_t& context, const krypto::Config &config) :
-            publisher_{context, config.at<std::string>("/services/publisher/mktdata/proxy/frontend/client")} {
+    BookBuilder<Verbose>::BookBuilder(zmq::context_t &context, const krypto::Config &config) :
+            publisher_{context, config.at<std::string>("/services/mktdata_gateway/frontend/client")} {
 
         krypto::instruments::InstrumentClient client{context, config};
         auto instruments = client.query(
@@ -87,7 +89,8 @@ namespace krypto::mktdata::coinbase {
             auto incrs = incremental.at("changes").get<std::vector<std::vector<std::string>>>();
 
             for (auto &incr: incrs) {
-                krypto::utils::OrderSide side = incr[0] == "buy" ? krypto::utils::OrderSide::BID : krypto::utils::OrderSide::ASK;
+                krypto::utils::OrderSide side =
+                        incr[0] == "buy" ? krypto::utils::OrderSide::BID : krypto::utils::OrderSide::ASK;
                 auto price = krypto::mktdata::convert_price(std::stod(incr[1]));
                 auto qty = krypto::mktdata::convert_quantity(std::stod(incr[2]));
 
@@ -194,7 +197,8 @@ namespace krypto::mktdata::coinbase {
                 auto incrs = incremental.at("changes").get<std::vector<std::vector<std::string>>>();
 
                 for (auto &incr: incrs) {
-                    krypto::utils::OrderSide side = incr[0] == "buy" ? krypto::utils::OrderSide::BID :krypto::utils:: OrderSide::ASK;
+                    krypto::utils::OrderSide side =
+                            incr[0] == "buy" ? krypto::utils::OrderSide::BID : krypto::utils::OrderSide::ASK;
                     auto price = krypto::mktdata::convert_price(std::stod(incr[1]));
                     auto qty = krypto::mktdata::convert_quantity(std::stod(incr[2]));
 
@@ -244,7 +248,7 @@ namespace krypto::mktdata::coinbase {
     }
 
     template<bool Verbose>
-    int64_t BookBuilder<Verbose>::parse_time(const std::string& ts) {
+    int64_t BookBuilder<Verbose>::parse_time(const std::string &ts) {
         return krypto::utils::parse_8601(ts).count();
     }
 

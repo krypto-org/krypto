@@ -43,7 +43,7 @@ int main(int argc, char **argv) {
 
     zmq::context_t context{1};
 
-    MktdataPrinter printer{context, config.at<std::string>("/services/publisher/mktdata/proxy/backend/client")};
+    MktdataPrinter printer{context, config.at<std::string>("/services/mktdata_gateway/backend/client")};
     auto done = std::async(std::launch::async, [&printer]() {
         printer.subscribe(krypto::utils::MsgType::UNDEFINED);
         printer.start();

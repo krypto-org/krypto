@@ -4,9 +4,10 @@ package krypto.serialization;
 
 public final class Exchange {
   private Exchange() { }
-  public static final byte COINBASE = 0;
+  public static final byte SIM = 0;
+  public static final byte COINBASE = 1;
 
-  public static final String[] names = { "COINBASE", };
+  public static final String[] names = { "SIM", "COINBASE", };
 
   public static String name(int e) { return names[e]; }
 }

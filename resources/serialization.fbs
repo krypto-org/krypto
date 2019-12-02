@@ -2,7 +2,7 @@ namespace krypto.serialization;
 
 // general
 
-enum Exchange: byte {COINBASE}
+enum Exchange: byte {SIM, COINBASE}
 
 enum Side: byte {UNKNOWN, BUY, SELL}
 

@@ -59,6 +59,20 @@ services = {
         }
     }
 
+    mktdata_gateway = {
+      frontend = {
+          port = 12020
+          server = "tcp://*:"${services.mktdata_gateway.frontend.port}
+          client = "tcp://"${global.ip}":"${services.mktdata_gateway.frontend.port}
+      }
+
+      backend = {
+          port = 12021
+          server = "tcp://*:"${services.mktdata_gateway.backend.port}
+          client = "tcp://"${global.ip}":"${services.mktdata_gateway.backend.port}
+      }
+    }
+
     publisher = {
         mktdata = {
             proxy = {

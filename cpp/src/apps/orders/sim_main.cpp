@@ -28,30 +28,19 @@ int main(int argc, char **argv) {
 
     zmq::context_t context{1};
 
-    krypto::orders::sim::OrderServer orders_server{context, config, "sim-orders"};
-    krypto::orders::sim::MktdataSubscriber mktdata_subscriber(context, config, orders_server);
-
-    mktdata_subscriber.subscribe(krypto::utils::MsgType::UNDEFINED);
+    using order_server_t = krypto::orders::sim::OrderServer<
+            krypto::serialization::Exchange::Exchange_SIM, true>;
+    order_server_t orders_server{context, config};
 
     std::thread server_thread(
-            std::bind(&krypto::orders::sim::OrderServer::start,
-                    &orders_server));
-
-    std::thread mktdata_thread(
-            std::bind(&krypto::orders::sim::MktdataSubscriber::start,
-                    &mktdata_subscriber));
-    mktdata_subscriber.subscribe(krypto::utils::MsgType::UNDEFINED);
+            std::bind(&order_server_t::start, &orders_server));
 
     shutdown_handler = [&](int signal) {
         SIGNAL_STATUS = signal;
-        mktdata_subscriber.stop();
         orders_server.stop();
     };
 
     std::signal(SIGINT, signal_handler);
-
-    KRYP_LOG(info, "Joining md server thread");
-    mktdata_thread.join();
 
     KRYP_LOG(info, "Joining server thread");
     server_thread.join();

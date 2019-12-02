@@ -86,21 +86,23 @@ namespace krypto::orders {
             zmq::poll(&items[0], 2, 0);
 
             if (items[0].revents && ZMQ_POLLIN) {
-                auto address = krypto::network::recv_string(*backend_);
+                /*
+                 * IN (S): IDENTITY -> EMPTY -> STATUS -> [CLIENT -> MSG_TYPE -> PAYLOAD]
+                 * OUT [C]: CLIENT_IDENTITY -> EMPTY -> EXCHANGE -> MSG_TYPE -> PAYLOAD
+                 * */
+                auto exchange = krypto::network::recv_string(*backend_);
                 krypto::network::recv_empty_frame(*backend_);
 
                 auto status = krypto::network::recv_status(*backend_);
-                auto exchange = krypto::network::recv_string(*backend_);
 
                 if (status == krypto::network::SocketStatus::READY) {
-                    KRYP_LOG(info, "{} :: ready @ address {}", exchange, address);
-                    workers_[exchange] = address;
+                    KRYP_LOG(info, "{} :: ready @ address", exchange);
+                    workers_[exchange] = exchange;
                 } else if (status == krypto::network::SocketStatus::DISCONNECT) {
                     KRYP_LOG(info, "{} :: disconnected", exchange);
                     workers_.erase(exchange);
                 } else if (status == krypto::network::SocketStatus::REPLY) {
                     auto client_addr = krypto::network::recv_string(*backend_);
-                    krypto::network::recv_empty_frame(*backend_);
                     auto msg_type = krypto::network::recv_msg_type(*backend_);
                     krypto::network::send_string(*frontend_, client_addr, ZMQ_SNDMORE);
                     krypto::network::send_empty_frame(*frontend_, ZMQ_SNDMORE);
@@ -124,7 +126,11 @@ namespace krypto::orders {
             }
 
             if (items[1].revents && ZMQ_POLLIN) {
-
+                /*
+                 * IN (C): CLIENT_IDENTITY -> EMPTY -> EXCHANGE -> MSG_TYPE -> PAYLOAD
+                 * OUT [S]: EXCHANGE -> EMPTY -> CLIENT_ADDRESS -> MSG_TYPE -> PAYLOAD
+                 * */
+                KRYP_LOG(info, "FRONTEND");
                 auto client_addr = krypto::network::recv_string(*frontend_);
                 krypto::network::recv_empty_frame(*frontend_);
                 auto exchange = krypto::network::recv_string(*frontend_);
@@ -138,7 +144,6 @@ namespace krypto::orders {
                     krypto::network::send_string(*backend_, worker_addr, ZMQ_SNDMORE);
                     krypto::network::send_empty_frame(*backend_, ZMQ_SNDMORE);
                     krypto::network::send_string(*backend_, client_addr, ZMQ_SNDMORE);
-                    krypto::network::send_empty_frame(*backend_, ZMQ_SNDMORE);
                     if constexpr (Verbose) {
                         KRYP_LOG(info, "{} sending request to {}@{} with payload size {}",
                                  client_addr, exchange, worker_addr, request_payload.size());

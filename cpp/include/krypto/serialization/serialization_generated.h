@@ -50,13 +50,15 @@ struct Position;
 struct RiskSummary;
 
 enum Exchange {
-  Exchange_COINBASE = 0,
-  Exchange_MIN = Exchange_COINBASE,
+  Exchange_SIM = 0,
+  Exchange_COINBASE = 1,
+  Exchange_MIN = Exchange_SIM,
   Exchange_MAX = Exchange_COINBASE
 };
 
-inline const Exchange (&EnumValuesExchange())[1] {
+inline const Exchange (&EnumValuesExchange())[2] {
   static const Exchange values[] = {
+    Exchange_SIM,
     Exchange_COINBASE
   };
   return values;
@@ -64,6 +66,7 @@ inline const Exchange (&EnumValuesExchange())[1] {
 
 inline const char * const *EnumNamesExchange() {
   static const char * const names[] = {
+    "SIM",
     "COINBASE",
     nullptr
   };
@@ -71,7 +74,7 @@ inline const char * const *EnumNamesExchange() {
 }
 
 inline const char *EnumNameExchange(Exchange e) {
-  if (e < Exchange_COINBASE || e > Exchange_COINBASE) return "";
+  if (e < Exchange_SIM || e > Exchange_COINBASE) return "";
   const size_t index = static_cast<size_t>(e);
   return EnumNamesExchange()[index];
 }
@@ -733,7 +736,7 @@ inline flatbuffers::Offset<Instrument> CreateInstrument(
     int64_t id = 0,
     InstrumentType type = InstrumentType_UNKNOWN,
     flatbuffers::Offset<flatbuffers::String> symbol = 0,
-    Exchange exchange = Exchange_COINBASE,
+    Exchange exchange = Exchange_SIM,
     flatbuffers::Offset<flatbuffers::String> exchange_symbol = 0,
     double tick_size = 0.0,
     double min_size = 0.0,
@@ -759,7 +762,7 @@ inline flatbuffers::Offset<Instrument> CreateInstrumentDirect(
     int64_t id = 0,
     InstrumentType type = InstrumentType_UNKNOWN,
     const char *symbol = nullptr,
-    Exchange exchange = Exchange_COINBASE,
+    Exchange exchange = Exchange_SIM,
     const char *exchange_symbol = nullptr,
     double tick_size = 0.0,
     double min_size = 0.0,

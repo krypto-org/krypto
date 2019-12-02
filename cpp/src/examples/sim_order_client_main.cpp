@@ -54,11 +54,11 @@ int main(int argc, char **argv) {
 
     std::signal(SIGINT, signal_handler);
 
-    int64_t security_id = 10100030018;
+    int64_t security_id = 10200030018;
     int64_t price = krypto::mktdata::convert_price(12000.0);
     int64_t qty = krypto::mktdata::convert_price(0.01);
 
-    auto order_id = client.new_order("sim-orders",
+    auto order_id = client.new_order("SIM",
                      security_id,
                      price,
                      qty,
@@ -67,10 +67,10 @@ int main(int argc, char **argv) {
 
     KRYP_LOG(info, "Order Id: {}", order_id);
 
-    std::this_thread::sleep_for(std::chrono::seconds{5});
+    std::this_thread::sleep_for(std::chrono::seconds{2});
 
     if (send_cancel) {
-        client.cancel_order("sim-orders", order_id);
+        client.cancel_order("SIM", order_id);
     }
 
     client.stop();
