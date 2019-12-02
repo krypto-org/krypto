@@ -101,11 +101,17 @@ namespace krypto::orders {
             zmq::poll(&items[0], 2, 0);
 
             if (items[0].revents && ZMQ_POLLIN) {
+                /*
+                 * IN: EXCHANGE -> MSG_TYPE -> PAYLOAD
+                 * */
                 auto exchange = krypto::network::recv_string(*queue_pull_);
                 auto msg_type = krypto::network::recv_msg_type(*queue_pull_);
                 zmq::message_t payload;
                 queue_pull_->recv(&payload);
 
+                /*
+                 * OUT: IDENTITY -> EMPTY -> EXCHANGE -> MSG_TYPE -> PAYLOAD
+                 * */
                 krypto::network::send_empty_frame(*sender_, ZMQ_SNDMORE);
                 krypto::network::send_string(*sender_, exchange, ZMQ_SNDMORE);
                 krypto::network::send_msg_type(*sender_, msg_type, ZMQ_SNDMORE);
@@ -113,6 +119,9 @@ namespace krypto::orders {
             }
 
             if (items[1].revents && ZMQ_POLLIN) {
+                /*
+                 * IN: EMPTY -> EXCHANGE -> MSG_TYPE -> PAYLOAD
+                 * */
                 krypto::network::recv_empty_frame(*sender_);
                 auto exchange = krypto::network::recv_string(*sender_);
                 auto msg_type = krypto::network::recv_msg_type(*sender_);

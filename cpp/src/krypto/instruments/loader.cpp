@@ -10,6 +10,9 @@ krypto::instruments::InstrumentLoader::InstrumentLoader(const krypto::Config &co
 std::vector<krypto::utils::Instrument> krypto::instruments::InstrumentLoader::load() {
     std::vector<krypto::utils::Instrument> result;
     for (auto &&et : krypto::serialization::EnumValuesExchange()) {
+        if (et == krypto::serialization::Exchange::Exchange_SIM) {
+            continue;
+        }
         auto exchange = krypto::exchanges::ExchangeFactory::make(et, config_);
         auto instruments = exchange.instruments();
 

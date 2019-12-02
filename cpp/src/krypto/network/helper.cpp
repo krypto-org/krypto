@@ -13,6 +13,7 @@ namespace krypto::network {
 
     void connect(zmq::socket_t &socket, const std::string &endpoint, const std::string &identity) {
         int linger = 0;
+        KRYP_LOG(info, "Setting identity : {}", identity);
         socket.setsockopt(ZMQ_LINGER, &linger, sizeof(linger));
         socket.setsockopt(ZMQ_IDENTITY, identity.c_str(), identity.size());
         socket.connect(endpoint);

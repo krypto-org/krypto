@@ -72,7 +72,7 @@ namespace krypto::orders::sim {
             order_gateway_endpoint_{config.at<std::string>(
                     "/services/order_gateway/backend/client")},
             mktdata_gateway_endpoint_{config.at<std::string>(
-                    "/services/order_gateway/backend/client")},
+                    "/services/mktdata_gateway/backend/client")},
             running_{false},
             msg_type_ref_{krypto::utils::name_to_msg_type()} {
     }
@@ -129,6 +129,8 @@ namespace krypto::orders::sim {
                 0
         };
         send(accept, client_identity);
+
+        KRYP_LOG(info, "Order security id : {}", request->security_id());
 
         if (quotes_.find(request->security_id()) != std::end(quotes_)) {
             if ((request->side() == krypto::serialization::Side_BUY &&
@@ -266,8 +268,8 @@ namespace krypto::orders::sim {
     void OrderServer<Exchange, Verbose>::start() {
         auto identity = krypto::serialization::EnumNameExchange(Exchange);
         krypto::network::connect(*receiver_, order_gateway_endpoint_, identity);
+        KRYP_LOG(info, "Connecting to market data gateway @ {}", mktdata_gateway_endpoint_);
         mktdata_subscriber_->connect(mktdata_gateway_endpoint_);
-        mktdata_subscriber_->setsockopt(ZMQ_SUBSCRIBE, "");
 
         if constexpr (Verbose) {
             KRYP_LOG(info, "Connected to gateway backend @ {}", order_gateway_endpoint_);
@@ -286,9 +288,13 @@ namespace krypto::orders::sim {
 
         running_ = true;
 
+        const std::string subscription = "";
+        mktdata_subscriber_->setsockopt(ZMQ_SUBSCRIBE, &subscription[0], subscription.length());
+
         while (running_) {
             zmq::poll(&items[0], 2, 0);
             if (items[0].revents && ZMQ_POLLIN) {
+
                 auto topic = krypto::network::recv_string(*mktdata_subscriber_);
                 auto topic_prefix = topic.substr(0, 2);
                 auto msg_type = msg_type_ref_.at(topic_prefix);
@@ -299,12 +305,15 @@ namespace krypto::orders::sim {
                 switch (msg_type) {
                     case krypto::utils::MsgType::QUOTE: {
                         process(flatbuffers::GetRoot<krypto::serialization::Quote>(payload_msg.data()));
+                        break;
                     }
                     case krypto::utils::MsgType::TRADE: {
                         process(flatbuffers::GetRoot<krypto::serialization::Trade>(payload_msg.data()));
+                        break;
                     }
                     case krypto::utils::MsgType::HEARTBEAT: {
                         process(flatbuffers::GetRoot<krypto::serialization::Heartbeat>(payload_msg.data()));
+                        break;
                     }
                     default: {
                         KRYP_LOG(info, "Ignoring unknown message type = {}", topic);
@@ -327,14 +336,17 @@ namespace krypto::orders::sim {
                 switch (msg_type) {
                     case krypto::utils::MsgType::ORDER_REQUEST: {
                         process(flatbuffers::GetRoot<krypto::serialization::OrderRequest>(payload_msg.data()), address);
+                        break;
                     }
                     case krypto::utils::MsgType::ORDER_CANCEL_REQUEST: {
                         process(flatbuffers::GetRoot<krypto::serialization::OrderCancelRequest>(payload_msg.data()),
                                 address);
+                        break;
                     }
                     case krypto::utils::MsgType::ORDER_REPLACE_REQUEST: {
                         process(flatbuffers::GetRoot<krypto::serialization::OrderReplaceRequest>(payload_msg.data()),
                                 address);
+                        break;
                     }
                     default: {
                         KRYP_LOG(info, "Ignoring unknown message type. ");
@@ -392,9 +404,7 @@ namespace krypto::orders::sim {
         }
 
         krypto::network::send_empty_frame(*receiver_, ZMQ_SNDMORE);
-        krypto::network::send_status(*receiver_, krypto::network::SocketStatus::READY, ZMQ_SNDMORE);
-        krypto::network::send_string(*receiver_, identity);
-
+        krypto::network::send_status(*receiver_, krypto::network::SocketStatus::READY);
     }
 
     template<krypto::serialization::Exchange Exchange, bool Verbose>
@@ -404,7 +414,6 @@ namespace krypto::orders::sim {
         }
 
         krypto::network::send_empty_frame(*receiver_, ZMQ_SNDMORE);
-        krypto::network::send_status(*receiver_, krypto::network::SocketStatus::DISCONNECT, ZMQ_SNDMORE);
-        krypto::network::send_string(*receiver_, identity);
+        krypto::network::send_status(*receiver_, krypto::network::SocketStatus::DISCONNECT);
     }
 }
