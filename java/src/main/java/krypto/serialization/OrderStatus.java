@@ -18,8 +18,9 @@ public final class OrderStatus {
   public static final byte FILLED = 11;
   public static final byte PARTIALLY_FILLED = 12;
   public static final byte EXPIRED = 13;
+  public static final byte DONE = 14;
 
-  public static final String[] names = { "UNKNOWN", "IN_FLIGHT", "CANCEL_IN_FLIGHT", "REPLACE_IN_FLIGHT", "NEW", "ACCEPTED", "CANCELLED", "REPLACED", "REJECTED", "CANCEL_REJECTED", "REPLACE_REJECTED", "FILLED", "PARTIALLY_FILLED", "EXPIRED", };
+  public static final String[] names = { "UNKNOWN", "IN_FLIGHT", "CANCEL_IN_FLIGHT", "REPLACE_IN_FLIGHT", "NEW", "ACCEPTED", "CANCELLED", "REPLACED", "REJECTED", "CANCEL_REJECTED", "REPLACE_REJECTED", "FILLED", "PARTIALLY_FILLED", "EXPIRED", "DONE", };
 
   public static String name(int e) { return names[e]; }
 }

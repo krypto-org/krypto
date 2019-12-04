@@ -10,19 +10,28 @@
 #include <krypto/utils/types.h>
 
 namespace {
-struct MktdataPrinter : public krypto::network::Subscriber<MktdataPrinter, krypto::mktdata::Parser , true> {
+    struct MktdataPrinter : public krypto::network::Subscriber<MktdataPrinter, krypto::mktdata::Parser, true> {
         using krypto::network::Subscriber<MktdataPrinter, krypto::mktdata::Parser, true>::Subscriber;
 
         void process(const krypto::serialization::Quote *quote) {
-            std::cout << "QUOTE: "<< quote->security_id() << '\n';
+//            std::cout << "QUOTE: " << quote->security_id() << '\n';
         }
 
-         void process(const krypto::serialization::Trade *trade) {
-            std::cout << "TRADE: " << trade->security_id() << '\n';
+        void process(const krypto::serialization::Trade *trade) {
+//            std::cout << "TRADE: " << trade->security_id() << '\n';
         }
 
         void process(const krypto::serialization::Heartbeat *hb) {
-            std::cout << "HB: " << hb->security_id() << '\n';
+//            std::cout << "HB: " << hb->security_id() << '\n';
+        }
+
+        void process(const krypto::serialization::OrderUpdate *ou) {
+            KRYP_LOG(info, "Order Update: {} | {} | {} | {}",
+                     ou->timestamp(),
+                     ou->exchange_order_id()->str(),
+                     krypto::serialization::EnumNameOrderStatus(ou->status()),
+                     ou->filled_quantity()
+            );
         }
     };
 

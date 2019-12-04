@@ -8,7 +8,7 @@ enum Side: byte {UNKNOWN, BUY, SELL}
 
 enum OrderSide: byte {UNKNOWN, BID, ASK}
 
-enum OrderStatus: byte {UNKNOWN, IN_FLIGHT, CANCEL_IN_FLIGHT, REPLACE_IN_FLIGHT, NEW, ACCEPTED, CANCELLED, REPLACED, REJECTED, CANCEL_REJECTED, REPLACE_REJECTED, FILLED, PARTIALLY_FILLED, EXPIRED}
+enum OrderStatus: byte {UNKNOWN, IN_FLIGHT, CANCEL_IN_FLIGHT, REPLACE_IN_FLIGHT, NEW, ACCEPTED, CANCELLED, REPLACED, REJECTED, CANCEL_REJECTED, REPLACE_REJECTED, FILLED, PARTIALLY_FILLED, EXPIRED, DONE}
 
 enum TimeInForce: byte {DAY, IOC, FOK, GTC, GTT}
 
@@ -158,6 +158,7 @@ table OrderReplaceRequest {
 table OrderUpdate {
   timestamp: long;
   order_id: string;
+  exchange_order_id: string;
   status: OrderStatus;
   filled_quantity: long;
 }

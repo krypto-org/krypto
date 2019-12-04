@@ -95,7 +95,7 @@ void krypto::mktdata::coinbase::WsConnection::stop() {
 std::string krypto::mktdata::coinbase::WsConnection::generate_subscription() {
     nlohmann::json subscription;
     subscription["type"] = "subscribe";
-    subscription["channels"] = {"level2", "heartbeat", "matches"};
+    subscription["channels"] = {"level2", "heartbeat", "matches", "full"};
     std::vector<std::string> symbols;
 
     std::transform(instruments_.begin(), instruments_.end(), std::back_inserter(symbols), [] (auto&& inst) {
