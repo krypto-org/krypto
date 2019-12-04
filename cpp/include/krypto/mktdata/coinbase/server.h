@@ -53,13 +53,15 @@ namespace krypto::mktdata::coinbase {
                     book_builder_.handle_order_done(update);
                 } else if (type == "match" || type == "last_match") {
                     book_builder_.handle_trade(update);
+                    if constexpr  (Verbose) {
+                        KRYP_LOG(debug, "Match Message: {}", update.dump());
+                    }
                     book_builder_.handle_order_match(update);
                 } else if (type == "change") {
                     book_builder_.handle_order_change(update);
                 } else if (type == "activate") {
                     // Ignore stop orders for now
-                }
-                else {
+                } else {
                     KRYP_LOG(debug, update.dump());
                 }
             }
