@@ -128,10 +128,6 @@ namespace krypto::network {
         zmq::message_t payload_msg;
         socket_->recv(&payload_msg);
 
-        if constexpr (Verbose) {
-            KRYP_LOG(info, "Received data -- topic: {} | payload size: {}", topic, payload_msg.size());
-        }
-
         auto payload = Parser::parse(payload_msg, msg_type);
 
         if (payload.has_value()) {

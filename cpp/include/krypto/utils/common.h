@@ -29,6 +29,8 @@ namespace krypto::utils {
 
     std::string create_topic(MsgType msg_type, int64_t id);
 
+    std::string create_topic(MsgType msg_type, krypto::serialization::Exchange exchange);
+
     std::unordered_map<std::string, krypto::serialization::Currency> name_to_currency();
 
     std::unordered_map<std::string, krypto::utils::MsgType > name_to_msg_type();

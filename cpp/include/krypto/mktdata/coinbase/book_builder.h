@@ -6,7 +6,7 @@
 #include <tbb/concurrent_queue.h>
 #include <nlohmann/json.hpp>
 
-#include <krypto/network/mktdata/top_of_book.h>
+#include <krypto/mktdata/pub.h>
 #include <krypto/mktdata/convert.h>
 #include <krypto/instruments/client.h>
 #include <krypto/utils/date_time.h>
@@ -23,11 +23,13 @@ namespace krypto::mktdata::coinbase {
         std::unordered_map<std::string, std::queue<nlohmann::json>> incr_queue_;
         std::unordered_map<std::string, bool> snapshot_received_;
 
-        krypto::network::mktdata::TopOfBookPublisher publisher_;
+        krypto::mktdata::Publisher publisher_;
 
         void apply_incremental(const std::string &symbol, int64_t price, int64_t qty, krypto::utils::OrderSide side);
 
         int64_t parse_time(const std::string &ts);
+
+        void send_order_update(const krypto::utils::OrderUpdate &order_update);
 
     public:
         BookBuilder(zmq::context_t &context, const krypto::Config &config);
@@ -47,6 +49,16 @@ namespace krypto::mktdata::coinbase {
         void handle_snap(nlohmann::json snapshot);
 
         void handle_trade(nlohmann::json trade);
+
+        void handle_order_received(nlohmann::json order_update);
+
+        void handle_order_open(nlohmann::json order_update);
+
+        void handle_order_done(nlohmann::json order_update);
+
+        void handle_order_match(nlohmann::json order_update);
+
+        void handle_order_change(nlohmann::json order_update);
 
         void handle_heartbeat(nlohmann::json hb);
     };
@@ -243,6 +255,84 @@ namespace krypto::mktdata::coinbase {
     }
 
     template<bool Verbose>
+    void BookBuilder<Verbose>::handle_order_received(nlohmann::json received) {
+        const krypto::utils::OrderUpdate order_update{
+                krypto::utils::current_time_in_nanoseconds(),
+                "",
+                received.at("order_id").get<std::string>(),
+                krypto::serialization::OrderStatus::OrderStatus_ACCEPTED,
+                0
+        };
+        send_order_update(order_update);
+    }
+
+    template<bool Verbose>
+    void BookBuilder<Verbose>::handle_order_open(nlohmann::json open_order) {
+        const krypto::utils::OrderUpdate order_update{
+                krypto::utils::current_time_in_nanoseconds(),
+                "",
+                open_order.at("order_id").get<std::string>(),
+                krypto::serialization::OrderStatus::OrderStatus_NEW,
+                0
+        };
+        send_order_update(order_update);
+    }
+
+    template<bool Verbose>
+    void BookBuilder<Verbose>::handle_order_done(nlohmann::json done) {
+        auto done_reason = done.at("reason").get<std::string>();
+
+        const krypto::utils::OrderUpdate order_update{
+                krypto::utils::current_time_in_nanoseconds(),
+                "",
+                done.at("order_id").get<std::string>(),
+                done_reason == "filled" ?
+                krypto::serialization::OrderStatus::OrderStatus_DONE :
+                krypto::serialization::OrderStatus_CANCELLED,
+                0
+        };
+        send_order_update(order_update);
+    }
+
+    template<bool Verbose>
+    void BookBuilder<Verbose>::handle_order_match(nlohmann::json match) {
+
+        auto ts = krypto::utils::current_time_in_nanoseconds();
+        auto size = krypto::mktdata::convert_quantity(
+                std::stod(match.at("size").get<std::string>()));
+
+        const krypto::utils::OrderUpdate maker_fill{
+                ts,
+                "",
+                match.at("maker_order_id").get<std::string>(),
+                krypto::serialization::OrderStatus::OrderStatus_FILLED,
+                size
+        };
+
+        const krypto::utils::OrderUpdate taker_fill{
+                ts,
+                "",
+                match.at("taker_order_id").get<std::string>(),
+                krypto::serialization::OrderStatus::OrderStatus_FILLED,
+                size
+        };
+
+        send_order_update(taker_fill);
+        send_order_update(maker_fill);
+    }
+
+    template<bool Verbose>
+    void BookBuilder<Verbose>::handle_order_change(nlohmann::json change) {
+        const krypto::utils::OrderUpdate order_update{
+                krypto::utils::current_time_in_nanoseconds(),
+                "",
+                change.at("order_id").get<std::string>(),
+                krypto::serialization::OrderStatus::OrderStatus_REPLACED,
+                0
+        };
+    }
+
+    template<bool Verbose>
     BookBuilder<Verbose>::~BookBuilder() {
         incr_queue_.clear();
     }
@@ -261,6 +351,13 @@ namespace krypto::mktdata::coinbase {
         krypto::utils::Heartbeat to_send{krypto::utils::current_time_in_nanoseconds(), id};
         auto topic = krypto::utils::create_topic(krypto::utils::MsgType::HEARTBEAT, id);
         publisher_.send(topic, to_send);
+    }
+
+    template<bool Verbose>
+    void BookBuilder<Verbose>::send_order_update(const krypto::utils::OrderUpdate &order_update) {
+        auto topic = krypto::utils::create_topic(krypto::utils::MsgType::ORDER_UPDATE,
+                                                 krypto::serialization::Exchange::Exchange_COINBASE);
+        publisher_.send(topic, order_update);
     }
 }
 

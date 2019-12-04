@@ -160,11 +160,12 @@ enum OrderStatus {
   OrderStatus_FILLED = 11,
   OrderStatus_PARTIALLY_FILLED = 12,
   OrderStatus_EXPIRED = 13,
+  OrderStatus_DONE = 14,
   OrderStatus_MIN = OrderStatus_UNKNOWN,
-  OrderStatus_MAX = OrderStatus_EXPIRED
+  OrderStatus_MAX = OrderStatus_DONE
 };
 
-inline const OrderStatus (&EnumValuesOrderStatus())[14] {
+inline const OrderStatus (&EnumValuesOrderStatus())[15] {
   static const OrderStatus values[] = {
     OrderStatus_UNKNOWN,
     OrderStatus_IN_FLIGHT,
@@ -179,7 +180,8 @@ inline const OrderStatus (&EnumValuesOrderStatus())[14] {
     OrderStatus_REPLACE_REJECTED,
     OrderStatus_FILLED,
     OrderStatus_PARTIALLY_FILLED,
-    OrderStatus_EXPIRED
+    OrderStatus_EXPIRED,
+    OrderStatus_DONE
   };
   return values;
 }
@@ -200,13 +202,14 @@ inline const char * const *EnumNamesOrderStatus() {
     "FILLED",
     "PARTIALLY_FILLED",
     "EXPIRED",
+    "DONE",
     nullptr
   };
   return names;
 }
 
 inline const char *EnumNameOrderStatus(OrderStatus e) {
-  if (e < OrderStatus_UNKNOWN || e > OrderStatus_EXPIRED) return "";
+  if (e < OrderStatus_UNKNOWN || e > OrderStatus_DONE) return "";
   const size_t index = static_cast<size_t>(e);
   return EnumNamesOrderStatus()[index];
 }
@@ -1572,14 +1575,18 @@ struct OrderUpdate FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
     VT_TIMESTAMP = 4,
     VT_ORDER_ID = 6,
-    VT_STATUS = 8,
-    VT_FILLED_QUANTITY = 10
+    VT_EXCHANGE_ORDER_ID = 8,
+    VT_STATUS = 10,
+    VT_FILLED_QUANTITY = 12
   };
   int64_t timestamp() const {
     return GetField<int64_t>(VT_TIMESTAMP, 0);
   }
   const flatbuffers::String *order_id() const {
     return GetPointer<const flatbuffers::String *>(VT_ORDER_ID);
+  }
+  const flatbuffers::String *exchange_order_id() const {
+    return GetPointer<const flatbuffers::String *>(VT_EXCHANGE_ORDER_ID);
   }
   OrderStatus status() const {
     return static_cast<OrderStatus>(GetField<int8_t>(VT_STATUS, 0));
@@ -1592,6 +1599,8 @@ struct OrderUpdate FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
            VerifyField<int64_t>(verifier, VT_TIMESTAMP) &&
            VerifyOffset(verifier, VT_ORDER_ID) &&
            verifier.VerifyString(order_id()) &&
+           VerifyOffset(verifier, VT_EXCHANGE_ORDER_ID) &&
+           verifier.VerifyString(exchange_order_id()) &&
            VerifyField<int8_t>(verifier, VT_STATUS) &&
            VerifyField<int64_t>(verifier, VT_FILLED_QUANTITY) &&
            verifier.EndTable();
@@ -1606,6 +1615,9 @@ struct OrderUpdateBuilder {
   }
   void add_order_id(flatbuffers::Offset<flatbuffers::String> order_id) {
     fbb_.AddOffset(OrderUpdate::VT_ORDER_ID, order_id);
+  }
+  void add_exchange_order_id(flatbuffers::Offset<flatbuffers::String> exchange_order_id) {
+    fbb_.AddOffset(OrderUpdate::VT_EXCHANGE_ORDER_ID, exchange_order_id);
   }
   void add_status(OrderStatus status) {
     fbb_.AddElement<int8_t>(OrderUpdate::VT_STATUS, static_cast<int8_t>(status), 0);
@@ -1629,11 +1641,13 @@ inline flatbuffers::Offset<OrderUpdate> CreateOrderUpdate(
     flatbuffers::FlatBufferBuilder &_fbb,
     int64_t timestamp = 0,
     flatbuffers::Offset<flatbuffers::String> order_id = 0,
+    flatbuffers::Offset<flatbuffers::String> exchange_order_id = 0,
     OrderStatus status = OrderStatus_UNKNOWN,
     int64_t filled_quantity = 0) {
   OrderUpdateBuilder builder_(_fbb);
   builder_.add_filled_quantity(filled_quantity);
   builder_.add_timestamp(timestamp);
+  builder_.add_exchange_order_id(exchange_order_id);
   builder_.add_order_id(order_id);
   builder_.add_status(status);
   return builder_.Finish();
@@ -1643,13 +1657,16 @@ inline flatbuffers::Offset<OrderUpdate> CreateOrderUpdateDirect(
     flatbuffers::FlatBufferBuilder &_fbb,
     int64_t timestamp = 0,
     const char *order_id = nullptr,
+    const char *exchange_order_id = nullptr,
     OrderStatus status = OrderStatus_UNKNOWN,
     int64_t filled_quantity = 0) {
   auto order_id__ = order_id ? _fbb.CreateString(order_id) : 0;
+  auto exchange_order_id__ = exchange_order_id ? _fbb.CreateString(exchange_order_id) : 0;
   return krypto::serialization::CreateOrderUpdate(
       _fbb,
       timestamp,
       order_id__,
+      exchange_order_id__,
       status,
       filled_quantity);
 }

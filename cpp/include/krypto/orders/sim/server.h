@@ -7,9 +7,11 @@
 #include <krypto/network/publisher.h>
 
 #include <tbb/concurrent_hash_map.h>
+#include <krypto/serialization/helper.h>
 #include <krypto/utils/types.h>
 #include <krypto/utils/date_time.h>
 #include <krypto/utils/message_types.h>
+
 
 namespace krypto::orders::sim {
     template<krypto::serialization::Exchange Exchange, bool Verbose = false>
@@ -79,15 +81,7 @@ namespace krypto::orders::sim {
 
     template<krypto::serialization::Exchange Exchange, bool Verbose>
     void OrderServer<Exchange, Verbose>::serialize(const krypto::utils::OrderUpdate &order_update) {
-        fb_builder_.Clear();
-        auto oid_offset = fb_builder_.CreateString(order_update.order_id);
-        krypto::serialization::OrderUpdateBuilder ou_builder{fb_builder_};
-        ou_builder.add_timestamp(order_update.timestamp);
-        ou_builder.add_filled_quantity(order_update.filled_quantity);
-        ou_builder.add_status(order_update.status);
-        ou_builder.add_order_id(oid_offset);
-        auto ou = ou_builder.Finish();
-        fb_builder_.Finish(ou);
+        krypto::serialization::serialize(fb_builder_, order_update);
     }
 
     template<krypto::serialization::Exchange Exchange, bool Verbose>
@@ -118,12 +112,14 @@ namespace krypto::orders::sim {
         const krypto::utils::OrderUpdate in_flight{
                 krypto::utils::current_time_in_nanoseconds(),
                 request->order_id()->str(),
+                request->order_id()->str(),
                 krypto::serialization::OrderStatus::OrderStatus_IN_FLIGHT,
                 0};
         send(in_flight, client_identity);
 
         const krypto::utils::OrderUpdate accept{
                 krypto::utils::current_time_in_nanoseconds(),
+                request->order_id()->str(),
                 request->order_id()->str(),
                 krypto::serialization::OrderStatus::OrderStatus_ACCEPTED,
                 0
@@ -142,6 +138,7 @@ namespace krypto::orders::sim {
                 const krypto::utils::OrderUpdate fill{
                         krypto::utils::current_time_in_nanoseconds(),
                         request->order_id()->str(),
+                        request->order_id()->str(),
                         krypto::serialization::OrderStatus::OrderStatus_FILLED,
                         request->quantity()
                 };
@@ -150,6 +147,7 @@ namespace krypto::orders::sim {
                 if (request->tif() == krypto::serialization::TimeInForce::TimeInForce_IOC) {
                     const krypto::utils::OrderUpdate expired{
                             krypto::utils::current_time_in_nanoseconds(),
+                            request->order_id()->str(),
                             request->order_id()->str(),
                             krypto::serialization::OrderStatus::OrderStatus_EXPIRED,
                             0
@@ -176,6 +174,7 @@ namespace krypto::orders::sim {
                     const krypto::utils::OrderUpdate new_order{
                             krypto::utils::current_time_in_nanoseconds(),
                             request->order_id()->str(),
+                            request->order_id()->str(),
                             krypto::serialization::OrderStatus::OrderStatus_NEW,
                             0
                     };
@@ -197,6 +196,7 @@ namespace krypto::orders::sim {
         const krypto::utils::OrderUpdate in_flight{
                 krypto::utils::current_time_in_nanoseconds(),
                 request->order_id()->str(),
+                request->order_id()->str(),
                 krypto::serialization::OrderStatus::OrderStatus_CANCEL_IN_FLIGHT,
                 0};
         send(in_flight, client_identity);
@@ -215,6 +215,7 @@ namespace krypto::orders::sim {
         const krypto::utils::OrderUpdate cancelled{
                 krypto::utils::current_time_in_nanoseconds(),
                 request->order_id()->str(),
+                request->order_id()->str(),
                 krypto::serialization::OrderStatus::OrderStatus_CANCELLED,
                 0};
         send(cancelled, client_identity);
@@ -227,6 +228,7 @@ namespace krypto::orders::sim {
         KRYP_LOG(info, "Processing replace order request : {}", request->order_id()->str());
         const krypto::utils::OrderUpdate in_flight{
                 krypto::utils::current_time_in_nanoseconds(),
+                request->order_id()->str(),
                 request->order_id()->str(),
                 krypto::serialization::OrderStatus::OrderStatus_REPLACE_IN_FLIGHT,
                 0};
@@ -248,6 +250,7 @@ namespace krypto::orders::sim {
 
         const krypto::utils::OrderUpdate replaced{
                 krypto::utils::current_time_in_nanoseconds(),
+                request->order_id()->str(),
                 request->order_id()->str(),
                 krypto::serialization::OrderStatus::OrderStatus_REPLACED,
                 request->quantity()};
@@ -371,6 +374,7 @@ namespace krypto::orders::sim {
             const std::string &client_identity) {
         const krypto::utils::OrderUpdate rejected{
                 krypto::utils::current_time_in_nanoseconds(),
+                order_id,
                 order_id,
                 order_status,
                 0

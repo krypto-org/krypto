@@ -15,7 +15,7 @@ namespace krypto::mktdata::coinbase {
         WsConnection ws_;
         BookBuilder<Verbose> book_builder_;
     public:
-        explicit Server(zmq::context_t& context, const krypto::Config &config);
+        explicit Server(zmq::context_t &context, const krypto::Config &config);
 
         void start();
 
@@ -23,9 +23,9 @@ namespace krypto::mktdata::coinbase {
     };
 
     template<bool Verbose>
-    Server<Verbose>::Server(zmq::context_t& context, const krypto::Config &config) :
+    Server<Verbose>::Server(zmq::context_t &context, const krypto::Config &config) :
             update_channel_{2},
-            ws_{context,config, update_channel_},
+            ws_{context, config, update_channel_},
             book_builder_{context, config} {
     }
 
@@ -43,10 +43,24 @@ namespace krypto::mktdata::coinbase {
                     book_builder_.handle_snap(std::move(update));
                 } else if (type == "l2update") {
                     book_builder_.handle_incr(std::move(update));
-                } else if (type == "match") {
-                    book_builder_.handle_trade(std::move(update));
                 } else if (type == "heartbeat") {
                     book_builder_.handle_heartbeat(std::move(update));
+                } else if (type == "received") {
+                    book_builder_.handle_order_received(update);
+                } else if (type == "open") {
+                    book_builder_.handle_order_open(update);
+                } else if (type == "done") {
+                    book_builder_.handle_order_done(update);
+                } else if (type == "match" || type == "last_match") {
+                    book_builder_.handle_trade(update);
+                    if constexpr  (Verbose) {
+                        KRYP_LOG(debug, "Match Message: {}", update.dump());
+                    }
+                    book_builder_.handle_order_match(update);
+                } else if (type == "change") {
+                    book_builder_.handle_order_change(update);
+                } else if (type == "activate") {
+                    // Ignore stop orders for now
                 } else {
                     KRYP_LOG(debug, update.dump());
                 }

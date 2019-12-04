@@ -12,6 +12,12 @@ namespace krypto::utils {
         return prefix + std::to_string(id);
     }
 
+    std::string create_topic(const MsgType msg_type, const krypto::serialization::Exchange exchange) {
+        auto prefix = std::string{MsgTypeNames[static_cast<uint8_t>(msg_type)]};
+        return prefix + "_" + std::string{krypto::serialization::EnumNameExchange(exchange)};
+    }
+
+
     std::unordered_map<std::string, krypto::serialization::Currency> name_to_currency() {
         auto values = krypto::serialization::EnumValuesCurrency();
         std::unordered_map<std::string, krypto::serialization::Currency> result;

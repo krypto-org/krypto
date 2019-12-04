@@ -18,27 +18,33 @@ public final class OrderUpdate extends Table {
   public String orderId() { int o = __offset(6); return o != 0 ? __string(o + bb_pos) : null; }
   public ByteBuffer orderIdAsByteBuffer() { return __vector_as_bytebuffer(6, 1); }
   public ByteBuffer orderIdInByteBuffer(ByteBuffer _bb) { return __vector_in_bytebuffer(_bb, 6, 1); }
-  public byte status() { int o = __offset(8); return o != 0 ? bb.get(o + bb_pos) : 0; }
-  public long filledQuantity() { int o = __offset(10); return o != 0 ? bb.getLong(o + bb_pos) : 0L; }
+  public String exchangeOrderId() { int o = __offset(8); return o != 0 ? __string(o + bb_pos) : null; }
+  public ByteBuffer exchangeOrderIdAsByteBuffer() { return __vector_as_bytebuffer(8, 1); }
+  public ByteBuffer exchangeOrderIdInByteBuffer(ByteBuffer _bb) { return __vector_in_bytebuffer(_bb, 8, 1); }
+  public byte status() { int o = __offset(10); return o != 0 ? bb.get(o + bb_pos) : 0; }
+  public long filledQuantity() { int o = __offset(12); return o != 0 ? bb.getLong(o + bb_pos) : 0L; }
 
   public static int createOrderUpdate(FlatBufferBuilder builder,
       long timestamp,
       int order_idOffset,
+      int exchange_order_idOffset,
       byte status,
       long filled_quantity) {
-    builder.startObject(4);
+    builder.startObject(5);
     OrderUpdate.addFilledQuantity(builder, filled_quantity);
     OrderUpdate.addTimestamp(builder, timestamp);
+    OrderUpdate.addExchangeOrderId(builder, exchange_order_idOffset);
     OrderUpdate.addOrderId(builder, order_idOffset);
     OrderUpdate.addStatus(builder, status);
     return OrderUpdate.endOrderUpdate(builder);
   }
 
-  public static void startOrderUpdate(FlatBufferBuilder builder) { builder.startObject(4); }
+  public static void startOrderUpdate(FlatBufferBuilder builder) { builder.startObject(5); }
   public static void addTimestamp(FlatBufferBuilder builder, long timestamp) { builder.addLong(0, timestamp, 0L); }
   public static void addOrderId(FlatBufferBuilder builder, int orderIdOffset) { builder.addOffset(1, orderIdOffset, 0); }
-  public static void addStatus(FlatBufferBuilder builder, byte status) { builder.addByte(2, status, 0); }
-  public static void addFilledQuantity(FlatBufferBuilder builder, long filledQuantity) { builder.addLong(3, filledQuantity, 0L); }
+  public static void addExchangeOrderId(FlatBufferBuilder builder, int exchangeOrderIdOffset) { builder.addOffset(2, exchangeOrderIdOffset, 0); }
+  public static void addStatus(FlatBufferBuilder builder, byte status) { builder.addByte(3, status, 0); }
+  public static void addFilledQuantity(FlatBufferBuilder builder, long filledQuantity) { builder.addLong(4, filledQuantity, 0L); }
   public static int endOrderUpdate(FlatBufferBuilder builder) {
     int o = builder.endObject();
     return o;

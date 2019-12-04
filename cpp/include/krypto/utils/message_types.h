@@ -23,6 +23,7 @@ namespace krypto::utils {
                 krypto::utils::MsgType::ORDER_UPDATE;
         int64_t timestamp;
         std::string order_id;
+        std::string exchange_order_id;
         krypto::serialization::OrderStatus status;
         int64_t filled_quantity;
     };

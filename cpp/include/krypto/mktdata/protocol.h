@@ -15,7 +15,8 @@ namespace krypto::mktdata {
         using receive_variant_t = std::variant<
                 const krypto::serialization::Quote *,
                 const krypto::serialization::Trade *,
-                const krypto::serialization::Heartbeat *>;
+                const krypto::serialization::Heartbeat *,
+                const krypto::serialization::OrderUpdate *>;
 
         static std::optional<receive_variant_t> parse(const zmq::message_t &msg,
                                                       krypto::utils::MsgType msg_type);
