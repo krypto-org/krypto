@@ -45,6 +45,7 @@ namespace krypto::mktdata {
         void process(const krypto::serialization::Quote *quote);
         void process(const krypto::serialization::Trade *trade);
         void process(const krypto::serialization::Heartbeat *hb);
+        void process(const krypto::serialization::OrderUpdate *order_update);
     private:
         typedef std::set<connection_hdl,std::owner_less<connection_hdl> > con_list_t;
 

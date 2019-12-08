@@ -27,6 +27,7 @@ namespace krypto::orders::sim {
         flatbuffers::FlatBufferBuilder fb_builder_;
         std::unordered_map<int64_t, krypto::utils::Quote> quotes_;
         std::unordered_map<std::string, int64_t> order_id_to_security_id_map_;
+        std::unordered_map<std::string, std::string> order_id_to_client_identity_map_;
         std::unordered_map<int64_t, std::unordered_map<
                 std::string,
                 krypto::utils::OrderRequest>> day_orders_;
@@ -88,7 +89,54 @@ namespace krypto::orders::sim {
     void OrderServer<Exchange, Verbose>::fill_price(
             int64_t security_id, const krypto::serialization::Side &side,
             int64_t price) {
-        // TODO: Find all prices that the trade trades through
+
+        if (day_orders_.find(security_id) == std::end(day_orders_)) {
+            return;
+        }
+
+        auto &orders = day_orders_.at(security_id);
+
+        std::vector<std::string> filled_order_ids;
+
+        std::for_each(std::begin(orders), std::end(orders), [&](auto &&pair) {
+            if (side == krypto::serialization::Side::Side_BUY &&
+                pair.second.side == krypto::serialization::Side::Side_SELL) {
+                if (pair.second.price <= price) {
+                    auto order_id = pair.second.order_id;
+                    KRYP_LOG(info, "=> {} -- filled", order_id);
+                    const krypto::utils::OrderUpdate fill{
+                            krypto::utils::current_time_in_nanoseconds(),
+                            order_id,
+                            order_id,
+                            krypto::serialization::OrderStatus::OrderStatus_FILLED,
+                            pair.second.quantity
+                    };
+                    send(fill, order_id_to_client_identity_map_.at(order_id));
+                    filled_order_ids.push_back(order_id);
+                }
+            } else if (side == krypto::serialization::Side::Side_SELL &&
+                       pair.second.side == krypto::serialization::Side::Side_BUY) {
+                if (pair.second.price >= price) {
+                    auto order_id = pair.second.order_id;
+                    KRYP_LOG(info, "=> {} -- filled", order_id);
+                    const krypto::utils::OrderUpdate fill{
+                            krypto::utils::current_time_in_nanoseconds(),
+                            order_id,
+                            order_id,
+                            krypto::serialization::OrderStatus::OrderStatus_FILLED,
+                            pair.second.quantity
+                    };
+                    send(fill, order_id_to_client_identity_map_.at(order_id));
+                    filled_order_ids.push_back(order_id);
+                }
+            }
+        });
+
+        for (auto && order_id : filled_order_ids) {
+            day_orders_.at(security_id).erase(order_id);
+            order_id_to_client_identity_map_.erase(order_id);
+            order_id_to_security_id_map_.equal_range(order_id);
+        }
     }
 
     template<krypto::serialization::Exchange Exchange, bool Verbose>
@@ -126,8 +174,6 @@ namespace krypto::orders::sim {
         };
         send(accept, client_identity);
 
-        KRYP_LOG(info, "Order security id : {}", request->security_id());
-
         if (quotes_.find(request->security_id()) != std::end(quotes_)) {
             if ((request->side() == krypto::serialization::Side_BUY &&
                  request->price() >= quotes_.at(request->security_id()).ask) ||
@@ -143,6 +189,7 @@ namespace krypto::orders::sim {
                         request->quantity()
                 };
                 send(fill, client_identity);
+                return;
             } else {
                 if (request->tif() == krypto::serialization::TimeInForce::TimeInForce_IOC) {
                     const krypto::utils::OrderUpdate expired{
@@ -153,6 +200,7 @@ namespace krypto::orders::sim {
                             0
                     };
                     send(expired, client_identity);
+                    return;
                 } else {
                     if (day_orders_.find(request->security_id()) == std::end(day_orders_)) {
                         day_orders_[request->security_id()] = {};
@@ -170,6 +218,7 @@ namespace krypto::orders::sim {
 
                     day_orders_.at(request->security_id())[request->order_id()->str()] = r;
                     order_id_to_security_id_map_[request->order_id()->str()] = request->security_id();
+                    order_id_to_client_identity_map_[request->order_id()->str()] = client_identity;
 
                     const krypto::utils::OrderUpdate new_order{
                             krypto::utils::current_time_in_nanoseconds(),
@@ -179,6 +228,7 @@ namespace krypto::orders::sim {
                             0
                     };
                     send(new_order, client_identity);
+                    return;
                 }
             }
         }
@@ -318,6 +368,10 @@ namespace krypto::orders::sim {
                         process(flatbuffers::GetRoot<krypto::serialization::Heartbeat>(payload_msg.data()));
                         break;
                     }
+                    case krypto::utils::MsgType::ORDER_UPDATE: {
+                        // Ignore
+                        break;
+                    }
                     default: {
                         KRYP_LOG(info, "Ignoring unknown message type = {}", topic);
                     }
@@ -386,7 +440,7 @@ namespace krypto::orders::sim {
     void OrderServer<Exchange, Verbose>::send(const krypto::utils::OrderUpdate &order_update,
                                               const std::string &client_identity) {
         if constexpr (Verbose) {
-            KRYP_LOG(info, "Sending order update {} for {} ... ",
+            KRYP_LOG(info, "{} :: {}",
                      krypto::serialization::EnumNameOrderStatus(
                              order_update.status), order_update.order_id);
         }
@@ -396,9 +450,6 @@ namespace krypto::orders::sim {
         krypto::network::send_msg_type(*receiver_, krypto::utils::MsgType::ORDER_UPDATE, ZMQ_SNDMORE);
         serialize(order_update);
         krypto::network::send_fb_buffer(*receiver_, fb_builder_);
-        if constexpr (Verbose) {
-            KRYP_LOG(info, "Sent!");
-        }
     }
 
     template<krypto::serialization::Exchange Exchange, bool Verbose>

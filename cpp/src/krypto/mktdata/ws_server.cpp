@@ -135,3 +135,7 @@ void krypto::mktdata::WebsocketServer::process(const krypto::serialization::Hear
         message_queue_.push(msg.dump());
     }
 }
+
+void krypto::mktdata::WebsocketServer::process(const krypto::serialization::OrderUpdate *hb) {
+    // Ignore for now
+}
