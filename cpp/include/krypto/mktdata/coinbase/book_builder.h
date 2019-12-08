@@ -344,8 +344,6 @@ namespace krypto::mktdata::coinbase {
 
     template<bool Verbose>
     void BookBuilder<Verbose>::handle_heartbeat(nlohmann::json hb) {
-        //{"last_trade_id":0,"product_id":"ZEC-BTC","sequence":25841202,
-        // "time":"2019-09-05T23:50:54.686991357Z","type":"heartbeat"}
         auto symbol = hb.at("product_id").get<std::string>();
         auto id = id_by_symbol_.at(symbol);
         krypto::utils::Heartbeat to_send{krypto::utils::current_time_in_nanoseconds(), id};
