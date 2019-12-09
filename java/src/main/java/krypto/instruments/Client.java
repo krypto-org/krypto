@@ -3,7 +3,7 @@ package krypto.instruments;
 
 import krypto.network.MessageType;
 import krypto.network.SerializationUtil;
-import krypto.network.ZmqUtils;
+import krypto.network.SocketUtils;
 import krypto.serialization.Exchange;
 import krypto.serialization.Instrument;
 import krypto.serialization.InstrumentResponse;
@@ -41,8 +41,8 @@ public class Client {
     public SortedMap<Long, Instrument> getInstruments(final byte requestType) {
         logger.info("Sending request for request type {}", RequestType.name(requestType));
 
-        ZmqUtils.sendEmptyFrame(socket, ZMQ.SNDMORE);
-        ZmqUtils.sendMessageType(socket, MessageType.INSTRUMENT_REQUEST,
+        SocketUtils.sendEmptyFrame(socket, ZMQ.SNDMORE);
+        SocketUtils.sendMessageType(socket, MessageType.INSTRUMENT_REQUEST,
                 ZMQ.SNDMORE);
         socket.send(SerializationUtil.serializeInstrumentRequest(new Request(requestType), fb));
 
@@ -59,8 +59,8 @@ public class Client {
     }
 
     public void refreshCache() {
-        ZmqUtils.sendEmptyFrame(socket, ZMQ.SNDMORE);
-        ZmqUtils.sendMessageType(socket, MessageType.INSTRUMENT_REQUEST,
+        SocketUtils.sendEmptyFrame(socket, ZMQ.SNDMORE);
+        SocketUtils.sendMessageType(socket, MessageType.INSTRUMENT_REQUEST,
                 ZMQ.SNDMORE);
         socket.send(SerializationUtil.serializeInstrumentRequestRequest(fb));
     }
