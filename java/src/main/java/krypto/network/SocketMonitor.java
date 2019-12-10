@@ -3,6 +3,7 @@ package krypto.network;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.zeromq.ZMQ;
+import zmq.ZError;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -26,7 +27,6 @@ public class SocketMonitor implements Runnable {
         HANDSHAKE_PROTOCOL
     }
 
-
     private static Map<Integer, EventType> ZMQ_EVENT_REFERENCE;
 
     static {
@@ -47,7 +47,7 @@ public class SocketMonitor implements Runnable {
 
 
     public interface Sniffer {
-        ZMQ.Socket getSocket();
+        ZMQ.Socket getMonitorSocket();
         void onStatusUpdate(String address, EventType evt);
     }
 
@@ -63,8 +63,8 @@ public class SocketMonitor implements Runnable {
     public void run() {
         while (!terminated) {
             try {
-                ZMQ.Event event = ZMQ.Event.recv(this.sniffer.getSocket());
-                if (event == null) {
+                ZMQ.Event event = ZMQ.Event.recv(sniffer.getMonitorSocket());
+                if (event == null && sniffer.getMonitorSocket().errno() == ZError.ETERM) {
                     break;
                 }
                 sniffer.onStatusUpdate(

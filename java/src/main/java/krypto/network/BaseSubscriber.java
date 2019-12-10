@@ -103,8 +103,8 @@ public abstract class BaseSubscriber implements SocketMonitor.Sniffer {
     }
 
     @Override
-    public ZMQ.Socket getSocket() {
-        return this.socket;
+    public ZMQ.Socket getMonitorSocket() {
+        return this.monitorSocket;
     }
 
     protected abstract void process();
