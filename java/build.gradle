@@ -36,6 +36,11 @@ dependencies {
     compile group: 'org.apache.logging.log4j', name: 'log4j-slf4j-impl', version: '2.12.1'
     compile group: 'com.fasterxml.jackson.dataformat', name: 'jackson-dataformat-yaml', version: '2.10.1'
     compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.10.1'
+    compile group: 'org.jfree', name: 'jfreechart', version: '1.5.0'
+    compile group: 'com.miglayout', name: 'miglayout', version: '3.7.4'
+    compile group: 'com.typesafe', name: 'config', version: '1.4.0'
+    compile group: 'com.jtattoo', name: 'JTattoo', version: '1.6.13'
+
 
     implementation 'io.grpc:grpc-netty-shaded:1.25.0'
     implementation 'io.grpc:grpc-protobuf:1.25.0'
@@ -68,7 +73,7 @@ protobuf {
 
 sourceSets {
     main {
-        proto { }
+        proto {}
     }
 }
 
