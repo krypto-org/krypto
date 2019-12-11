@@ -18,17 +18,17 @@ import java.nio.ByteBuffer;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
-public class Client {
+public class InstrumentsClient {
     static {
         System.setProperty("logFilename", "krypto.instrument.client.test.log");
     }
 
-    private static Logger logger = LogManager.getLogger(Client.class);
+    private static Logger logger = LogManager.getLogger(InstrumentsClient.class);
 
     private final FlatBufferBuilder fb = new FlatBufferBuilder();
     private final ZMQ.Socket socket;
 
-    public Client(final ZMQ.Context context, final String address) {
+    public InstrumentsClient(final ZMQ.Context context, final String address) {
         this.socket = context.socket(SocketType.DEALER);
         this.socket.connect(address);
         logger.info("Connected to {}", address);
@@ -67,8 +67,8 @@ public class Client {
 
     public static void main(String[] args) {
         final ZMQ.Context context = ZMQ.context(1);
-        final Client client = new Client(context, "tcp://192.168.1.12:12000");
-        client.getInstruments().forEach((id, inst) -> {
+        final InstrumentsClient instrumentsClient = new InstrumentsClient(context, "tcp://192.168.1.12:12000");
+        instrumentsClient.getInstruments().forEach((id, inst) -> {
             logger.info("{}: {}@{}", id, inst.symbol(), Exchange.name( inst.exchange()));
         });
     }
