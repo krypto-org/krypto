@@ -19,7 +19,7 @@ public class StartScreen extends LiveFrame
 {
     private static final Logger logger = LogManager.getLogger(StartScreen.class);
 
-    public static final String APPLICATION_ICON_PATH = "/application_logo.png";
+    public static final String APPLICATION_ICON_PATH = "/krypto.png";
 
     private final UIDataCache uiDataCache;
     private final SortedMap<Long, Instrument> instruments;
