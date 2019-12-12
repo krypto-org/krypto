@@ -11,22 +11,29 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import javax.swing.*;
+import java.awt.*;
 import java.util.SortedMap;
 import java.util.concurrent.ConcurrentSkipListMap;
 
 public class StartScreen extends LiveFrame
 {
-    private static Logger logger = LogManager.getLogger(StartScreen.class);
+    private static final Logger logger = LogManager.getLogger(StartScreen.class);
+
+    public static final String APPLICATION_ICON_PATH = "/application_logo.png";
 
     private final UIDataCache uiDataCache;
     private final SortedMap<Long, Instrument> instruments;
     private final MktdataSheetTableModel quotesTableModel;
-    private final JMenuBar menuBar;
+    private final JPanel navigationPanel;
+//    private final JMenuBar menuBar;
 
     public StartScreen(final UIDataCache uiDataCache) {
         this.setTitle("KRYPTO");
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.setBounds(100, 100, 950, 750);
+
+        this.setIconImage(Toolkit.getDefaultToolkit().getImage(
+                StartScreen.class.getResource(APPLICATION_ICON_PATH)));
 
         JPanel contentPane = new JPanel();
         this.setContentPane(contentPane);
@@ -43,24 +50,27 @@ public class StartScreen extends LiveFrame
                 .setDefaultRenderer(new TableColumnHeaderRenderer());
         quotesScrollPane.setViewportView(quotesTable);
 
-        this.menuBar = new JMenuBar();
-        final JMenu mdMenu = new JMenu("Mktdata");
-        final JMenu ordersMenu = new JMenu("Orders");
-        final JMenu riskMenu = new JMenu("Risk");
-        final JMenu strategyMenu = new JMenu("Strategy");
+        this.navigationPanel = new NavigationPanel();
+//
+//        this.menuBar = new JMenuBar();
+//        final JMenu mdMenu = new JMenu("Mktdata");
+//        final JMenu ordersMenu = new JMenu("Orders");
+//        final JMenu riskMenu = new JMenu("Risk");
+//        final JMenu strategyMenu = new JMenu("Strategy");
+//
+//        mdMenu.add(new JMenuItem("Ladder"));
+//        ordersMenu.add("Orders");
+//        ordersMenu.add("Fills");
+//
+//        this.menuBar.add(mdMenu);
+//        this.menuBar.add(ordersMenu);
+//        this.menuBar.add(riskMenu);
+//        this.menuBar.add(strategyMenu);
+//
+//        this.setJMenuBar(menuBar);
 
-        mdMenu.add(new JMenuItem("Ladder"));
-        ordersMenu.add("Orders");
-        ordersMenu.add("Fills");
-
-        this.menuBar.add(mdMenu);
-        this.menuBar.add(ordersMenu);
-        this.menuBar.add(riskMenu);
-        this.menuBar.add(strategyMenu);
-
-        this.setJMenuBar(menuBar);
-
-        contentPane.add(quotesScrollPane, "cell 0 0,grow");
+        contentPane.add(this.navigationPanel, "cell 0 0 1 1,h 100!");
+        contentPane.add(quotesScrollPane, "cell 0 1 1 19");
 
         this.queryInstruments();
         this.startUpdates();
