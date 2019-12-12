@@ -13,7 +13,7 @@ import java.util.SortedMap;
 
 public class MktdataSheetTableModel extends ReadOnlyTableModel {
 
-    private final DecimalFormat PRICE_FORMAT = new DecimalFormat("0.00");
+    private final DecimalFormat PRICE_FORMAT = new DecimalFormat("0.0000");
     private final DecimalFormat QUANTITY_FORMAT = new DecimalFormat("0.0000");
 
     private final Map<Long, Instrument> instruments;
@@ -64,6 +64,10 @@ public class MktdataSheetTableModel extends ReadOnlyTableModel {
                         return PRICE_FORMAT.format(Conversion.convertPrice(quote.ask()));
                     case ASK_QUANTITY:
                         return QUANTITY_FORMAT.format(Conversion.convertQuantity(quote.askQuantity()));
+                    case LAST:
+                        return PRICE_FORMAT.format(Conversion.convertPrice(quote.last()));
+                    case LAST_QUANTITY:
+                        return QUANTITY_FORMAT.format(Conversion.convertQuantity(quote.lastQuantity()));
                     default:
                         return Double.NaN;
                 }

@@ -18,6 +18,8 @@ public class MktdataSheetTable extends JTable {
         COLUMN_COLORS.put(Column.ASK, ColorConstants.ASK_PRICE_COLUMN_COLOR);
         COLUMN_COLORS.put(Column.BID_QUANTITY, ColorConstants.BID_QUANTITY_COLUMN_COLOR);
         COLUMN_COLORS.put(Column.ASK_QUANTITY, ColorConstants.ASK_QUANTITY_COLUMN_COLOR);
+        COLUMN_COLORS.put(Column.LAST, ColorConstants.TOTAL_COLOR);
+        COLUMN_COLORS.put(Column.LAST_QUANTITY, ColorConstants.TOTAL_COLOR);
     }
 
     public MktdataSheetTable(TableModel dm) {
@@ -26,6 +28,7 @@ public class MktdataSheetTable extends JTable {
             this.getColumnModel().getColumn(column.ordinal()).setCellRenderer(
                     new ColoredColumnTableCellRenderer(color, Color.WHITE, column.ordinal(), true));
         });
+
     }
 
     public enum Column {
@@ -33,6 +36,8 @@ public class MktdataSheetTable extends JTable {
         BID_QUANTITY,
         BID,
         ASK,
-        ASK_QUANTITY
+        ASK_QUANTITY,
+        LAST,
+        LAST_QUANTITY
     }
 }
