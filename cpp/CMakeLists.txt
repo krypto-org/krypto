@@ -102,7 +102,8 @@ add_library(krypto STATIC
         src/krypto/orders/protocol.cpp
         include/krypto/orders/client.h
         include/krypto/utils/id_gen.h
-        include/krypto/orders/gateway.h include/krypto/mktdata/gateway.h include/krypto/serialization/helper.h src/serialization/helper.cpp)
+        include/krypto/orders/gateway.h include/krypto/mktdata/gateway.h include/krypto/serialization/helper.h
+        src/krypto/serialization/helper.cpp include/krypto/pricing/ewma.h src/krypto/pricing/ewma.cpp)
 target_link_libraries(krypto Threads::Threads)
 
 add_library(crypto STATIC IMPORTED include/krypto/mktdata/coinbase/book_builder.h)
