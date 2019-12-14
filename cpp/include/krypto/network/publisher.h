@@ -35,6 +35,8 @@ namespace krypto::network {
 
         void connect();
 
+        void bind();
+
         template<typename... Args>
         bool send(const std::string &topic, Args... args);
     };
@@ -54,9 +56,20 @@ namespace krypto::network {
 
     template<typename Derived>
     void PublisherBase<Derived>::connect() {
-        KRYP_LOG(info, "Connecting to proxy @ {}", endpoint_);
-        socket_->connect(endpoint_);
-        connected_ = true;
+        if (!connected_) {
+            KRYP_LOG(info, "Connecting to proxy @ {}", endpoint_);
+            socket_->connect(endpoint_);
+            connected_ = true;
+        }
+    }
+
+    template<typename Derived>
+    void PublisherBase<Derived>::bind() {
+        if (!connected_) {
+            KRYP_LOG(info, "Binding @ {}", endpoint_);
+            socket_->bind(endpoint_);
+            connected_ = true;
+        }
     }
 
     template<typename Derived>

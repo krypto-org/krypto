@@ -73,6 +73,14 @@ services = {
       }
     }
 
+    pricing = {
+        port = 12030
+        server = "tcp://*:"${services.pricing.port}
+        client = "tcp://"${global.ip}":"${services.pricing.port}
+        polling_millis = 50
+        half_life = 30.0
+    }
+
     publisher = {
         mktdata = {
             proxy = {

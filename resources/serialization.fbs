@@ -55,7 +55,8 @@ enum Currency : byte {
     ZRX,
     XTZ,
     ALGO,
-    DASH
+    DASH,
+    OXT
 }
 
 enum RequestType: byte {INVALID, ALL, ID, EXCHANGE, PRODUCT}
@@ -169,6 +170,8 @@ table Order {
   fees: double;
 }
 
+// Risk
+
 struct Position {
   security_id: long;
   position: long;
@@ -178,4 +181,13 @@ table RiskSummary {
   timestamp: long;
   positions: [Position];
   pnl: double;
+}
+
+// Model
+
+table TheoreticalSnapshot {
+  timestamp: long;
+  security_id: long;
+  price: double;
+  error: double;
 }

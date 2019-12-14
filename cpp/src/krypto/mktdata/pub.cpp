@@ -2,6 +2,7 @@
 #include <krypto/mktdata/convert.h>
 #include <krypto/utils/types.h>
 #include <krypto/serialization/helper.h>
+#include <krypto/pricing/pub.h>
 
 
 void krypto::mktdata::Publisher::serialize(
@@ -46,4 +47,3 @@ void krypto::mktdata::Publisher::serialize(const krypto::utils::Heartbeat &hb) {
 void krypto::mktdata::Publisher::serialize(const krypto::utils::OrderUpdate& order_update) {
     krypto::serialization::serialize(fb_builder_, order_update);
 }
-

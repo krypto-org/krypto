@@ -32,6 +32,7 @@ namespace krypto::utils {
         ORDER_UPDATE,
         POSITION,
         RISK_SUMMARY,
+        THEO,
         SIZE
     };
 
@@ -50,7 +51,8 @@ namespace krypto::utils {
             "OR",
             "OU",
             "PP",
-            "PR"
+            "PR",
+            "PT"
     };
 
     static constexpr const MsgType MsgTypes[enum_size<MsgType>()] = {
@@ -68,7 +70,8 @@ namespace krypto::utils {
             MsgType::ORDER_REPLACE_REQUEST,
             MsgType::ORDER_UPDATE,
             MsgType::POSITION,
-            MsgType::RISK_SUMMARY
+            MsgType::RISK_SUMMARY,
+            MsgType::THEO
     };
 
     struct Heartbeat {

@@ -49,6 +49,8 @@ struct Position;
 
 struct RiskSummary;
 
+struct TheoreticalSnapshot;
+
 enum Exchange {
   Exchange_SIM = 0,
   Exchange_COINBASE = 1,
@@ -323,11 +325,12 @@ enum Currency {
   Currency_XTZ = 24,
   Currency_ALGO = 25,
   Currency_DASH = 26,
+  Currency_OXT = 27,
   Currency_MIN = Currency_UNKNOWN,
-  Currency_MAX = Currency_DASH
+  Currency_MAX = Currency_OXT
 };
 
-inline const Currency (&EnumValuesCurrency())[27] {
+inline const Currency (&EnumValuesCurrency())[28] {
   static const Currency values[] = {
     Currency_UNKNOWN,
     Currency_BAT,
@@ -355,7 +358,8 @@ inline const Currency (&EnumValuesCurrency())[27] {
     Currency_ZRX,
     Currency_XTZ,
     Currency_ALGO,
-    Currency_DASH
+    Currency_DASH,
+    Currency_OXT
   };
   return values;
 }
@@ -389,13 +393,14 @@ inline const char * const *EnumNamesCurrency() {
     "XTZ",
     "ALGO",
     "DASH",
+    "OXT",
     nullptr
   };
   return names;
 }
 
 inline const char *EnumNameCurrency(Currency e) {
-  if (e < Currency_UNKNOWN || e > Currency_DASH) return "";
+  if (e < Currency_UNKNOWN || e > Currency_OXT) return "";
   const size_t index = static_cast<size_t>(e);
   return EnumNamesCurrency()[index];
 }
@@ -1819,6 +1824,76 @@ inline flatbuffers::Offset<RiskSummary> CreateRiskSummaryDirect(
       timestamp,
       positions__,
       pnl);
+}
+
+struct TheoreticalSnapshot FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
+    VT_TIMESTAMP = 4,
+    VT_SECURITY_ID = 6,
+    VT_PRICE = 8,
+    VT_ERROR = 10
+  };
+  int64_t timestamp() const {
+    return GetField<int64_t>(VT_TIMESTAMP, 0);
+  }
+  int64_t security_id() const {
+    return GetField<int64_t>(VT_SECURITY_ID, 0);
+  }
+  double price() const {
+    return GetField<double>(VT_PRICE, 0.0);
+  }
+  double error() const {
+    return GetField<double>(VT_ERROR, 0.0);
+  }
+  bool Verify(flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyField<int64_t>(verifier, VT_TIMESTAMP) &&
+           VerifyField<int64_t>(verifier, VT_SECURITY_ID) &&
+           VerifyField<double>(verifier, VT_PRICE) &&
+           VerifyField<double>(verifier, VT_ERROR) &&
+           verifier.EndTable();
+  }
+};
+
+struct TheoreticalSnapshotBuilder {
+  flatbuffers::FlatBufferBuilder &fbb_;
+  flatbuffers::uoffset_t start_;
+  void add_timestamp(int64_t timestamp) {
+    fbb_.AddElement<int64_t>(TheoreticalSnapshot::VT_TIMESTAMP, timestamp, 0);
+  }
+  void add_security_id(int64_t security_id) {
+    fbb_.AddElement<int64_t>(TheoreticalSnapshot::VT_SECURITY_ID, security_id, 0);
+  }
+  void add_price(double price) {
+    fbb_.AddElement<double>(TheoreticalSnapshot::VT_PRICE, price, 0.0);
+  }
+  void add_error(double error) {
+    fbb_.AddElement<double>(TheoreticalSnapshot::VT_ERROR, error, 0.0);
+  }
+  explicit TheoreticalSnapshotBuilder(flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  TheoreticalSnapshotBuilder &operator=(const TheoreticalSnapshotBuilder &);
+  flatbuffers::Offset<TheoreticalSnapshot> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = flatbuffers::Offset<TheoreticalSnapshot>(end);
+    return o;
+  }
+};
+
+inline flatbuffers::Offset<TheoreticalSnapshot> CreateTheoreticalSnapshot(
+    flatbuffers::FlatBufferBuilder &_fbb,
+    int64_t timestamp = 0,
+    int64_t security_id = 0,
+    double price = 0.0,
+    double error = 0.0) {
+  TheoreticalSnapshotBuilder builder_(_fbb);
+  builder_.add_error(error);
+  builder_.add_price(price);
+  builder_.add_security_id(security_id);
+  builder_.add_timestamp(timestamp);
+  return builder_.Finish();
 }
 
 }  // namespace serialization

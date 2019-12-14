@@ -102,7 +102,8 @@ add_library(krypto STATIC
         src/krypto/orders/protocol.cpp
         include/krypto/orders/client.h
         include/krypto/utils/id_gen.h
-        include/krypto/orders/gateway.h include/krypto/mktdata/gateway.h include/krypto/serialization/helper.h src/serialization/helper.cpp)
+        include/krypto/orders/gateway.h include/krypto/mktdata/gateway.h include/krypto/serialization/helper.h
+        src/krypto/serialization/helper.cpp include/krypto/pricing/ewma.h src/krypto/pricing/ewma.cpp include/krypto/pricing/pub.h src/krypto/pricing/pub.cpp include/krypto/pricing/server.h include/krypto/pricing/client.h src/krypto/pricing/client.cpp)
 target_link_libraries(krypto Threads::Threads)
 
 add_library(crypto STATIC IMPORTED include/krypto/mktdata/coinbase/book_builder.h)
@@ -141,6 +142,8 @@ target_link_libraries(krypto-ws-server krypto CONAN_PKG::boost ssl crypto dl CON
 add_executable(krypto-sim-orders src/apps/orders/sim_main.cpp)
 target_link_libraries(krypto-sim-orders krypto CONAN_PKG::boost ssl crypto dl CONAN_PKG::bzip2 CONAN_PKG::zlib CONAN_PKG::tbb CONAN_PKG::zmq CONAN_PKG::cppzmq Threads::Threads)
 
+add_executable(krypto-pricing-server src/apps/pricing/krypto_pricing_server_main.cpp)
+target_link_libraries(krypto-pricing-server krypto CONAN_PKG::boost ssl crypto dl CONAN_PKG::bzip2 CONAN_PKG::zlib CONAN_PKG::tbb CONAN_PKG::zmq CONAN_PKG::cppzmq Threads::Threads)
 
 # Examples
 
@@ -156,3 +159,5 @@ target_link_libraries(config-loader krypto)
 add_executable(sim-order-client src/examples/sim_order_client_main.cpp)
 target_link_libraries(sim-order-client krypto CONAN_PKG::boost ssl crypto dl CONAN_PKG::bzip2 CONAN_PKG::zlib CONAN_PKG::tbb CONAN_PKG::zmq CONAN_PKG::cppzmq Threads::Threads)
 
+add_executable(theo-client src/examples/theo_printer_main.cpp)
+target_link_libraries(theo-client krypto CONAN_PKG::boost ssl crypto dl CONAN_PKG::bzip2 CONAN_PKG::zlib CONAN_PKG::tbb CONAN_PKG::zmq CONAN_PKG::cppzmq Threads::Threads)
