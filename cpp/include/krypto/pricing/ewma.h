@@ -23,15 +23,9 @@ namespace krypto::pricing {
                 double_t time_delta);
 
         double_t calculate_std(double_t previous_std,
-                               double_t previous_ewma,
-                               double_t current_price,
-                               double_t time_delta);
-
-        double_t calculate_std(double_t previous_std,
-                               double_t previous_ewma,
                                double_t current_price,
                                double_t time_delta,
-                               double_t mean);
+                               double_t current_ewma);
 
     };
 }

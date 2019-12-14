@@ -56,4 +56,14 @@ namespace krypto::utils {
         int64_t quantity;
         krypto::serialization::Side side;
     };
+
+    struct TheoreticalSnapshot final {
+        static const constexpr krypto::utils::MsgType message_type =
+                krypto::utils::MsgType::THEO;
+        int64_t timestamp;
+        int64_t security_id;
+        double_t price;
+        double_t error;
+        bool valid;
+    };
 }

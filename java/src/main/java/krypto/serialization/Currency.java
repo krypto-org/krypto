@@ -31,8 +31,9 @@ public final class Currency {
   public static final byte XTZ = 24;
   public static final byte ALGO = 25;
   public static final byte DASH = 26;
+  public static final byte OXT = 27;
 
-  public static final String[] names = { "UNKNOWN", "BAT", "BCH", "BTC", "CVC", "DAI", "DNT", "EOS", "ETC", "ETH", "EUR", "GBP", "GNT", "LINK", "LOOM", "LTC", "MANA", "REP", "USD", "USDC", "XLM", "XRP", "ZEC", "ZRX", "XTZ", "ALGO", "DASH", };
+  public static final String[] names = { "UNKNOWN", "BAT", "BCH", "BTC", "CVC", "DAI", "DNT", "EOS", "ETC", "ETH", "EUR", "GBP", "GNT", "LINK", "LOOM", "LTC", "MANA", "REP", "USD", "USDC", "XLM", "XRP", "ZEC", "ZRX", "XTZ", "ALGO", "DASH", "OXT", };
 
   public static String name(int e) { return names[e]; }
 }
