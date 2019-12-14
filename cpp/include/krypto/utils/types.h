@@ -70,7 +70,8 @@ namespace krypto::utils {
             MsgType::ORDER_REPLACE_REQUEST,
             MsgType::ORDER_UPDATE,
             MsgType::POSITION,
-            MsgType::RISK_SUMMARY
+            MsgType::RISK_SUMMARY,
+            MsgType::THEO
     };
 
     struct Heartbeat {

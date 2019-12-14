@@ -134,7 +134,7 @@ namespace krypto::pricing {
         };
 
         while (running_) {
-            zmq::poll(&items[0], 1, 1);
+            zmq::poll(&items[0], 1, 0);
 
             if (items[0].revents && ZMQ_POLLIN) {
 
@@ -171,6 +171,9 @@ namespace krypto::pricing {
 
     template<bool Verbose>
     void PricingServer<Verbose>::stop() {
+        const std::string subscription = "";
+        mktdata_subscriber_->setsockopt(ZMQ_SUBSCRIBE, &subscription[0], subscription.length());
+        mktdata_subscriber_->disconnect(mktdata_gateway_endpoint_);
         running_ = false;
     }
 }
