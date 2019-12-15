@@ -26,17 +26,18 @@ public class KryptoGui {
                 Collections.singletonList("tcp://localhost:12021"),
                 true);
         subscriber.subscribe("");
-        subscriber.start();
 
         PricingClient pricingClient = new PricingClient(
                 context, Collections.singletonList("tcp://localhost:12030"),
                 true);
         pricingClient.subscribe("");
-        pricingClient.start();
 
         final UIDataCache uiDataCache = new UIDataCache(instrumentsClient);
         subscriber.registerListener(uiDataCache);
         pricingClient.registerListener(uiDataCache);
+
+        subscriber.start();
+        pricingClient.start();
 
         EventQueue.invokeLater(() -> {
             try {

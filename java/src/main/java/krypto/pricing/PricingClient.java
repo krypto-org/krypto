@@ -38,8 +38,6 @@ public class PricingClient extends BaseSubscriber {
 
                 final byte messageType = MessageType.MsgTypeNames.get(topic.substring(0, 2));
 
-                System.err.println(topic);
-
                 if (messageType == MessageType.THEO) {
                     this.listeners.forEach(listener -> listener.onTheoreticalSnapshot(
                             TheoreticalSnapshot.getRootAsTheoreticalSnapshot(

@@ -48,6 +48,7 @@ public class Subscriber extends BaseSubscriber {
                 final byte messageType = MessageType.MsgTypeNames.get(topic.substring(0, 2));
 
                 switch (messageType) {
+
                     case MessageType.HEARTBEAT:
                         this.listeners.forEach(listener -> listener.onHeartbeat(
                                 Heartbeat.getRootAsHeartbeat(
