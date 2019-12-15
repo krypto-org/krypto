@@ -18,11 +18,11 @@ public class KryptoGui {
         final Config config = ConfigFactory.parseFile(new File("config.hocon")).resolve();
         final ZMQ.Context context = ZMQ.context(1);
 
-        final InstrumentsClient instrumentsClient = new InstrumentsClient(context, "tcp://192.168.1.12:12000");
+        final InstrumentsClient instrumentsClient = new InstrumentsClient(context, "tcp://localhost:12000");
 
         Subscriber subscriber = new Subscriber(
                 context,
-                Collections.singletonList("tcp://192.168.1.12:12021"),
+                Collections.singletonList("tcp://localhost:12021"),
                 true);
         subscriber.subscribe("");
         subscriber.start();

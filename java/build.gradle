@@ -9,7 +9,6 @@ buildscript {
 }
 
 plugins {
-    id "com.google.protobuf" version "0.8.10"
     id 'java'
     id "idea"
 }
@@ -45,40 +44,4 @@ dependencies {
     implementation 'io.grpc:grpc-netty-shaded:1.25.0'
     implementation 'io.grpc:grpc-protobuf:1.25.0'
     implementation 'io.grpc:grpc-stub:1.25.0'
-}
-
-protobuf {
-    plugins {
-        grpc {
-            artifact = 'io.grpc:protoc-gen-grpc-java:1.0.0-pre2'
-        }
-    }
-
-    generateProtoTasks {
-        // all() returns the collection of all protoc tasks
-        all().each { task ->
-            task.builtins {
-            }
-
-            task.plugins {
-                grpc {
-                    outputSubDir = 'java'
-                }
-            }
-        }
-    }
-
-    generatedFilesBaseDir = "$projectDir/src"
-}
-
-sourceSets {
-    main {
-        proto {}
-    }
-}
-
-idea {
-    module {
-        sourceDirs += file("${projectDir}/src/main/java");
-    }
 }
