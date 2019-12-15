@@ -16,19 +16,25 @@ import java.util.Collections;
 
 public class KryptoGui {
     public static void main(String[] args) {
-        final Config config = ConfigFactory.parseFile(new File("config.hocon")).resolve();
+        final Config config = ConfigFactory.parseFile(new File(args[0])).resolve();
+
         final ZMQ.Context context = ZMQ.context(1);
 
-        final InstrumentsClient instrumentsClient = new InstrumentsClient(context, "tcp://localhost:12000");
+        System.err.println(config);
+
+        final InstrumentsClient instrumentsClient = new InstrumentsClient(
+                context, config.getString("services.instruments.server"));
 
         Subscriber subscriber = new Subscriber(
                 context,
-                Collections.singletonList("tcp://localhost:12021"),
+                Collections.singletonList(config.getString(
+                        "services.mktdata_gateway.backend.server")),
                 true);
         subscriber.subscribe("");
 
         PricingClient pricingClient = new PricingClient(
-                context, Collections.singletonList("tcp://localhost:12030"),
+                context, Collections.singletonList(
+                        config.getString("services.pricing.server")),
                 true);
         pricingClient.subscribe("");
 
@@ -38,6 +44,8 @@ public class KryptoGui {
 
         subscriber.start();
         pricingClient.start();
+
+        System.err.println(config);
 
         EventQueue.invokeLater(() -> {
             try {
