@@ -1,6 +1,5 @@
 package krypto.ui.instruments;
 
-import krypto.serialization.Instrument;
 import krypto.ui.UIDataCache;
 import krypto.ui.components.FontConstants;
 import krypto.ui.components.TableColumnHeaderRenderer;
@@ -20,8 +19,7 @@ public class InstrumentsView extends JFrame {
     private final JScrollPane instrumentsTableSP = new JScrollPane();
     private final InstrumentsTableModel instrumentsTableModel;
     private final InstrumentsTable instrumentsTable;
-    private final TableRowSorter<InstrumentsTableModel> instrumentsSorter;
-    private final UIDataCache dataCache;
+//    private final TableRowSorter<InstrumentsTableModel> instrumentsSorter;
 
     public InstrumentsView(final UIDataCache dataCache)
     {
@@ -36,10 +34,9 @@ public class InstrumentsView extends JFrame {
                         "[100px,fill][grow]",
                         "[30px,fill][grow]"));
 
-        this.dataCache = dataCache;
         this.instrumentsTableModel = new InstrumentsTableModel(dataCache);
-        this.instrumentsTable = new InstrumentsTable(this.instrumentsTableModel);
-        this.instrumentsSorter = new TableRowSorter<>();
+        this.instrumentsTable = new InstrumentsTable(instrumentsTableModel);
+//        this.instrumentsSorter = new TableRowSorter<>();
 
         this.initializeInstrumentsTable();
         this.initializeSearchText();
@@ -49,7 +46,7 @@ public class InstrumentsView extends JFrame {
     {
         lblSearch.setFont(FontConstants.LABEL_FONT);
         contentPane.add(lblSearch, "cell 0 0,alignx trailing,hmin 30");
-        instrumentsTable.setRowSorter(instrumentsSorter);
+//        instrumentsTable.setRowSorter(instrumentsSorter);
         txtSearch.setFont(FontConstants.TEXT_BOX_FONT);
         txtSearch.addKeyListener(new KeyAdapter()
         {
@@ -59,11 +56,11 @@ public class InstrumentsView extends JFrame {
                 String text = txtSearch.getText().toUpperCase();
                 if (text.length() == 0)
                 {
-                    instrumentsSorter.setRowFilter(null);
+//                    instrumentsSorter.setRowFilter(null);
                 }
                 else
                 {
-                    instrumentsSorter.setRowFilter(RowFilter.regexFilter(text));
+//                    instrumentsSorter.setRowFilter(RowFilter.regexFilter(text));
                 }
             }
         });
@@ -79,6 +76,10 @@ public class InstrumentsView extends JFrame {
         instrumentsTableSP.setViewportView(instrumentsTable);
         instrumentsTable.getTableHeader()
                 .setDefaultRenderer(new TableColumnHeaderRenderer());
+    }
+
+    public void refresh() {
+        this.instrumentsTableModel.reload();
     }
 
 }

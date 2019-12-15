@@ -2,8 +2,10 @@ package krypto.ui;
 
 
 import krypto.serialization.Instrument;
+import krypto.ui.components.HeatmapColumnTableCellRenderer;
 import krypto.ui.components.LiveFrame;
 import krypto.ui.components.TableColumnHeaderRenderer;
+import krypto.ui.instruments.InstrumentsView;
 import krypto.ui.mktdata.MktdataSheetTable;
 import krypto.ui.mktdata.MktdataSheetTableModel;
 import net.miginfocom.swing.MigLayout;
@@ -19,12 +21,12 @@ public class StartScreen extends LiveFrame
 {
     private static final Logger logger = LogManager.getLogger(StartScreen.class);
 
-    public static final String APPLICATION_ICON_PATH = "/krypto.png";
+    private static final String APPLICATION_ICON_PATH = "/krypto.png";
 
     private final UIDataCache uiDataCache;
     private final SortedMap<Long, Instrument> instruments;
+    private final NavigationPanel navigationPanel;
     private final MktdataSheetTableModel quotesTableModel;
-    private final JPanel navigationPanel;
 
     public StartScreen(final UIDataCache uiDataCache) {
         this.setTitle("KRYPTO");
@@ -43,15 +45,17 @@ public class StartScreen extends LiveFrame
         this.instruments = new ConcurrentSkipListMap<>();
         JScrollPane quotesScrollPane = new JScrollPane();
 
-        this.quotesTableModel = new MktdataSheetTableModel();
-        JTable quotesTable = new MktdataSheetTable(this.quotesTableModel);
+        final HeatmapColumnTableCellRenderer theoCellRemderer = new HeatmapColumnTableCellRenderer();
+
+        this.quotesTableModel = new MktdataSheetTableModel(theoCellRemderer);
+        JTable quotesTable = new MktdataSheetTable(this.quotesTableModel, theoCellRemderer);
         quotesTable.getTableHeader()
                 .setDefaultRenderer(new TableColumnHeaderRenderer());
         quotesScrollPane.setViewportView(quotesTable);
 
-        this.navigationPanel = new NavigationPanel();
+        this.navigationPanel = new NavigationPanel(uiDataCache);
 
-        contentPane.add(this.navigationPanel, "wrap");
+        contentPane.add(navigationPanel, "wrap");
         contentPane.add(quotesScrollPane);
 
         this.queryInstruments();
@@ -75,6 +79,8 @@ public class StartScreen extends LiveFrame
     private void onInstrumentsLoad() {
         this.quotesTableModel.updateInstruments(this.instruments);
         this.quotesTableModel.updateTable();
+        SwingUtilities.invokeLater(
+                this.navigationPanel::refresh);
     }
 
     @Override
@@ -86,6 +92,7 @@ public class StartScreen extends LiveFrame
                             this.uiDataCache.getQuotes());
                     this.quotesTableModel.updateTheos(
                             this.uiDataCache.getTheos());
+                    this.quotesTableModel.updateScaledTheoRatio();
                 });
     }
 }

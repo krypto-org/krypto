@@ -5,9 +5,11 @@ import krypto.network.MessageType;
 import krypto.serialization.Instrument;
 import krypto.serialization.Quote;
 import krypto.serialization.TheoreticalSnapshot;
+import krypto.ui.components.HeatmapColumnTableCellRenderer;
 import krypto.ui.components.LiveUpdatedTableModel;
 import krypto.ui.components.ReadOnlyTableModel;
 
+import javax.swing.table.TableCellRenderer;
 import java.text.DecimalFormat;
 import java.util.HashMap;
 import java.util.Map;
@@ -23,11 +25,15 @@ public class MktdataSheetTableModel extends ReadOnlyTableModel {
     private final Map<Long, TheoreticalSnapshot> theos;
     private final Map<Integer, Long> instrumentIdToRowNums;
 
-    public MktdataSheetTableModel() {
+    private final HeatmapColumnTableCellRenderer theoCellRenderer;
+
+    public MktdataSheetTableModel(final HeatmapColumnTableCellRenderer theoCellRenderer) {
         this.instruments = new HashMap<>();
         this.instrumentIdToRowNums = new HashMap<>();
         this.quotes = new HashMap<>();
         this.theos = new HashMap<>();
+
+        this.theoCellRenderer = theoCellRenderer;
     }
 
     @Override
@@ -92,7 +98,26 @@ public class MktdataSheetTableModel extends ReadOnlyTableModel {
 
     public void updateTheos(final Map<Long, TheoreticalSnapshot> snapshots) {
         this.theos.putAll(snapshots);
-        this.fireTableRowsUpdated(0, this.getRowCount());
+        this.fireTableRowsUpdated(0, this.getRowCount() - 1);
+    }
+
+    public void updateScaledTheoRatio() {
+        final Map<Integer, Double> theoScaledValues = new HashMap<>();
+        for (int row =0; row< this.getRowCount(); ++row) {
+            final long instId = this.instrumentIdToRowNums.get(row);
+            if (this.quotes.containsKey(instId) && this.theos.containsKey(instId)) {
+                final Quote quote = this.quotes.get(instId);
+                final TheoreticalSnapshot theoSnapshot = this.theos.get(instId);
+
+                final double bid  = Conversion.convertPrice(quote.bid());
+                final double ask = Conversion.convertPrice(quote.ask());
+                final double diff = (ask - bid);
+
+                final double value = (((Math.min(Math.max(theoSnapshot.price() - bid, 0), diff)) / diff) - 0.5) / 0.5;
+                theoScaledValues.put(row, value);
+            }
+        }
+        this.theoCellRenderer.updateValues(theoScaledValues);
     }
 
     @Override

@@ -10,19 +10,19 @@ import java.util.Map;
 public class InstrumentsTableModel extends ReadOnlyTableModel {
     private final UIDataCache dataCache;
 
-    private final Map<Long, Instrument> instruments;
-    private final Map<Integer, Long> instrumentRowNums;
+    private final Map<Long, Instrument> instruments = new HashMap<>();
+    private final Map<Integer, Long> instrumentRowNums = new HashMap<>();
 
-    public InstrumentsTableModel(final UIDataCache dataCache) {
+    InstrumentsTableModel(final UIDataCache dataCache) {
         this.dataCache = dataCache;
-        this.instruments = new HashMap<>();
-        this.instrumentRowNums = new HashMap<>();
-        this.reload();
     }
 
     @Override
     public int getRowCount() {
-        return this.instruments.size();
+        if (this.instrumentRowNums == null) {
+            return 0;
+        }
+        return this.instrumentRowNums.size();
     }
 
     @Override
@@ -73,12 +73,13 @@ public class InstrumentsTableModel extends ReadOnlyTableModel {
         return '-';
     }
 
-    public void reload() {
-       this.instruments.putAll(
-               this.dataCache.getInstruments(true));
-       int row = 0;
-       for (final Instrument instrument: this.instruments.values()) {
-           this.instrumentRowNums.put(row++, instrument.id());
-       }
+    void reload() {
+        this.instruments.putAll(
+                this.dataCache.getInstruments(false));
+        int row = 0;
+        for (final Instrument instrument : this.instruments.values()) {
+            this.instrumentRowNums.put(row++, instrument.id());
+        }
+        this.fireTableRowsUpdated(0, this.getRowCount() - 1);
     }
 }

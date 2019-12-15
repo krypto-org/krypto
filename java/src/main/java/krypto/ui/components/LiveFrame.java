@@ -10,7 +10,7 @@ import java.util.TimerTask;
 public abstract class LiveFrame extends JFrame
 {
 	protected Timer updateTimer;
-	protected int updateFrequency = 100;
+	protected int updateFrequency = 250;
 	protected JButton btnManualRefresh;
 	private boolean isIdle = true;
 	private boolean timerRunning = false;

@@ -7,9 +7,9 @@ import javax.swing.*;
 import javax.swing.table.TableModel;
 import java.util.Arrays;
 
-public class InstrumentsTable extends JTable {
+class InstrumentsTable extends JTable {
 
-    public InstrumentsTable(TableModel dm) {
+    InstrumentsTable(TableModel dm) {
         super(dm);
         Arrays.stream(Column.values()).forEach(
                 (column) ->
