@@ -25,7 +25,6 @@ public class StartScreen extends LiveFrame
     private final SortedMap<Long, Instrument> instruments;
     private final MktdataSheetTableModel quotesTableModel;
     private final JPanel navigationPanel;
-//    private final JMenuBar menuBar;
 
     public StartScreen(final UIDataCache uiDataCache) {
         this.setTitle("KRYPTO");
@@ -51,23 +50,6 @@ public class StartScreen extends LiveFrame
         quotesScrollPane.setViewportView(quotesTable);
 
         this.navigationPanel = new NavigationPanel();
-//
-//        this.menuBar = new JMenuBar();
-//        final JMenu mdMenu = new JMenu("Mktdata");
-//        final JMenu ordersMenu = new JMenu("Orders");
-//        final JMenu riskMenu = new JMenu("Risk");
-//        final JMenu strategyMenu = new JMenu("Strategy");
-//
-//        mdMenu.add(new JMenuItem("Ladder"));
-//        ordersMenu.add("Orders");
-//        ordersMenu.add("Fills");
-//
-//        this.menuBar.add(mdMenu);
-//        this.menuBar.add(ordersMenu);
-//        this.menuBar.add(riskMenu);
-//        this.menuBar.add(strategyMenu);
-//
-//        this.setJMenuBar(menuBar);
 
         contentPane.add(this.navigationPanel, "cell 0 0 1 1,h 100!");
         contentPane.add(quotesScrollPane, "cell 0 1 1 19");
@@ -98,7 +80,13 @@ public class StartScreen extends LiveFrame
     @Override
     protected void refreshUi()
     {
-        SwingUtilities.invokeLater(() -> this.quotesTableModel.updateQuotes(this.uiDataCache.getQuotes()));
+        SwingUtilities.invokeLater(
+                () -> {
+                    this.quotesTableModel.updateQuotes(
+                            this.uiDataCache.getQuotes());
+                    this.quotesTableModel.updateTheos(
+                            this.uiDataCache.getTheos());
+                });
     }
 }
 
