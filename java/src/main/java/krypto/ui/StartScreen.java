@@ -36,7 +36,7 @@ public class StartScreen extends LiveFrame
 
         JPanel contentPane = new JPanel();
         this.setContentPane(contentPane);
-        contentPane.setLayout(new MigLayout("", "[fill,grow]", "[fill,grow]"));
+        contentPane.setLayout(new MigLayout("", "[fill,grow]", "[50][fill,grow]"));
 
         this.uiDataCache = uiDataCache;
 
@@ -51,8 +51,8 @@ public class StartScreen extends LiveFrame
 
         this.navigationPanel = new NavigationPanel();
 
-        contentPane.add(this.navigationPanel, "cell 0 0 1 1,h 100!");
-        contentPane.add(quotesScrollPane, "cell 0 1 1 19");
+        contentPane.add(this.navigationPanel, "wrap");
+        contentPane.add(quotesScrollPane);
 
         this.queryInstruments();
         this.startUpdates();
