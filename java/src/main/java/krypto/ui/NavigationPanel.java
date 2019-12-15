@@ -1,6 +1,7 @@
 package krypto.ui;
 
 import krypto.ui.components.ImageButton;
+import krypto.ui.instruments.InstrumentsView;
 import net.miginfocom.swing.MigLayout;
 
 import javax.swing.*;
@@ -11,14 +12,19 @@ import java.util.Arrays;
 
 public class NavigationPanel extends JPanel {
 
-    public static String ANALYTICS_ICON_PATH = "/option_analytics.png";
-    public static String RISK_ICON_PATH = "/risk.png";
-    public static String INSTRUMENTS_ICON_PATH = "/instruments.png";
-    public static String MARKET_DATA_ICON_PATH = "/market_data.png";
-    public static String SETTINGS_ICON_PATH = "/settings.png";
-    public static String AUDIT_ICON_PATH = "/audit.png";
-    public static String TRADE_SHEETS_ICON_PATH = "/trade_sheets.png";
-    public static String STRATEGY_ICON_PATH = "/strategy.png";
+    private static final String ANALYTICS_ICON_PATH = "/option_analytics.png";
+    private static final String RISK_ICON_PATH = "/risk.png";
+    private static final String INSTRUMENTS_ICON_PATH = "/instruments.png";
+    private static final String MARKET_DATA_ICON_PATH = "/market_data.png";
+    private static final String SETTINGS_ICON_PATH = "/settings.png";
+    private static final String AUDIT_ICON_PATH = "/audit.png";
+    private static final String TRADE_SHEETS_ICON_PATH = "/trade_sheets.png";
+    public static final String STRATEGY_ICON_PATH = "/strategy.png";
+
+    private final UIDataCache uiDataCache;
+
+    private final InstrumentsView instrumentsView;
+    private boolean instrumentsViewVisible = false;
 
     private JButton btnCurves;
     private JButton btnRisk;
@@ -29,25 +35,21 @@ public class NavigationPanel extends JPanel {
     private JButton btnTradeSheets;
 
 
-    public NavigationPanel() {
+    NavigationPanel(final UIDataCache uiDataCache) {
         this.setLayout(new MigLayout("", "[fill,grow]", "[fill,grow]"));
+        this.uiDataCache = uiDataCache;
+
+        this.instrumentsView = new InstrumentsView(uiDataCache);
+
         this.initializeButtons();
     }
 
-    private void initializeButtons()
-    {
+    private void initializeButtons() {
         btnInstruments = new ImageButton(
                 Toolkit.getDefaultToolkit().getImage(
                         this.getClass().getResource(INSTRUMENTS_ICON_PATH)),
                 40, 40);
-        btnInstruments.addActionListener(new ActionListener()
-        {
-            @Override
-            public void actionPerformed(ActionEvent e)
-            {
-
-            }
-        });
+        btnInstruments.addActionListener(e -> this.initializeInstrumentsView());
         btnInstruments.setToolTipText("Instruments");
         this.add(btnInstruments, "cell 0 0 1 1");
 
@@ -55,11 +57,9 @@ public class NavigationPanel extends JPanel {
                 Toolkit.getDefaultToolkit().getImage(
                         this.getClass().getResource(MARKET_DATA_ICON_PATH)),
                 40, 40);
-        btnMarketData.addActionListener(new ActionListener()
-        {
+        btnMarketData.addActionListener(new ActionListener() {
             @Override
-            public void actionPerformed(ActionEvent e)
-            {
+            public void actionPerformed(ActionEvent e) {
 //                initializeMarketDataWindow();
             }
         });
@@ -71,11 +71,9 @@ public class NavigationPanel extends JPanel {
                         .getImage(this.getClass()
                                 .getResource(ANALYTICS_ICON_PATH)),
                 40, 40);
-        btnCurves.addActionListener(new ActionListener()
-        {
+        btnCurves.addActionListener(new ActionListener() {
             @Override
-            public void actionPerformed(ActionEvent e)
-            {
+            public void actionPerformed(ActionEvent e) {
 //                initializeTheoAnalysisWindow();
             }
         });
@@ -86,11 +84,9 @@ public class NavigationPanel extends JPanel {
                 Toolkit.getDefaultToolkit().getImage(
                         this.getClass().getResource(TRADE_SHEETS_ICON_PATH)),
                 40, 40);
-        btnTradeSheets.addActionListener(new ActionListener()
-        {
+        btnTradeSheets.addActionListener(new ActionListener() {
             @Override
-            public void actionPerformed(ActionEvent e)
-            {
+            public void actionPerformed(ActionEvent e) {
 //                initializeTradeSheetsView();
             }
         });
@@ -99,11 +95,9 @@ public class NavigationPanel extends JPanel {
 
         btnRisk = new ImageButton(Toolkit.getDefaultToolkit()
                 .getImage(this.getClass().getResource(RISK_ICON_PATH)), 40, 40);
-        btnRisk.addActionListener(new ActionListener()
-        {
+        btnRisk.addActionListener(new ActionListener() {
             @Override
-            public void actionPerformed(ActionEvent e)
-            {
+            public void actionPerformed(ActionEvent e) {
 
 //                initializeRiskView();
             }
@@ -115,11 +109,9 @@ public class NavigationPanel extends JPanel {
                 Toolkit.getDefaultToolkit().getImage(
                         this.getClass().getResource(SETTINGS_ICON_PATH)),
                 40, 40);
-        btnSettings.addActionListener(new ActionListener()
-        {
+        btnSettings.addActionListener(new ActionListener() {
             @Override
-            public void actionPerformed(ActionEvent e)
-            {
+            public void actionPerformed(ActionEvent e) {
 //                initializeSettingsView();
             }
         });
@@ -128,11 +120,9 @@ public class NavigationPanel extends JPanel {
 
         btnAudit = new ImageButton(Toolkit.getDefaultToolkit().getImage(
                 this.getClass().getResource(AUDIT_ICON_PATH)), 40, 40);
-        btnAudit.addActionListener(new ActionListener()
-        {
+        btnAudit.addActionListener(new ActionListener() {
             @Override
-            public void actionPerformed(ActionEvent e)
-            {
+            public void actionPerformed(ActionEvent e) {
 //                initializeLogView();
             }
         });
@@ -146,6 +136,18 @@ public class NavigationPanel extends JPanel {
         btnSettings.setEnabled(true);
         btnAudit.setEnabled(true);
         btnTradeSheets.setEnabled(true);
-   }
+    }
 
+    private void initializeInstrumentsView() {
+        if (!instrumentsViewVisible) {
+            instrumentsView.setIconImage(Toolkit.getDefaultToolkit().getImage(
+                    NavigationPanel.class.getResource(INSTRUMENTS_ICON_PATH)));
+            instrumentsViewVisible = true;
+        }
+        instrumentsView.setVisible(true);
+    }
+
+    void refresh() {
+        this.instrumentsView.refresh();
+    }
 }

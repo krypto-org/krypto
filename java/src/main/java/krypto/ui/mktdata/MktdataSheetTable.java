@@ -1,9 +1,11 @@
 package krypto.ui.mktdata;
 
+import krypto.ui.components.CenterAlignedTableCellRenderer;
 import krypto.ui.components.ColorConstants;
 import krypto.ui.components.ColoredColumnTableCellRenderer;
 
 import javax.swing.*;
+import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableModel;
 import java.awt.*;
 import java.util.HashMap;
@@ -22,19 +24,20 @@ public class MktdataSheetTable extends JTable {
         COLUMN_COLORS.put(Column.LAST_QUANTITY, ColorConstants.TOTAL_COLOR);
     }
 
-    public MktdataSheetTable(TableModel dm) {
+    public MktdataSheetTable(TableModel dm, TableCellRenderer theoCellRenderer) {
         super(dm);
         COLUMN_COLORS.forEach((column, color) -> {
             this.getColumnModel().getColumn(column.ordinal()).setCellRenderer(
                     new ColoredColumnTableCellRenderer(color, Color.WHITE, column.ordinal(), true));
         });
-
+        this.getColumnModel().getColumn(Column.THEO.ordinal()).setCellRenderer(theoCellRenderer);
     }
 
     public enum Column {
         INSTRUMENT,
         BID_QUANTITY,
         BID,
+        THEO,
         ASK,
         ASK_QUANTITY,
         LAST,

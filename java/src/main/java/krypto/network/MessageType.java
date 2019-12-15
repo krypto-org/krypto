@@ -21,6 +21,7 @@ public class MessageType {
     public static final byte ORDER_UPDATE = 12;
     public static final byte POSITION = 13;
     public static final byte RISK_SUMMARY = 14;
+    public static final byte THEO = 15;
 
     public static final Map<String, Byte> MsgTypeNames = new HashMap<>();
 
@@ -40,6 +41,7 @@ public class MessageType {
         MsgTypeNames.put("OU", ORDER_UPDATE);
         MsgTypeNames.put("PP", POSITION);
         MsgTypeNames.put("PR", RISK_SUMMARY);
+        MsgTypeNames.put("PT", THEO);
 
     }
 }
