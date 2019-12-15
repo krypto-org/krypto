@@ -128,7 +128,7 @@ add_executable(krypto-coinbase-mktdata src/apps/mktdata/coinbase_main.cpp)
 target_link_libraries(krypto-coinbase-mktdata krypto CONAN_PKG::boost ssl crypto dl CONAN_PKG::bzip2 CONAN_PKG::zlib CONAN_PKG::tbb CONAN_PKG::zmq CONAN_PKG::cppzmq Threads::Threads)
 
 add_executable(krypto-instruments-server src/apps/instruments/server_main.cpp include/krypto/root_certificates.h src/krypto/utils/common.cpp)
-target_link_libraries(krypto-instruments-server krypto CONAN_PKG::boost ssl crypto dl CONAN_PKG::bzip2 CONAN_PKG::zlib CONAN_PKG::tbb CONAN_PKG::zmq CONAN_PKG::cppzmq CONAN_PKG::glfw CONAN_PKG::glad CONAN_PKG::imgui Threads::Threads)
+target_link_libraries(krypto-instruments-server krypto CONAN_PKG::boost ssl crypto dl CONAN_PKG::bzip2 CONAN_PKG::zlib CONAN_PKG::tbb CONAN_PKG::zmq CONAN_PKG::cppzmq Threads::Threads)
 
 add_executable(krypto-order-gateway src/apps/orders/order_gateway_main.cpp)
 target_link_libraries(krypto-order-gateway krypto CONAN_PKG::boost ssl crypto dl CONAN_PKG::bzip2 CONAN_PKG::zlib CONAN_PKG::tbb CONAN_PKG::zmq CONAN_PKG::cppzmq Threads::Threads)
