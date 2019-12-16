@@ -72,6 +72,7 @@ table Instrument {
   max_size: double;
   crypto_base: Currency;
   crypto_quote: Currency;
+  active: bool;
 }
 
 // market data

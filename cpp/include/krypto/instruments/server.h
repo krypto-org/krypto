@@ -1,5 +1,9 @@
 #pragma once
 
+#include <unordered_set>
+
+#include <boost/algorithm/string.hpp>
+
 #include <krypto/utils/common.h>
 #include <krypto/network/rpc/worker.h>
 #include <krypto/config.h>
@@ -19,10 +23,13 @@ namespace krypto::instruments {
         uint32_t polling_millis_;
         std::atomic_bool running_;
         flatbuffers::FlatBufferBuilder fb_builder_;
+        std::unordered_set<std::string> active_instruments_;
 
         bool process(const zmq::message_t &msg, krypto::utils::MsgType msg_type);
 
         void process_request(const krypto::serialization::InstrumentRequest *request);
+
+        std::vector<std::string> parse_active_symbols(std::string list);
 
     public:
         Server(zmq::context_t &context, const krypto::Config &config);
@@ -41,6 +48,18 @@ namespace krypto::instruments {
             polling_millis_{config.at<uint32_t>("/services/instruments/polling_millis")},
             running_{false} {
         cache_ = store_.load();
+        KRYP_LOG(info, "{}", config.get().dump());
+        auto active = config.at<std::string>("/services/instruments/active_symbols");
+        for (auto&& symbol: parse_active_symbols(active)) {
+            active_instruments_.insert(symbol);
+        }
+    }
+
+    template<bool Verbose>
+    std::vector<std::string> Server<Verbose>::parse_active_symbols(std::string list) {
+        std::vector<std::string> symbols;
+        boost::split(symbols, list, boost::is_any_of(","));
+        return symbols;
     }
 
     template<bool Verbose>
@@ -128,7 +147,9 @@ namespace krypto::instruments {
                         inst.min_size,
                         inst.max_size,
                         inst.crypto_base,
-                        inst.crypto_quote);
+                        inst.crypto_quote,
+                        active_instruments_.find(inst.symbol) !=
+                        std::end(active_instruments_));
                 instruments.emplace_back(inst_offset);
             }
         }

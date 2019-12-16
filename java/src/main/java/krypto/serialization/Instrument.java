@@ -28,6 +28,7 @@ public final class Instrument extends Table {
   public double maxSize() { int o = __offset(18); return o != 0 ? bb.getDouble(o + bb_pos) : 0.0; }
   public byte cryptoBase() { int o = __offset(20); return o != 0 ? bb.get(o + bb_pos) : 0; }
   public byte cryptoQuote() { int o = __offset(22); return o != 0 ? bb.get(o + bb_pos) : 0; }
+  public boolean active() { int o = __offset(24); return o != 0 ? 0!=bb.get(o + bb_pos) : false; }
 
   public static int createInstrument(FlatBufferBuilder builder,
       long id,
@@ -39,14 +40,16 @@ public final class Instrument extends Table {
       double min_size,
       double max_size,
       byte crypto_base,
-      byte crypto_quote) {
-    builder.startObject(10);
+      byte crypto_quote,
+      boolean active) {
+    builder.startObject(11);
     Instrument.addMaxSize(builder, max_size);
     Instrument.addMinSize(builder, min_size);
     Instrument.addTickSize(builder, tick_size);
     Instrument.addId(builder, id);
     Instrument.addExchangeSymbol(builder, exchange_symbolOffset);
     Instrument.addSymbol(builder, symbolOffset);
+    Instrument.addActive(builder, active);
     Instrument.addCryptoQuote(builder, crypto_quote);
     Instrument.addCryptoBase(builder, crypto_base);
     Instrument.addExchange(builder, exchange);
@@ -54,7 +57,7 @@ public final class Instrument extends Table {
     return Instrument.endInstrument(builder);
   }
 
-  public static void startInstrument(FlatBufferBuilder builder) { builder.startObject(10); }
+  public static void startInstrument(FlatBufferBuilder builder) { builder.startObject(11); }
   public static void addId(FlatBufferBuilder builder, long id) { builder.addLong(0, id, 0L); }
   public static void addType(FlatBufferBuilder builder, byte type) { builder.addByte(1, type, 0); }
   public static void addSymbol(FlatBufferBuilder builder, int symbolOffset) { builder.addOffset(2, symbolOffset, 0); }
@@ -65,6 +68,7 @@ public final class Instrument extends Table {
   public static void addMaxSize(FlatBufferBuilder builder, double maxSize) { builder.addDouble(7, maxSize, 0.0); }
   public static void addCryptoBase(FlatBufferBuilder builder, byte cryptoBase) { builder.addByte(8, cryptoBase, 0); }
   public static void addCryptoQuote(FlatBufferBuilder builder, byte cryptoQuote) { builder.addByte(9, cryptoQuote, 0); }
+  public static void addActive(FlatBufferBuilder builder, boolean active) { builder.addBoolean(10, active, false); }
   public static int endInstrument(FlatBufferBuilder builder) {
     int o = builder.endObject();
     return o;

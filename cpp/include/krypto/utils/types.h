@@ -90,6 +90,7 @@ namespace krypto::utils {
         double_t max_size;
         krypto::serialization::Currency crypto_base;
         krypto::serialization::Currency crypto_quote;
+        bool active;
 
         friend std::ostream &operator<<(std::ostream &os, const Instrument &instrument) {
             os << "id: " << instrument.id << " symbol: " << instrument.symbol

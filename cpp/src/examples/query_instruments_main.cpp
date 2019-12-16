@@ -21,6 +21,6 @@ int main(int argc, char ** argv) {
     auto insts = client.query().get();
     KRYP_LOG(info, "{}", insts.size());
     for (auto&& inst: insts) {
-        KRYP_LOG(info, "{} : {}", inst.symbol, inst.id);
+        KRYP_LOG(info, "{} : {} => {}", inst.symbol, inst.id, inst.active);
     }
 }
