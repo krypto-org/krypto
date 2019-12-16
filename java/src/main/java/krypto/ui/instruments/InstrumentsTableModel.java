@@ -65,6 +65,8 @@ public class InstrumentsTableModel extends ReadOnlyTableModel {
                         return instrument.cryptoBase();
                     case CRYPTO_QUOTE:
                         return instrument.cryptoQuote();
+                    case ACTIVE:
+                        return instrument.active();
                     default:
                         return '-';
                 }
