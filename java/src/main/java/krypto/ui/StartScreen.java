@@ -67,7 +67,7 @@ public class StartScreen extends LiveFrame
         Thread instrumentsCallThread = new Thread(() ->
         {
             this.instruments.clear();
-            this.uiDataCache.getInstruments(true).forEach((this.instruments::put));
+            this.uiDataCache.getActiveInstruments(true).forEach((this.instruments::put));
             logger.info(String.format("TOTAL INSTRUMENTS: %s", instruments.size()));
             this.onInstrumentsLoad();
             logger.info("LOADED INSTRUMENTS AND UPDATED MAPPING TABLE");

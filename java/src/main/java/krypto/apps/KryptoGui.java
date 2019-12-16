@@ -45,8 +45,6 @@ public class KryptoGui {
         subscriber.start();
         pricingClient.start();
 
-        System.err.println(config);
-
         EventQueue.invokeLater(() -> {
             try {
                 UIManager.setLookAndFeel(
