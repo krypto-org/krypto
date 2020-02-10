@@ -23,18 +23,18 @@ public class KryptoGui {
         System.err.println(config);
 
         final InstrumentsClient instrumentsClient = new InstrumentsClient(
-                context, config.getString("services.instruments.server"));
+                context, config.getString("services.instruments.client"));
 
         Subscriber subscriber = new Subscriber(
                 context,
                 Collections.singletonList(config.getString(
-                        "services.mktdata_gateway.backend.server")),
+                        "services.mktdata_gateway.backend.client")),
                 true);
         subscriber.subscribe("");
 
         PricingClient pricingClient = new PricingClient(
                 context, Collections.singletonList(
-                        config.getString("services.pricing.server")),
+                        config.getString("services.pricing.client")),
                 true);
         pricingClient.subscribe("");
 
