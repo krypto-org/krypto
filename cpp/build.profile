@@ -4,10 +4,10 @@ os_build=Linux
 arch=x86_64
 arch_build=x86_64
 compiler=gcc
-compiler.version=8.2
+compiler.version=9.3
 compiler.libcxx=libstdc++
 build_type=Release
 [options]
 [build_requires]
-gcc/8.2@kapilsh/release
+gcc/9.3@kapilsh/release
 [env]

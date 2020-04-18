@@ -5,7 +5,7 @@ boost/1.68.0@kapilsh/release
 openssl/1.1.1@kapilsh/release
 bzip2/1.0.6@kapilsh/release
 zlib/1.2.11@kapilsh/release
-tbb/2018_U6@kapilsh/release
+tbb/v2020.2@kapilsh/release
 websocketpp/0.8.1@kapilsh/release
 flatbuffers/1.11.0@kapilsh/release
 zmq/4.2.5@kapilsh/release

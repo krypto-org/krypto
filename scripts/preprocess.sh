@@ -15,7 +15,7 @@ SCRIPT_DIR=$(dirname "${SCRIPT_PATH}")
 KRYPTO_DIR=$(realpath "${SCRIPT_DIR}"/..)
 
 # shellcheck disable=SC2034
-GCC_VERSION=8.2
+GCC_VERSION=9.3
 FLAT_BUFFERS_VERSION=1.11.0
 FLAT_BUFFERS_BINARY_PACKAGE=flatbuffers/${FLAT_BUFFERS_VERSION}@kapilsh/release
 
@@ -32,7 +32,7 @@ export PATH=${KRYPTO_DIR}/resources/bin/:${PATH}
 cd "${KRYPTO_DIR}"/resources || exit
 
 mkdir build && cd build || exit
-conan install ${FLAT_BUFFERS_BINARY_PACKAGE} -g virtualenv
+conan install ${FLAT_BUFFERS_BINARY_PACKAGE} -g virtualenv -scompiler.version=${GCC_VERSION}
 source activate.sh
 cd ..
 

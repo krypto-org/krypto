@@ -57,7 +57,8 @@ enum Currency : byte {
     ALGO,
     DASH,
     OXT,
-    ATOM
+    ATOM,
+    KNC
 }
 
 enum RequestType: byte {INVALID, ALL, ID, EXCHANGE, PRODUCT}

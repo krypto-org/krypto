@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.10)
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake")
 
-set(GCC_VERSION 8.2)
+set(GCC_VERSION 9.3)
 
 add_compile_options(
         -std=gnu++17
