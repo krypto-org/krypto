@@ -16,29 +16,29 @@ import java.util.Collections;
 
 public class KryptoGui {
     public static void main(String[] args) {
-        final Config config = ConfigFactory.parseFile(new File(args[0])).resolve();
+        final var config = ConfigFactory.parseFile(new File(args[0])).resolve();
 
-        final ZMQ.Context context = ZMQ.context(1);
+        final var context = ZMQ.context(1);
 
         System.err.println(config);
 
-        final InstrumentsClient instrumentsClient = new InstrumentsClient(
+        final var instrumentsClient = new InstrumentsClient(
                 context, config.getString("services.instruments.client"));
 
-        Subscriber subscriber = new Subscriber(
+        final var subscriber = new Subscriber(
                 context,
                 Collections.singletonList(config.getString(
                         "services.mktdata_gateway.backend.client")),
                 true);
         subscriber.subscribe("");
 
-        PricingClient pricingClient = new PricingClient(
+        final var pricingClient = new PricingClient(
                 context, Collections.singletonList(
                         config.getString("services.pricing.client")),
                 true);
         pricingClient.subscribe("");
 
-        final UIDataCache uiDataCache = new UIDataCache(instrumentsClient);
+        final var uiDataCache = new UIDataCache(instrumentsClient);
         subscriber.registerListener(uiDataCache);
         pricingClient.registerListener(uiDataCache);
 
@@ -51,7 +51,7 @@ public class KryptoGui {
                         "com.jtattoo.plaf.noire.NoireLookAndFeel");
                 UIManager.put("InternalFrame.titleFont",
                         new Font("Cambria Math", Font.BOLD, 12));
-                StartScreen frame = new StartScreen(uiDataCache);
+                final var frame = new StartScreen(uiDataCache);
                 frame.setVisible(true);
             } catch (Exception e) {
                 e.printStackTrace();
