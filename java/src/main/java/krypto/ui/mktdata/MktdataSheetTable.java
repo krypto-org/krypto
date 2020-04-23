@@ -20,6 +20,8 @@ public class MktdataSheetTable extends JTable {
         COLUMN_COLORS.put(Column.ASK, ColorConstants.ASK_PRICE_COLUMN_COLOR);
         COLUMN_COLORS.put(Column.BID_QUANTITY, ColorConstants.BID_QUANTITY_COLUMN_COLOR);
         COLUMN_COLORS.put(Column.ASK_QUANTITY, ColorConstants.ASK_QUANTITY_COLUMN_COLOR);
+        COLUMN_COLORS.put(Column.THEO_BID, ColorConstants.BID_PRICE_COLUMN_COLOR);
+        COLUMN_COLORS.put(Column.THEO_ASK, ColorConstants.ASK_PRICE_COLUMN_COLOR);
         COLUMN_COLORS.put(Column.LAST, ColorConstants.TOTAL_COLOR);
         COLUMN_COLORS.put(Column.LAST_QUANTITY, ColorConstants.TOTAL_COLOR);
     }
@@ -37,7 +39,9 @@ public class MktdataSheetTable extends JTable {
         INSTRUMENT,
         BID_QUANTITY,
         BID,
+        THEO_BID,
         THEO,
+        THEO_ASK,
         ASK,
         ASK_QUANTITY,
         LAST,

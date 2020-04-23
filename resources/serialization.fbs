@@ -192,5 +192,11 @@ table TheoreticalSnapshot {
   timestamp: long;
   security_id: long;
   price: double;
+  adjusted_price: double;
   error: double;
+  mm_base_bid: double;
+  mm_base_ask: double;
+  mm_base_spread: double;
+  bid_liquidity: double;
+  ask_liquidity: double;
 }

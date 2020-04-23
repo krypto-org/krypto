@@ -8,6 +8,7 @@
 #include <krypto/utils/message_types.h>
 #include <krypto/pricing/pub.h>
 #include <krypto/pricing/ewma.h>
+#include <krypto/logger.h>
 
 namespace krypto::pricing {
     template<bool Verbose = false>
@@ -66,37 +67,63 @@ namespace krypto::pricing {
                     quote->security_id(),
                     std::numeric_limits<double>::quiet_NaN(),
                     std::numeric_limits<double>::quiet_NaN(),
+                    std::numeric_limits<double>::quiet_NaN(),
+                    std::numeric_limits<double>::quiet_NaN(),
+                    std::numeric_limits<double>::quiet_NaN(),
+                    std::numeric_limits<double>::quiet_NaN(),
+                    std::numeric_limits<double>::quiet_NaN(),
+                    std::numeric_limits<double>::quiet_NaN(),
                     false
             };
         }
 
-        if (std::isnan(theo_snapshots_.at(quote->security_id()).price)) {
+        if (!theo_snapshots_.at(quote->security_id()).valid) {
             theo_snapshots_.at(quote->security_id()).price = weighted_mid;
-        } else {
+            theo_snapshots_.at(quote->security_id()).adjusted_price = weighted_mid;
+            theo_snapshots_.at(quote->security_id()).error = 0;
+            const double_t spread = ask - bid;
+            theo_snapshots_.at(quote->security_id()).mm_base_spread = spread;
+            theo_snapshots_.at(quote->security_id()).mm_base_ask = weighted_mid + 0.5 * spread;
+            theo_snapshots_.at(quote->security_id()).mm_base_bid = weighted_mid - 0.5 * spread;
+            theo_snapshots_.at(quote->security_id()).bid_liquidity = bid_qty;
+            theo_snapshots_.at(quote->security_id()).ask_liquidity = ask_qty;
             theo_snapshots_.at(quote->security_id()).valid = true;
+        } else {
             double_t previous_price = theo_snapshots_.at(quote->security_id()).price;
+            double_t previous_spread = theo_snapshots_.at(quote->security_id()).mm_base_spread;
+            double_t previous_bid_liq = theo_snapshots_.at(quote->security_id()).bid_liquidity;
+            double_t previous_ask_liq = theo_snapshots_.at(quote->security_id()).ask_liquidity;
+
             int64_t previous_time = theo_snapshots_.at(quote->security_id()).timestamp;
             double_t time_delta = calculate_time_delta_seconds(
                     previous_time, quote->timestamp());
             theo_snapshots_.at(quote->security_id()).price =
                     calculator_.calculate_mean(previous_price, weighted_mid, time_delta);
+            double_t previous_std = theo_snapshots_.at(quote->security_id()).error;
+            theo_snapshots_.at(quote->security_id()).error =
+                    calculator_.calculate_std(
+                            previous_std,
+                            weighted_mid,
+                            time_delta,
+                            theo_snapshots_.at(quote->security_id()).price);
+            const double_t spread = calculator_.calculate_mean(previous_spread, ask - bid, time_delta);
 
-            if (std::isnan(theo_snapshots_.at(quote->security_id()).error)) {
-                double_t mean = (previous_price + theo_snapshots_.at(quote->security_id()).price) / 2.0;
-                double_t sq_sum = std::pow(previous_price, 2) +
-                                  std::pow(theo_snapshots_.at(quote->security_id()).price, 2);
-                theo_snapshots_.at(quote->security_id()).error =
-                        std::sqrt(sq_sum - 2 * std::pow(mean, 2));
-            } else {
-                double_t previous_std = theo_snapshots_.at(quote->security_id()).error;
-                theo_snapshots_.at(quote->security_id()).error =
-                        calculator_.calculate_std(
-                                previous_std,
-                                weighted_mid,
-                                time_delta,
-                                theo_snapshots_.at(quote->security_id()).price);
-            }
+            theo_snapshots_.at(quote->security_id()).mm_base_spread = spread;
+            theo_snapshots_.at(quote->security_id()).mm_base_ask = weighted_mid + 0.5 * spread;
+            theo_snapshots_.at(quote->security_id()).mm_base_bid = weighted_mid - 0.5 * spread;
+
+            theo_snapshots_.at(quote->security_id()).bid_liquidity =
+                    calculator_.calculate_mean(previous_bid_liq, bid_qty, time_delta);
+            theo_snapshots_.at(quote->security_id()).ask_liquidity =
+                    calculator_.calculate_mean(previous_ask_liq, ask_qty, time_delta);
+
+            // TODO: Trade impact model
+            theo_snapshots_.at(quote->security_id()).adjusted_price =
+                    theo_snapshots_.at(quote->security_id()).price;
+
         }
+
+        KRYP_LOG(debug, "{}", theo_snapshots_.at(quote->security_id()));
 
         if (theo_snapshots_.at(quote->security_id()).valid) {
             auto topic = krypto::utils::create_topic(

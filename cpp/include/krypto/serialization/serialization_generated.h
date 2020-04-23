@@ -1849,7 +1849,13 @@ struct TheoreticalSnapshot FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table 
     VT_TIMESTAMP = 4,
     VT_SECURITY_ID = 6,
     VT_PRICE = 8,
-    VT_ERROR = 10
+    VT_ADJUSTED_PRICE = 10,
+    VT_ERROR = 12,
+    VT_MM_BASE_BID = 14,
+    VT_MM_BASE_ASK = 16,
+    VT_MM_BASE_SPREAD = 18,
+    VT_BID_LIQUIDITY = 20,
+    VT_ASK_LIQUIDITY = 22
   };
   int64_t timestamp() const {
     return GetField<int64_t>(VT_TIMESTAMP, 0);
@@ -1860,15 +1866,39 @@ struct TheoreticalSnapshot FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table 
   double price() const {
     return GetField<double>(VT_PRICE, 0.0);
   }
+  double adjusted_price() const {
+    return GetField<double>(VT_ADJUSTED_PRICE, 0.0);
+  }
   double error() const {
     return GetField<double>(VT_ERROR, 0.0);
+  }
+  double mm_base_bid() const {
+    return GetField<double>(VT_MM_BASE_BID, 0.0);
+  }
+  double mm_base_ask() const {
+    return GetField<double>(VT_MM_BASE_ASK, 0.0);
+  }
+  double mm_base_spread() const {
+    return GetField<double>(VT_MM_BASE_SPREAD, 0.0);
+  }
+  double bid_liquidity() const {
+    return GetField<double>(VT_BID_LIQUIDITY, 0.0);
+  }
+  double ask_liquidity() const {
+    return GetField<double>(VT_ASK_LIQUIDITY, 0.0);
   }
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
            VerifyField<int64_t>(verifier, VT_TIMESTAMP) &&
            VerifyField<int64_t>(verifier, VT_SECURITY_ID) &&
            VerifyField<double>(verifier, VT_PRICE) &&
+           VerifyField<double>(verifier, VT_ADJUSTED_PRICE) &&
            VerifyField<double>(verifier, VT_ERROR) &&
+           VerifyField<double>(verifier, VT_MM_BASE_BID) &&
+           VerifyField<double>(verifier, VT_MM_BASE_ASK) &&
+           VerifyField<double>(verifier, VT_MM_BASE_SPREAD) &&
+           VerifyField<double>(verifier, VT_BID_LIQUIDITY) &&
+           VerifyField<double>(verifier, VT_ASK_LIQUIDITY) &&
            verifier.EndTable();
   }
 };
@@ -1885,8 +1915,26 @@ struct TheoreticalSnapshotBuilder {
   void add_price(double price) {
     fbb_.AddElement<double>(TheoreticalSnapshot::VT_PRICE, price, 0.0);
   }
+  void add_adjusted_price(double adjusted_price) {
+    fbb_.AddElement<double>(TheoreticalSnapshot::VT_ADJUSTED_PRICE, adjusted_price, 0.0);
+  }
   void add_error(double error) {
     fbb_.AddElement<double>(TheoreticalSnapshot::VT_ERROR, error, 0.0);
+  }
+  void add_mm_base_bid(double mm_base_bid) {
+    fbb_.AddElement<double>(TheoreticalSnapshot::VT_MM_BASE_BID, mm_base_bid, 0.0);
+  }
+  void add_mm_base_ask(double mm_base_ask) {
+    fbb_.AddElement<double>(TheoreticalSnapshot::VT_MM_BASE_ASK, mm_base_ask, 0.0);
+  }
+  void add_mm_base_spread(double mm_base_spread) {
+    fbb_.AddElement<double>(TheoreticalSnapshot::VT_MM_BASE_SPREAD, mm_base_spread, 0.0);
+  }
+  void add_bid_liquidity(double bid_liquidity) {
+    fbb_.AddElement<double>(TheoreticalSnapshot::VT_BID_LIQUIDITY, bid_liquidity, 0.0);
+  }
+  void add_ask_liquidity(double ask_liquidity) {
+    fbb_.AddElement<double>(TheoreticalSnapshot::VT_ASK_LIQUIDITY, ask_liquidity, 0.0);
   }
   explicit TheoreticalSnapshotBuilder(flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
@@ -1905,9 +1953,21 @@ inline flatbuffers::Offset<TheoreticalSnapshot> CreateTheoreticalSnapshot(
     int64_t timestamp = 0,
     int64_t security_id = 0,
     double price = 0.0,
-    double error = 0.0) {
+    double adjusted_price = 0.0,
+    double error = 0.0,
+    double mm_base_bid = 0.0,
+    double mm_base_ask = 0.0,
+    double mm_base_spread = 0.0,
+    double bid_liquidity = 0.0,
+    double ask_liquidity = 0.0) {
   TheoreticalSnapshotBuilder builder_(_fbb);
+  builder_.add_ask_liquidity(ask_liquidity);
+  builder_.add_bid_liquidity(bid_liquidity);
+  builder_.add_mm_base_spread(mm_base_spread);
+  builder_.add_mm_base_ask(mm_base_ask);
+  builder_.add_mm_base_bid(mm_base_bid);
   builder_.add_error(error);
+  builder_.add_adjusted_price(adjusted_price);
   builder_.add_price(price);
   builder_.add_security_id(security_id);
   builder_.add_timestamp(timestamp);

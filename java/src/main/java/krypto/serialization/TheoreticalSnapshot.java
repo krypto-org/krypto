@@ -17,26 +17,50 @@ public final class TheoreticalSnapshot extends Table {
   public long timestamp() { int o = __offset(4); return o != 0 ? bb.getLong(o + bb_pos) : 0L; }
   public long securityId() { int o = __offset(6); return o != 0 ? bb.getLong(o + bb_pos) : 0L; }
   public double price() { int o = __offset(8); return o != 0 ? bb.getDouble(o + bb_pos) : 0.0; }
-  public double error() { int o = __offset(10); return o != 0 ? bb.getDouble(o + bb_pos) : 0.0; }
+  public double adjustedPrice() { int o = __offset(10); return o != 0 ? bb.getDouble(o + bb_pos) : 0.0; }
+  public double error() { int o = __offset(12); return o != 0 ? bb.getDouble(o + bb_pos) : 0.0; }
+  public double mmBaseBid() { int o = __offset(14); return o != 0 ? bb.getDouble(o + bb_pos) : 0.0; }
+  public double mmBaseAsk() { int o = __offset(16); return o != 0 ? bb.getDouble(o + bb_pos) : 0.0; }
+  public double mmBaseSpread() { int o = __offset(18); return o != 0 ? bb.getDouble(o + bb_pos) : 0.0; }
+  public double bidLiquidity() { int o = __offset(20); return o != 0 ? bb.getDouble(o + bb_pos) : 0.0; }
+  public double askLiquidity() { int o = __offset(22); return o != 0 ? bb.getDouble(o + bb_pos) : 0.0; }
 
   public static int createTheoreticalSnapshot(FlatBufferBuilder builder,
       long timestamp,
       long security_id,
       double price,
-      double error) {
-    builder.startObject(4);
+      double adjusted_price,
+      double error,
+      double mm_base_bid,
+      double mm_base_ask,
+      double mm_base_spread,
+      double bid_liquidity,
+      double ask_liquidity) {
+    builder.startObject(10);
+    TheoreticalSnapshot.addAskLiquidity(builder, ask_liquidity);
+    TheoreticalSnapshot.addBidLiquidity(builder, bid_liquidity);
+    TheoreticalSnapshot.addMmBaseSpread(builder, mm_base_spread);
+    TheoreticalSnapshot.addMmBaseAsk(builder, mm_base_ask);
+    TheoreticalSnapshot.addMmBaseBid(builder, mm_base_bid);
     TheoreticalSnapshot.addError(builder, error);
+    TheoreticalSnapshot.addAdjustedPrice(builder, adjusted_price);
     TheoreticalSnapshot.addPrice(builder, price);
     TheoreticalSnapshot.addSecurityId(builder, security_id);
     TheoreticalSnapshot.addTimestamp(builder, timestamp);
     return TheoreticalSnapshot.endTheoreticalSnapshot(builder);
   }
 
-  public static void startTheoreticalSnapshot(FlatBufferBuilder builder) { builder.startObject(4); }
+  public static void startTheoreticalSnapshot(FlatBufferBuilder builder) { builder.startObject(10); }
   public static void addTimestamp(FlatBufferBuilder builder, long timestamp) { builder.addLong(0, timestamp, 0L); }
   public static void addSecurityId(FlatBufferBuilder builder, long securityId) { builder.addLong(1, securityId, 0L); }
   public static void addPrice(FlatBufferBuilder builder, double price) { builder.addDouble(2, price, 0.0); }
-  public static void addError(FlatBufferBuilder builder, double error) { builder.addDouble(3, error, 0.0); }
+  public static void addAdjustedPrice(FlatBufferBuilder builder, double adjustedPrice) { builder.addDouble(3, adjustedPrice, 0.0); }
+  public static void addError(FlatBufferBuilder builder, double error) { builder.addDouble(4, error, 0.0); }
+  public static void addMmBaseBid(FlatBufferBuilder builder, double mmBaseBid) { builder.addDouble(5, mmBaseBid, 0.0); }
+  public static void addMmBaseAsk(FlatBufferBuilder builder, double mmBaseAsk) { builder.addDouble(6, mmBaseAsk, 0.0); }
+  public static void addMmBaseSpread(FlatBufferBuilder builder, double mmBaseSpread) { builder.addDouble(7, mmBaseSpread, 0.0); }
+  public static void addBidLiquidity(FlatBufferBuilder builder, double bidLiquidity) { builder.addDouble(8, bidLiquidity, 0.0); }
+  public static void addAskLiquidity(FlatBufferBuilder builder, double askLiquidity) { builder.addDouble(9, askLiquidity, 0.0); }
   public static int endTheoreticalSnapshot(FlatBufferBuilder builder) {
     int o = builder.endObject();
     return o;
