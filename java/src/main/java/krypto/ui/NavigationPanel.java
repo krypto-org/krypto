@@ -8,7 +8,6 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.Arrays;
 
 public class NavigationPanel extends JPanel {
 
@@ -26,15 +25,6 @@ public class NavigationPanel extends JPanel {
     private final InstrumentsView instrumentsView;
     private boolean instrumentsViewVisible = false;
 
-    private JButton btnCurves;
-    private JButton btnRisk;
-    private JButton btnInstruments;
-    private JButton btnMarketData;
-    private JButton btnSettings;
-    private JButton btnAudit;
-    private JButton btnTradeSheets;
-
-
     NavigationPanel(final UIDataCache uiDataCache) {
         this.setLayout(new MigLayout("", "[fill,grow]", "[fill,grow]"));
         this.uiDataCache = uiDataCache;
@@ -45,7 +35,7 @@ public class NavigationPanel extends JPanel {
     }
 
     private void initializeButtons() {
-        btnInstruments = new ImageButton(
+        final JButton btnInstruments = new ImageButton(
                 Toolkit.getDefaultToolkit().getImage(
                         this.getClass().getResource(INSTRUMENTS_ICON_PATH)),
                 40, 40);
@@ -53,77 +43,51 @@ public class NavigationPanel extends JPanel {
         btnInstruments.setToolTipText("Instruments");
         this.add(btnInstruments, "cell 0 0 1 1");
 
-        btnMarketData = new ImageButton(
+        final JButton btnMarketData = new ImageButton(
                 Toolkit.getDefaultToolkit().getImage(
                         this.getClass().getResource(MARKET_DATA_ICON_PATH)),
                 40, 40);
-        btnMarketData.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-//                initializeMarketDataWindow();
-            }
-        });
+        btnMarketData.addActionListener(e -> initializeMarketDataWindow());
         btnMarketData.setToolTipText("Market Data");
         this.add(btnMarketData, "cell 1 0 1 1");
 
-        btnCurves = new ImageButton(
+        final JButton btnCurves = new ImageButton(
                 Toolkit.getDefaultToolkit()
                         .getImage(this.getClass()
                                 .getResource(ANALYTICS_ICON_PATH)),
                 40, 40);
-        btnCurves.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-//                initializeTheoAnalysisWindow();
-            }
-        });
-        btnCurves.setToolTipText("Theo Server");
+        btnCurves.addActionListener(e -> initializePricingWindow());
+        btnCurves.setToolTipText("Pricing");
         this.add(btnCurves, "cell 2 0 1 1");
 
-        btnTradeSheets = new ImageButton(
+        final JButton btnStrategy = new ImageButton(
                 Toolkit.getDefaultToolkit().getImage(
-                        this.getClass().getResource(TRADE_SHEETS_ICON_PATH)),
+                        this.getClass().getResource(STRATEGY_ICON_PATH)),
                 40, 40);
-        btnTradeSheets.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-//                initializeTradeSheetsView();
-            }
-        });
-        btnTradeSheets.setToolTipText("Trade Sheets");
-        this.add(btnTradeSheets, "cell 3 0 1 1");
+        btnStrategy.addActionListener(e -> initializeStrategyWindow());
+        btnStrategy.setToolTipText("Trade Sheets");
+        this.add(btnStrategy, "cell 3 0 1 1");
 
-        btnRisk = new ImageButton(Toolkit.getDefaultToolkit()
+        final JButton btnRisk = new ImageButton(Toolkit.getDefaultToolkit()
                 .getImage(this.getClass().getResource(RISK_ICON_PATH)), 40, 40);
-        btnRisk.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-
-//                initializeRiskView();
-            }
-        });
+        btnRisk.addActionListener(e -> initializeRiskWindow());
         btnRisk.setToolTipText("Risk");
         this.add(btnRisk, "cell 4 0 1 1");
 
-        btnSettings = new ImageButton(
+        final JButton btnSettings = new ImageButton(
                 Toolkit.getDefaultToolkit().getImage(
                         this.getClass().getResource(SETTINGS_ICON_PATH)),
                 40, 40);
-        btnSettings.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-//                initializeSettingsView();
-            }
-        });
+        btnSettings.addActionListener(e -> initializeSettingsWindow());
         btnSettings.setToolTipText("Settings");
         this.add(btnSettings, "cell 5 0 1 1");
 
-        btnAudit = new ImageButton(Toolkit.getDefaultToolkit().getImage(
+        final JButton btnAudit = new ImageButton(Toolkit.getDefaultToolkit().getImage(
                 this.getClass().getResource(AUDIT_ICON_PATH)), 40, 40);
         btnAudit.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-//                initializeLogView();
+                initializeLogView();
             }
         });
         btnAudit.setToolTipText("Audit Log");
@@ -135,7 +99,7 @@ public class NavigationPanel extends JPanel {
         btnMarketData.setEnabled(true);
         btnSettings.setEnabled(true);
         btnAudit.setEnabled(true);
-        btnTradeSheets.setEnabled(true);
+        btnStrategy.setEnabled(true);
     }
 
     private void initializeInstrumentsView() {
@@ -145,6 +109,30 @@ public class NavigationPanel extends JPanel {
             instrumentsViewVisible = true;
         }
         instrumentsView.setVisible(true);
+    }
+
+    private void initializeMarketDataWindow() {
+
+    }
+
+    private void initializePricingWindow() {
+
+    }
+
+    private void initializeStrategyWindow() {
+
+    }
+
+    private void initializeRiskWindow() {
+
+    }
+
+    private void initializeSettingsWindow() {
+
+    }
+
+    private void initializeLogView() {
+
     }
 
     void refresh() {
