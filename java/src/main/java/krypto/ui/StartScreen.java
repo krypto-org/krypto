@@ -43,9 +43,8 @@ public class StartScreen extends LiveFrame
         this.uiDataCache = uiDataCache;
 
         this.instruments = new ConcurrentSkipListMap<>();
-        JScrollPane quotesScrollPane = new JScrollPane();
-
-        final HeatmapColumnTableCellRenderer theoCellRemderer = new HeatmapColumnTableCellRenderer();
+        final var quotesScrollPane = new JScrollPane();
+        final var theoCellRemderer = new HeatmapColumnTableCellRenderer();
 
         this.quotesTableModel = new MktdataSheetTableModel(theoCellRemderer);
         JTable quotesTable = new MktdataSheetTable(this.quotesTableModel, theoCellRemderer);

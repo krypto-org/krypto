@@ -23,7 +23,7 @@ public abstract class LiveFrame extends JFrame
 		btnManualRefresh.setFont(new Font("Cambria Math", Font.BOLD, 11));
 	}
 
-	protected void startUpdates()
+	public void startUpdates()
 	{
 		if (!timerRunning)
 		{
@@ -53,7 +53,7 @@ public abstract class LiveFrame extends JFrame
 		}
 	}
 
-	protected void stopUpdates()
+	public void stopUpdates()
 	{
 		if (timerRunning)
 		{

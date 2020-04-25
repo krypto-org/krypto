@@ -69,17 +69,17 @@ public class UIDataCache implements
         return instruments;
     }
 
-    Map<Long, Instrument> getActiveInstruments(final boolean reloadCache) {
+    public Map<Long, Instrument> getActiveInstruments(final boolean reloadCache) {
         return this.getInstruments(reloadCache).values().stream().filter(
                 Instrument::active).collect(
                         Collectors.toMap(Instrument::id, instrument -> instrument));
     }
 
-    Map<Long, Quote> getQuotes() {
+    public Map<Long, Quote> getQuotes() {
         return quotes;
     }
 
-    Map<Long, TheoreticalSnapshot> getTheos() {
+    public Map<Long, TheoreticalSnapshot> getTheos() {
         return theos;
     }
 }

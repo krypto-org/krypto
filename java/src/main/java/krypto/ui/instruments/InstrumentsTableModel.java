@@ -75,7 +75,7 @@ public class InstrumentsTableModel extends ReadOnlyTableModel {
         return '-';
     }
 
-    void reload() {
+    public void reload() {
         this.instruments.putAll(
                 this.dataCache.getInstruments(false));
         int row = 0;
