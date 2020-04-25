@@ -68,18 +68,10 @@ public class MktdataSheetTableModel extends ReadOnlyTableModel {
                         return DisplayConstants.PRICE_FORMAT.format(Conversion.convertPrice(quote.bid()));
                     case BID_QUANTITY:
                         return DisplayConstants.QUANTITY_FORMAT.format(Conversion.convertQuantity(quote.bidQuantity()));
-                    case THEO_BID:
-                        return this.theos.containsKey(instId) ?
-                                DisplayConstants.PRICE_FORMAT.format(
-                                        this.theos.get(instId).mmBaseBid()) : Double.NaN;
                     case THEO:
                         return this.theos.containsKey(instId) ?
                                 DisplayConstants.PRICE_FORMAT.format(
                                         this.theos.get(instId).price()) : Double.NaN;
-                    case THEO_ASK:
-                        return this.theos.containsKey(instId) ?
-                                DisplayConstants.PRICE_FORMAT.format(
-                                        this.theos.get(instId).mmBaseAsk()) : Double.NaN;
                     case ASK:
                         return DisplayConstants.PRICE_FORMAT.format(Conversion.convertPrice(quote.ask()));
                     case ASK_QUANTITY:

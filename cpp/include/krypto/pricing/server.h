@@ -53,6 +53,7 @@ namespace krypto::pricing {
 
     template<bool Verbose>
     void PricingServer<Verbose>::process(const krypto::serialization::Quote *quote) {
+
         double_t bid = krypto::mktdata::extract_price(quote->bid());
         double_t ask = krypto::mktdata::extract_price(quote->ask());
 
@@ -122,8 +123,6 @@ namespace krypto::pricing {
                     theo_snapshots_.at(quote->security_id()).price;
 
         }
-
-        KRYP_LOG(debug, "{}", theo_snapshots_.at(quote->security_id()));
 
         if (theo_snapshots_.at(quote->security_id()).valid) {
             auto topic = krypto::utils::create_topic(
