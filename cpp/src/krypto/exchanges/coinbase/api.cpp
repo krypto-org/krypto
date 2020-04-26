@@ -59,7 +59,7 @@ namespace krypto::exchanges::coinbase {
         if (!server_time.has_value()) {
             return std::nullopt;
         }
-        std::string ts = std::to_string(server_time.value().at("epoch").get<int>());
+        std::string ts = Authenticator::get_timestamp();
         std::string order_str = create_order_message(order);
         std::optional<std::string> sign = authenticator_.sign(
                 ts, "POST", orders_endpoint_, order_str);
