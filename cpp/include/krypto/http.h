@@ -20,7 +20,8 @@ namespace krypto {
         HttpClient& operator=(HttpClient&& rhs) = default;
 
         ~HttpClient();
-        std::optional<std::string> get(const std::string&);
-        std::optional<std::string> post(const std::string&, const std::string&);
+        std::optional<std::string> get(const std::string&, const std::unordered_map<std::string, std::string>&);
+        std::optional<std::string> post(const std::string&, const std::string&,
+                const std::unordered_map<std::string, std::string>&);
     };
 }

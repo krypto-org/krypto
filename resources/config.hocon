@@ -8,16 +8,26 @@ exchanges = {
     id = 101
 
     rest = {
-      base_url = "api.pro.coinbase.com"
+      base_url = {
+        production = "api.pro.coinbase.com"
+        sandbox = "api-public.sandbox.pro.coinbase.com"
+      }
+
       channels = {
         instruments = products
         statistics = stats
+        accounts = accounts
+        orders = orders
+        fills = fills
        }
        timeout = 15000
     }
 
     ws = {
-      base_url = "wss://ws-feed.pro.coinbase.com"
+      base_url = {
+        production = "wss://ws-feed.pro.coinbase.com"
+        sandbox = "wss://ws-feed-public.sandbox.pro.coinbase.com"
+      }
       channels = {
         ticker = ticker
         snapshot = level2
@@ -29,7 +39,7 @@ exchanges = {
       
       services = {
         instruments = {
-          url = ${exchanges.coinbase.rest.base_url}/${exchanges.coinbase.rest.channels.instruments}
+          url = ${exchanges.coinbase.rest.base_url.production}/${exchanges.coinbase.rest.channels.instruments}
         }
       }
 
