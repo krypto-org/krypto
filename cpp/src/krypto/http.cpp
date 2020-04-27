@@ -8,8 +8,7 @@
 #include <boost/asio/ip/tcp.hpp>
 #include <boost/asio/ssl/error.hpp>
 #include <boost/asio/ssl/stream.hpp>
-#include <cstdlib>
-#include <iostream>
+#include <boost/lexical_cast.hpp>
 #include <string>
 
 using tcp = boost::asio::ip::tcp;
@@ -102,10 +101,12 @@ std::optional<std::string> krypto::HttpClient::post(const std::string& endpoint,
     req.set(http::field::host, host_);
     req.set(http::field::user_agent, BOOST_BEAST_VERSION_STRING);
     req.set(http::field::content_type, "application/json");
+    req.set(http::field::content_length, std::to_string(strlen(data.c_str())));
     for (auto&& pair: custom_headers) {
         req.insert(pair.first, pair.second);
     }
     req.body() = data;
+    req.prepare_payload();
 
     KRYP_LOG(info, "Sending message: {}", req.body());
 
@@ -137,6 +138,5 @@ std::optional<std::string> krypto::HttpClient::post(const std::string& endpoint,
     return std::optional<std::string>{boost::beast::buffers_to_string(res.body().data())};
 }
 
-krypto::HttpClient::~HttpClient() {
-}
+krypto::HttpClient::~HttpClient() = default;
 

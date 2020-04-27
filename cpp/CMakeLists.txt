@@ -145,6 +145,11 @@ target_link_libraries(krypto-sim-orders krypto CONAN_PKG::boost ssl crypto dl CO
 add_executable(krypto-pricing-server src/apps/pricing/krypto_pricing_server_main.cpp)
 target_link_libraries(krypto-pricing-server krypto CONAN_PKG::boost ssl crypto dl CONAN_PKG::bzip2 CONAN_PKG::zlib CONAN_PKG::tbb CONAN_PKG::zmq CONAN_PKG::cppzmq Threads::Threads)
 
+# Unit tests
+add_executable(krypto-test-auth src/tests/test_auth.cpp)
+target_link_libraries(krypto-test-auth krypto CONAN_PKG::boost ssl crypto dl CONAN_PKG::bzip2 CONAN_PKG::zlib CONAN_PKG::tbb CONAN_PKG::zmq CONAN_PKG::cppzmq CONAN_PKG::cryptopp CONAN_PKG::catch2 Threads::Threads)
+
+
 # Examples
 
 add_executable(mktdata-printer src/examples/mktdata_printer_main.cpp)
