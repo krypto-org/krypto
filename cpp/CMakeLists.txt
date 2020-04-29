@@ -71,7 +71,7 @@ add_library(krypto STATIC
         src/krypto/network/mktdata/snap.cpp
         include/krypto/mktdata/pub.h
         src/krypto/mktdata/pub.cpp
-        include/krypto/http.h src/krypto/http.cpp
+        include/krypto/utils/http.h src/krypto/utils/http.cpp
         include/krypto/config.h
         include/krypto/exchanges/factory.h
         include/krypto/exchanges/base.h

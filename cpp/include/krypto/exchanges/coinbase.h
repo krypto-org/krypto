@@ -4,14 +4,14 @@
 
 #include <krypto/utils/common.h>
 #include <krypto/exchanges/base.h>
-#include <krypto/http.h>
+#include <krypto/utils/http.h>
 #include <nlohmann/json.hpp>
 #include <krypto/utils/types.h>
 
 namespace krypto::exchanges {
     class Coinbase : public Exchange<Coinbase> {
     private:
-        krypto::HttpClient http_client_;
+        krypto::utils::HttpClient http_client_;
         std::string endpoint_;
     public:
         explicit Coinbase(const Config &config, const std::string &environment);

@@ -22,68 +22,160 @@ namespace krypto::exchanges::coinbase {
         order_json["price"] = order.price;
         order_json["size"] = order.size;
         order_json["type"] = order.order_type;
+        order_json["post_only"] = order.post_only;
+        if (order.client_oid.has_value()) {
+            order_json["client_oid"] = order.client_oid.value();
+        }
+        if (order.self_trade_prevention_flag.has_value()) {
+            order_json["stp"] = order.self_trade_prevention_flag.value();
+        }
+        if (order.stop.has_value() && order.stop_price.has_value()) {
+            order_json["stop"] = order.stop.value();
+            order_json["stop_price"] = order.stop_price.value();
+        }
+        if (order.tif.has_value()) {
+            order_json["time_in_force"] = order.tif.value();
+        }
+        if (order.cancel_after.has_value()) {
+            order_json["cancel_after"] = order.cancel_after.value();
+        }
         return order_json.dump();
     }
 
-    std::optional<std::string> Api::get_products() {
-        return http_client_.get(inst_endpoint_, {});
-    }
-
-    std::optional<std::string> Api::get_balances() {
-        return get_balances("");
-    }
-
-    std::optional<std::string> Api::get_balances(const std::string &account) {
+    std::optional<std::string>
+    Api::send_authenticated_request(
+            const std::string &request_type,
+            const std::string &endpoint,
+            const std::string &data) {
         std::unordered_map<std::string, std::string> headers;
-        std::string ts = krypto::exchanges::coinbase::Authenticator::get_timestamp();
-        std::string endpoint = "/accounts" + (account.empty() ? "" : "/" + account);
-        std::optional<std::string> sign = authenticator_.sign(
-                ts, "GET", endpoint, "");
-        if (!sign.has_value()) {
-            return std::nullopt;
-        }
-        headers["CB-ACCESS-KEY"] = authenticator_.key();
-        headers["CB-ACCESS-PASSPHRASE"] = authenticator_.passphrase();
-        headers["CB-ACCESS-SIGN"] = sign.value();
-        headers["CB-ACCESS-TIMESTAMP"] = ts;
-        return http_client_.get(endpoint, headers);
-    }
-
-    std::optional<std::string> Api::get_balances_history(const std::string &account) {
-        return get_balances(account + "/ledger");
-    }
-
-    std::optional<std::string> Api::send_limit_order(const Order &order) {
-        std::unordered_map<std::string, std::string> headers;
-        std::optional<nlohmann::json> server_time = get_time();
-        if (!server_time.has_value()) {
-            return std::nullopt;
-        }
         std::string ts = Authenticator::get_timestamp();
-        std::string order_str = create_order_message(order);
         std::optional<std::string> sign = authenticator_.sign(
-                ts, "POST", orders_endpoint_, order_str);
-
+                ts, request_type, endpoint, data);
         if (!sign.has_value()) {
             return std::nullopt;
         }
-
-        KRYP_LOG(info, "{} | {} | {} | {}",
-                 authenticator_.key(),
-                 authenticator_.passphrase(), sign.value(), ts);
-
         headers["CB-ACCESS-KEY"] = authenticator_.key();
         headers["CB-ACCESS-PASSPHRASE"] = authenticator_.passphrase();
         headers["CB-ACCESS-SIGN"] = sign.value();
         headers["CB-ACCESS-TIMESTAMP"] = ts;
-        auto response = http_client_.post(orders_endpoint_, order_str, headers);
-        if (!response.has_value()) {
-            KRYP_LOG(error, "No response");
+        if (request_type == "GET") {
+            return http_client_.get(endpoint, headers);
+        } else if (request_type == "POST") {
+            return http_client_.post(endpoint, data, headers);
+        } else if (request_type == "DELETE") {
+            return http_client_.delete_(endpoint, headers);
         }
-        return response;
+        return std::nullopt;
     }
 
     std::optional<nlohmann::json> Api::get_time() {
-        return nlohmann::json::parse(http_client_.get("/time", {}).value());
+        auto result = http_client_.get("/time", {});
+        if (result.has_value())
+            return nlohmann::json::parse(result.value());
+        return std::nullopt;
     }
+
+    std::optional<nlohmann::json> Api::get_products() {
+        auto result = http_client_.get(inst_endpoint_, {});
+        if (result.has_value())
+            return nlohmann::json::parse(result.value());
+        return std::nullopt;
+    }
+
+    std::optional<nlohmann::json> Api::get_accounts() {
+        return get_account("");
+    }
+
+    std::optional<nlohmann::json> Api::get_account(const std::string &account) {
+        std::string endpoint = "/accounts" + (account.empty() ? "" : "/" + account);
+        auto result = send_authenticated_request("GET", endpoint, "");
+        if (result.has_value())
+            return nlohmann::json::parse(result.value());
+        return std::nullopt;
+    }
+
+    std::optional<nlohmann::json> Api::get_account_history(const std::string &account) {
+        return get_account(account + "/ledger");
+    }
+
+    std::optional<nlohmann::json> Api::place_order(const Order &order) {
+        auto order_str = create_order_message(order);
+        auto result = send_authenticated_request("POST", orders_endpoint_, order_str);
+        if (result.has_value())
+            return nlohmann::json::parse(result.value());
+        return std::nullopt;
+    }
+
+    std::optional<nlohmann::json> Api::get_account_holds(const std::string &account) {
+        return get_account(account + "/holds");
+    }
+
+    std::optional<nlohmann::json> Api::cancel_order(const std::string &order_id) {
+        std::string endpoint = orders_endpoint_ + "/" + order_id;
+        auto result = send_authenticated_request("DELETE", orders_endpoint_, "");
+        if (result.has_value())
+            return nlohmann::json::parse(result.value());
+        return std::nullopt;
+    }
+
+    std::optional<nlohmann::json> Api::cancel_all(std::optional<std::string> product_id) {
+        std::stringstream ss;
+        ss << orders_endpoint_;
+        if (product_id.has_value()) {
+            ss << "?product_id=";
+            ss << product_id.value();
+        }
+        auto result = send_authenticated_request("DELETE", ss.str(), "");
+        if (result.has_value())
+            return nlohmann::json::parse(result.value());
+        return std::nullopt;
+    }
+
+    std::optional<nlohmann::json>
+    Api::get_order(const std::optional<std::string> &status) {
+        std::stringstream ss;
+        ss << orders_endpoint_;
+        if (status.has_value()) {
+            ss << "?status=";
+            ss << status.value();
+        }
+        auto result = send_authenticated_request("GET", ss.str(), "");
+        if (result.has_value())
+            return nlohmann::json::parse(result.value());
+        return std::nullopt;
+    }
+
+    std::optional<nlohmann::json> Api::get_order(const std::string &product_id,
+                                                 const std::optional<std::string> &status) {
+        std::stringstream ss;
+        ss << orders_endpoint_;
+        ss << "?product_id=";
+        ss << product_id;
+        if (status.has_value()) {
+            ss << "&status=";
+            ss << status.value();
+        }
+        auto result = send_authenticated_request("GET", ss.str(), "");
+        if (result.has_value())
+            return nlohmann::json::parse(result.value());
+        return std::nullopt;
+    }
+
+    std::optional<nlohmann::json> Api::get_fills_for_order(const std::string &order_id) {
+        std::string endpoint = "/fills?order_id=" + order_id;
+        auto result = send_authenticated_request("GET", endpoint, "");
+        if (result.has_value())
+            return nlohmann::json::parse(result.value());
+        return std::nullopt;
+    }
+
+    std::optional<nlohmann::json> Api::get_fills_for_product(const std::string &product_id) {
+        std::string endpoint = "/fills?product_id=" + product_id;
+        auto result = send_authenticated_request("GET", endpoint, "");
+        if (result.has_value())
+            return nlohmann::json::parse(result.value());
+        return std::nullopt;
+    }
+
+
 }
