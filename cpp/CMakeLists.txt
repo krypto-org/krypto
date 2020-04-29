@@ -71,7 +71,7 @@ add_library(krypto STATIC
         src/krypto/network/mktdata/snap.cpp
         include/krypto/mktdata/pub.h
         src/krypto/mktdata/pub.cpp
-        include/krypto/http.h src/krypto/http.cpp
+        include/krypto/utils/http.h src/krypto/utils/http.cpp
         include/krypto/config.h
         include/krypto/exchanges/factory.h
         include/krypto/exchanges/base.h
@@ -103,7 +103,7 @@ add_library(krypto STATIC
         include/krypto/orders/client.h
         include/krypto/utils/id_gen.h
         include/krypto/orders/gateway.h include/krypto/mktdata/gateway.h include/krypto/serialization/helper.h
-        src/krypto/serialization/helper.cpp include/krypto/pricing/ewma.h src/krypto/pricing/ewma.cpp include/krypto/pricing/pub.h src/krypto/pricing/pub.cpp include/krypto/pricing/server.h include/krypto/pricing/client.h src/krypto/pricing/client.cpp)
+        src/krypto/serialization/helper.cpp include/krypto/pricing/ewma.h src/krypto/pricing/ewma.cpp include/krypto/pricing/pub.h src/krypto/pricing/pub.cpp include/krypto/pricing/server.h include/krypto/pricing/client.h src/krypto/pricing/client.cpp src/krypto/exchanges/coinbase/auth.cpp include/krypto/exchanges/coinbase/auth.h include/krypto/exchanges/coinbase/api.h src/krypto/exchanges/coinbase/api.cpp include/krypto/exchanges/coinbase/types.h)
 target_link_libraries(krypto Threads::Threads)
 
 add_library(crypto STATIC IMPORTED include/krypto/mktdata/coinbase/book_builder.h)
@@ -145,6 +145,11 @@ target_link_libraries(krypto-sim-orders krypto CONAN_PKG::boost ssl crypto dl CO
 add_executable(krypto-pricing-server src/apps/pricing/krypto_pricing_server_main.cpp)
 target_link_libraries(krypto-pricing-server krypto CONAN_PKG::boost ssl crypto dl CONAN_PKG::bzip2 CONAN_PKG::zlib CONAN_PKG::tbb CONAN_PKG::zmq CONAN_PKG::cppzmq Threads::Threads)
 
+# Unit tests
+add_executable(krypto-test-auth src/tests/test_auth.cpp)
+target_link_libraries(krypto-test-auth krypto CONAN_PKG::boost ssl crypto dl CONAN_PKG::bzip2 CONAN_PKG::zlib CONAN_PKG::tbb CONAN_PKG::zmq CONAN_PKG::cppzmq CONAN_PKG::cryptopp CONAN_PKG::catch2 Threads::Threads)
+
+
 # Examples
 
 add_executable(mktdata-printer src/examples/mktdata_printer_main.cpp)
@@ -161,3 +166,6 @@ target_link_libraries(sim-order-client krypto CONAN_PKG::boost ssl crypto dl CON
 
 add_executable(theo-client src/examples/theo_printer_main.cpp)
 target_link_libraries(theo-client krypto CONAN_PKG::boost ssl crypto dl CONAN_PKG::bzip2 CONAN_PKG::zlib CONAN_PKG::tbb CONAN_PKG::zmq CONAN_PKG::cppzmq Threads::Threads)
+
+add_executable(coinbase-api-test src/examples/coinbase_api_main.cpp)
+target_link_libraries(coinbase-api-test krypto CONAN_PKG::boost ssl crypto dl CONAN_PKG::bzip2 CONAN_PKG::zlib CONAN_PKG::tbb CONAN_PKG::zmq CONAN_PKG::cppzmq CONAN_PKG::cryptopp Threads::Threads)

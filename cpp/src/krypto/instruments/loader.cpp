@@ -13,7 +13,8 @@ std::vector<krypto::utils::Instrument> krypto::instruments::InstrumentLoader::lo
         if (et == krypto::serialization::Exchange::Exchange_SIM) {
             continue;
         }
-        auto exchange = krypto::exchanges::ExchangeFactory::make(et, config_);
+        auto exchange = krypto::exchanges::ExchangeFactory::make(
+                et, config_, "production");
         auto instruments = exchange.instruments();
 
         result.insert(result.end(), std::begin(instruments), std::end(instruments));

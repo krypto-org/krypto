@@ -4,33 +4,35 @@
 
 #include <krypto/utils/common.h>
 #include <krypto/exchanges/base.h>
-#include <krypto/http.h>
+#include <krypto/utils/http.h>
 #include <nlohmann/json.hpp>
 #include <krypto/utils/types.h>
 
 namespace krypto::exchanges {
     class Coinbase : public Exchange<Coinbase> {
     private:
-        krypto::HttpClient http_client_;
+        krypto::utils::HttpClient http_client_;
         std::string endpoint_;
     public:
-        explicit Coinbase(const Config &config);
+        explicit Coinbase(const Config &config, const std::string &environment);
 
         std::vector<krypto::utils::Instrument> read_instruments();
 
         static const krypto::serialization::Exchange key = krypto::serialization::Exchange::Exchange_COINBASE;
     };
 
-    Coinbase::Coinbase(const Config &config) : Coinbase::Exchange(),
-                                               http_client_{
-                                                       config.at<std::string>("/exchanges/coinbase/rest/base_url")},
-                                               endpoint_{config.at<std::string>(
-                                                       "/exchanges/coinbase/rest/channels/instruments")} {}
+    Coinbase::Coinbase(const Config &config, const std::string &environment) :
+            Coinbase::Exchange(),
+            http_client_{
+                    config.at<std::string>(
+                            "/exchanges/coinbase/rest/base_url" + environment)},
+            endpoint_{config.at<std::string>(
+                    "/exchanges/coinbase/rest/channels/instruments")} {}
 
     std::vector<krypto::utils::Instrument> Coinbase::read_instruments() {
         std::vector<krypto::utils::Instrument> result;
 
-        auto insts = http_client_.get("/" + endpoint_);
+        auto insts = http_client_.get("/" + endpoint_, {});
 
         if (insts.has_value()) {
             nlohmann::json insts_json = nlohmann::json::parse(insts.value());

@@ -10,6 +10,8 @@ websocketpp/0.8.1@kapilsh/release
 flatbuffers/1.11.0@kapilsh/release
 zmq/4.2.5@kapilsh/release
 cppzmq/4.3.0@kapilsh/release
+cryptopp/8.20@kapilsh/release
+catch2/2.4.2@kapilsh/release
 
 [generators]
 cmake
