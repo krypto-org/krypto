@@ -16,10 +16,10 @@ public class TheoreticalSnapshotTable extends JTable {
 
     static {
         COLUMN_COLORS = new HashMap<>();
-        COLUMN_COLORS.put(Column.MM_BID, ColorConstants.BID_PRICE_COLUMN_COLOR);
-        COLUMN_COLORS.put(Column.MM_ASK, ColorConstants.ASK_PRICE_COLUMN_COLOR);
-        COLUMN_COLORS.put(Column.BID_LIQUIDITY, ColorConstants.BID_QUANTITY_COLUMN_COLOR);
-        COLUMN_COLORS.put(Column.ASK_LIQUIDITY, ColorConstants.ASK_QUANTITY_COLUMN_COLOR);
+        COLUMN_COLORS.put(Column.MM_BID, ColorConstants.THEO_BID_BACKGROUND_COLOR);
+        COLUMN_COLORS.put(Column.MM_ASK, ColorConstants.THEO_ASK_BACKGROUND_COLOR);
+        COLUMN_COLORS.put(Column.BID_LIQUIDITY, ColorConstants.THEO_BID_BACKGROUND_COLOR);
+        COLUMN_COLORS.put(Column.ASK_LIQUIDITY, ColorConstants.THEO_ASK_BACKGROUND_COLOR);
         COLUMN_COLORS.put(Column.ERROR, ColorConstants.TOTAL_COLOR);
         COLUMN_COLORS.put(Column.WIDTH_MULT, ColorConstants.TOTAL_COLOR);
 

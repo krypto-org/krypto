@@ -1,6 +1,5 @@
 package krypto.ui.mktdata;
 
-import krypto.ui.components.CenterAlignedTableCellRenderer;
 import krypto.ui.components.ColorConstants;
 import krypto.ui.components.ColoredColumnTableCellRenderer;
 
@@ -16,10 +15,10 @@ public class MktdataSheetTable extends JTable {
 
     static {
         COLUMN_COLORS = new HashMap<>();
-        COLUMN_COLORS.put(Column.BID, ColorConstants.BID_PRICE_COLUMN_COLOR);
-        COLUMN_COLORS.put(Column.ASK, ColorConstants.ASK_PRICE_COLUMN_COLOR);
-        COLUMN_COLORS.put(Column.BID_QUANTITY, ColorConstants.BID_QUANTITY_COLUMN_COLOR);
-        COLUMN_COLORS.put(Column.ASK_QUANTITY, ColorConstants.ASK_QUANTITY_COLUMN_COLOR);
+        COLUMN_COLORS.put(Column.BID, ColorConstants.BID_BACKGROUND_COLOR);
+        COLUMN_COLORS.put(Column.ASK, ColorConstants.ASK_BACKGROUND_COLOR);
+        COLUMN_COLORS.put(Column.BID_QUANTITY, ColorConstants.BID_BACKGROUND_COLOR);
+        COLUMN_COLORS.put(Column.ASK_QUANTITY, ColorConstants.ASK_BACKGROUND_COLOR);
         COLUMN_COLORS.put(Column.LAST, ColorConstants.TOTAL_COLOR);
         COLUMN_COLORS.put(Column.LAST_QUANTITY, ColorConstants.TOTAL_COLOR);
     }

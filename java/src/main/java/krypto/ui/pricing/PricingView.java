@@ -9,13 +9,15 @@ import net.miginfocom.swing.MigLayout;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
+import java.util.Objects;
 
 public class PricingView extends LiveFrame {
 
     private final UIDataCache uiDataCache;
     private final TheoreticalSnapshotTableModel theoreticalSnapshotTableModel;
+    private final PricingChartPanel chartPanel;
 
-    public PricingView(final UIDataCache uiDataCache)  {
+    public PricingView(final UIDataCache uiDataCache) {
         this.setTitle("PRICING");
         this.uiDataCache = uiDataCache;
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -39,6 +41,9 @@ public class PricingView extends LiveFrame {
         tableScrollPane.setViewportView(theoreticalSnapshotTable);
 
         contentPane.add(tableScrollPane, "cell 0 0 1 1");
+
+        this.chartPanel = new PricingChartPanel();
+        contentPane.add(chartPanel, "cell 0 1 1 1");
     }
 
     @Override
@@ -53,6 +58,20 @@ public class PricingView extends LiveFrame {
                             .fireTableRowsUpdated(
                                     0, this.theoreticalSnapshotTableModel.getRowCount() - 1);
                     this.theoreticalSnapshotTableModel.updateScaledTheoRatio();
+                    this.uiDataCache.getActiveInstruments(false)
+                            .entrySet().stream().filter(
+                            e -> Objects.equals(e.getValue().exchangeSymbol(), "BTC-USD"))
+                            .findFirst().ifPresent(e -> {
+                        var id = e.getValue().id();
+                        if (this.uiDataCache.getTheos().containsKey(id)) {
+                            this.chartPanel.updateTheoSnapshot(this.uiDataCache.getTheos().get(id));
+                        }
+                        if (this.uiDataCache.getQuotes().containsKey(id)) {
+                            this.chartPanel.updateQuote(this.uiDataCache.getQuotes().get(id));
+                        }
+                    });
+
+
                 });
     }
 }

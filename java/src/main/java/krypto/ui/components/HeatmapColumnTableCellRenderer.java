@@ -8,8 +8,8 @@ import java.util.Map;
 
 public class HeatmapColumnTableCellRenderer extends DefaultTableCellRenderer {
 
-    private static final Color BLUE = ColorConstants.CustomColors.APPLICATION_BLUE;
-    private static final Color RED = ColorConstants.CustomColors.APPLICATION_RED;
+    private static final Color BLUE = ColorConstants.CustomColors.DARK_BLUE;
+    private static final Color RED = ColorConstants.CustomColors.DARK_RED;
 
     private static final double SCALE = 1.0;
 
