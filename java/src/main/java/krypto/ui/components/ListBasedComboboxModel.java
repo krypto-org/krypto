@@ -6,7 +6,7 @@ import java.util.List;
 public class ListBasedComboboxModel extends DefaultComboBoxModel<String>
 {
 
-	private List<String> comboboxItems;
+	private final List<String> comboboxItems;
 
 	public ListBasedComboboxModel(List<String> items)
 	{
