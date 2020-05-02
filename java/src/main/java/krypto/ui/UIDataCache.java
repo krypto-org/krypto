@@ -16,6 +16,7 @@ public class UIDataCache implements
     private final Map<Long, Quote> quotes;
     private final Map<Long, TheoreticalSnapshot> theos;
     private final SortedMap<Long, Instrument> instruments;
+    private final Map<String, Long> symbolToInstrumentIdMapping;
     private final Set<Long> activeInstruments;
 
     public UIDataCache(final InstrumentsClient instrumentsClient) {
@@ -23,6 +24,7 @@ public class UIDataCache implements
         this.instruments = new TreeMap<>();
         this.quotes = new ConcurrentHashMap<>();
         this.theos = new ConcurrentHashMap<>();
+        this.symbolToInstrumentIdMapping = new HashMap<>();
         this.activeInstruments = new HashSet<>();
     }
 
@@ -63,6 +65,7 @@ public class UIDataCache implements
             this.instruments.values().forEach(inst -> {
                 if (inst.active()) {
                     activeInstruments.add(inst.id());
+                    symbolToInstrumentIdMapping.put(inst.symbol(), inst.id());
                 }
             });
         }
@@ -73,6 +76,10 @@ public class UIDataCache implements
         return this.getInstruments(reloadCache).values().stream().filter(
                 Instrument::active).collect(
                         Collectors.toMap(Instrument::id, instrument -> instrument));
+    }
+
+    public Map<String, Long> getSymbolToInstrumentIdMapping() {
+        return symbolToInstrumentIdMapping;
     }
 
     public Map<Long, Quote> getQuotes() {

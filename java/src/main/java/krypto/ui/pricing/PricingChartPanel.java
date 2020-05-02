@@ -5,9 +5,9 @@ import krypto.serialization.Quote;
 import krypto.serialization.TheoreticalSnapshot;
 import krypto.ui.components.ColorConstants;
 import net.miginfocom.swing.MigLayout;
-import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
+import org.jfree.chart.axis.DateAxis;
 import org.jfree.chart.axis.NumberAxis;
 import org.jfree.chart.axis.ValueAxis;
 import org.jfree.chart.plot.PlotOrientation;
@@ -15,79 +15,74 @@ import org.jfree.chart.plot.XYPlot;
 import org.jfree.chart.renderer.xy.XYItemRenderer;
 import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
 import org.jfree.data.time.Millisecond;
-import org.jfree.data.time.Second;
-import org.jfree.data.time.TimeSeries;
-import org.jfree.data.time.TimeSeriesCollection;
-import org.jfree.data.xy.XYDataset;
 
 import javax.swing.*;
-import java.awt.*;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 public class PricingChartPanel extends JPanel {
-    // TODO: TimeSeriesCollection
-    // TODO: Add rolling window
-    // TODO: Add new value
-    // TODO: Remove last value if past the time window
-    // 5 Lines - Theo Bid, Theo Offer, Actual Bid, Actual Offer, Mid
 
-    private final TimeSeries mmBidSeries;
-    private final TimeSeries mmAskSeries;
-    private final TimeSeries bidSeries;
-    private final TimeSeries askSeries;
-    private final TimeSeries theoSeries;
+    private final Map<Long, PricingChartData> dataByInstrument = new HashMap<>();
+    private final JFreeChart chart = createChart();
+    private final int numberOfValues;
+    private final long timeframe;
 
+    private long selectedInstrumentId;
     private long initialTimestamp;
 
-    public PricingChartPanel() {
-
-        this.mmBidSeries = new TimeSeries("MM Bid");
-        this.mmAskSeries = new TimeSeries("MM Ask");
-        this.bidSeries = new TimeSeries("Bid");
-        this.askSeries = new TimeSeries("Ask");
-        this.theoSeries = new TimeSeries("Theo");
-
-        final TimeSeriesCollection dataset = new TimeSeriesCollection();
-        dataset.addSeries(this.mmBidSeries);
-        dataset.addSeries(this.mmAskSeries);
-        dataset.addSeries(this.bidSeries);
-        dataset.addSeries(this.askSeries);
-        dataset.addSeries(this.theoSeries);
-
+    public PricingChartPanel(final int numberOfValues, final long timeframe) {
+        this.numberOfValues = numberOfValues;
+        this.timeframe = timeframe;
         this.setLayout(
                 new MigLayout("",
                         "[fill,grow]",
                         "[fill,grow]"));
-
-        JFreeChart chart = createChart(dataset);
         final ChartPanel chartPanel = new ChartPanel(chart);
         this.add(chartPanel, "cell 0 0 1 1");
+        this.initialTimestamp = this.getRoundedTimestamp(
+                System.currentTimeMillis());
     }
 
     public void updateTheoSnapshot(final TheoreticalSnapshot snapshot) {
-        final Millisecond now = new Millisecond(new Date(snapshot.timestamp() / 1000000));
-        this.mmBidSeries.addOrUpdate(now, snapshot.mmBaseBid());
-        this.mmAskSeries.addOrUpdate(now, snapshot.mmBaseAsk());
-        this.theoSeries.addOrUpdate(now, snapshot.price());
+        final long ts = this.getRoundedTimestamp(snapshot.timestamp());
+        final Millisecond now = new Millisecond(new Date(ts));
+        final PricingChartData chartData = this.dataByInstrument.computeIfAbsent(
+                snapshot.securityId(), k -> new PricingChartData());
+        chartData.getMmBidSeries().addOrUpdate(now, snapshot.mmBaseBid());
+        chartData.getMmAskSeries().addOrUpdate(now, snapshot.mmBaseAsk());
+        chartData.getTheoSeries().addOrUpdate(now, snapshot.price());
+        if (ts > initialTimestamp + numberOfValues * timeframe) {
+            removeDataForTimestamp(chartData);
+        }
     }
 
     public void updateQuote(final Quote quote) {
-        final Millisecond now = new Millisecond(new Date(quote.timestamp() / 1000000));
-        this.bidSeries.addOrUpdate(now, Conversion.convertPrice(quote.bid()));
-        this.askSeries.addOrUpdate(now, Conversion.convertPrice(quote.ask()));
+        final long ts = this.getRoundedTimestamp(quote.timestamp());
+        final Millisecond now = new Millisecond(new Date(ts));
+        final PricingChartData chartData = this.dataByInstrument.computeIfAbsent(
+                quote.securityId(), k -> new PricingChartData());
+        chartData.getBidSeries().addOrUpdate(now, Conversion.convertPrice(quote.bid()));
+        chartData.getAskSeries().addOrUpdate(now, Conversion.convertPrice(quote.ask()));
+        if (ts > initialTimestamp + numberOfValues * timeframe) {
+            removeDataForTimestamp(chartData);
+        }
     }
 
-    private JFreeChart createChart(final TimeSeriesCollection dataset) {
-        final JFreeChart result = ChartFactory.createTimeSeriesChart(
-                "Theo Snapshot",
-                "Time",
-                "Price",
-                dataset, false,
-                false,
-                false
-        );
+    private static JFreeChart createChart() {
+        final XYPlot plot = new XYPlot();
+        plot.setOrientation(PlotOrientation.VERTICAL);
 
-        final XYPlot plot = result.getXYPlot();
+        XYItemRenderer renderer = new XYLineAndShapeRenderer(
+                true, false);
+        plot.setRenderer(0, renderer);
+
+        ValueAxis domainAxis = new DateAxis("Time");
+        domainAxis.setAutoRange(true);
+        ValueAxis priceAxis = new NumberAxis("Price ($)");
+        plot.setDomainAxis(0, domainAxis);
+        plot.setRangeAxis(0, priceAxis);
+
         plot.getRenderer().setSeriesPaint(0,
                 ColorConstants.THEO_BID_BACKGROUND_COLOR);
         plot.getRenderer().setSeriesPaint(1,
@@ -102,7 +97,33 @@ public class PricingChartPanel extends JPanel {
         ValueAxis valueAxis = plot.getDomainAxis();
         valueAxis.setAutoRange(true);
 
-        return result;
+        return new JFreeChart("Theoretical Snapshot",
+                JFreeChart.DEFAULT_TITLE_FONT, plot, true);
     }
 
+    public void setSelectedInstrument(final long instrumentId) {
+        this.selectedInstrumentId = instrumentId;
+        if (this.dataByInstrument.containsKey(this.selectedInstrumentId)) {
+            final XYPlot plot = (XYPlot) this.chart.getPlot();
+            plot.setDataset(this.dataByInstrument.get(
+                    this.selectedInstrumentId).getDataset());
+            plot.mapDatasetToDomainAxis(0, 0);
+            plot.mapDatasetToRangeAxis(0, 0);
+        }
+    }
+
+    private long getRoundedTimestamp(final long timestampInNanos) {
+        final long tsInMillis = timestampInNanos / 1000000;
+        return (tsInMillis / this.timeframe) * this.timeframe;
+    }
+
+    private void removeDataForTimestamp(final PricingChartData chartData) {
+        final var removeTS = new Millisecond(new Date(initialTimestamp));
+        chartData.getMmBidSeries().delete(removeTS);
+        chartData.getMmAskSeries().delete(removeTS);
+        chartData.getTheoSeries().delete(removeTS);
+        chartData.getBidSeries().delete(removeTS);
+        chartData.getAskSeries().delete(removeTS);
+        initialTimestamp += timeframe;
+    }
 }

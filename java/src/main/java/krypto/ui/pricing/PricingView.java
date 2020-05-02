@@ -14,6 +14,7 @@ import java.util.Objects;
 public class PricingView extends LiveFrame {
 
     private final UIDataCache uiDataCache;
+    private final TheoreticalSnapshotTable theoreticalSnapshotTable;
     private final TheoreticalSnapshotTableModel theoreticalSnapshotTableModel;
     private final PricingChartPanel chartPanel;
 
@@ -34,7 +35,7 @@ public class PricingView extends LiveFrame {
         final var theoCellRenderer = new HeatmapColumnTableCellRenderer();
         this.theoreticalSnapshotTableModel = new TheoreticalSnapshotTableModel(
                 uiDataCache, theoCellRenderer);
-        final var theoreticalSnapshotTable = new TheoreticalSnapshotTable(
+        this.theoreticalSnapshotTable = new TheoreticalSnapshotTable(
                 theoreticalSnapshotTableModel, theoCellRenderer);
         theoreticalSnapshotTable.getTableHeader()
                 .setDefaultRenderer(new TableColumnHeaderRenderer());
@@ -42,8 +43,14 @@ public class PricingView extends LiveFrame {
 
         contentPane.add(tableScrollPane, "cell 0 0 1 1");
 
-        this.chartPanel = new PricingChartPanel();
+        this.chartPanel = new PricingChartPanel(4 * 10, 250);
         contentPane.add(chartPanel, "cell 0 1 1 1");
+
+        theoreticalSnapshotTable.setSelectionMode(
+                ListSelectionModel.SINGLE_INTERVAL_SELECTION);
+        theoreticalSnapshotTable.getSelectionModel().addListSelectionListener(
+                event -> this.updateProductSelection(
+                        theoreticalSnapshotTable.getSelectedRow()));
     }
 
     @Override
@@ -58,20 +65,23 @@ public class PricingView extends LiveFrame {
                             .fireTableRowsUpdated(
                                     0, this.theoreticalSnapshotTableModel.getRowCount() - 1);
                     this.theoreticalSnapshotTableModel.updateScaledTheoRatio();
-                    this.uiDataCache.getActiveInstruments(false)
-                            .entrySet().stream().filter(
-                            e -> Objects.equals(e.getValue().exchangeSymbol(), "BTC-USD"))
-                            .findFirst().ifPresent(e -> {
-                        var id = e.getValue().id();
-                        if (this.uiDataCache.getTheos().containsKey(id)) {
-                            this.chartPanel.updateTheoSnapshot(this.uiDataCache.getTheos().get(id));
-                        }
-                        if (this.uiDataCache.getQuotes().containsKey(id)) {
-                            this.chartPanel.updateQuote(this.uiDataCache.getQuotes().get(id));
-                        }
-                    });
 
+                    this.uiDataCache.getTheos().values().forEach(
+                            this.chartPanel::updateTheoSnapshot);
+                    this.uiDataCache.getQuotes().values().forEach(
+                            this.chartPanel::updateQuote);
 
+                    if (this.theoreticalSnapshotTable.getSelectedRows().length == 0) {
+                        this.theoreticalSnapshotTable.setRowSelectionInterval(0, 0);
+                    }
                 });
+    }
+
+    private void updateProductSelection(final int selectedRow) {
+        final String symbol = theoreticalSnapshotTableModel.getValueAt(
+                selectedRow,
+                TheoreticalSnapshotTable.Column.INSTRUMENT.ordinal()).toString();
+        final var id = this.uiDataCache.getSymbolToInstrumentIdMapping().get(symbol);
+        this.chartPanel.setSelectedInstrument(id);
     }
 }
