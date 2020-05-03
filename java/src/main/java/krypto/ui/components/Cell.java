@@ -2,8 +2,8 @@ package krypto.ui.components;
 
 public class Cell
 {
-	private int row;
-	private int column;
+	private final int row;
+	private final int column;
 
 	public Cell(int row, int column)
 	{

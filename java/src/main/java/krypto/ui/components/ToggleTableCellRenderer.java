@@ -4,7 +4,7 @@ import javax.swing.*;
 import java.awt.*;
 
 public class ToggleTableCellRenderer extends CenterAlignedTableCellRenderer {
-    private JToggleButton toggleButton = new JToggleButton();
+    private final JToggleButton toggleButton = new JToggleButton();
 
     private final int column;
     private final String onLabel;

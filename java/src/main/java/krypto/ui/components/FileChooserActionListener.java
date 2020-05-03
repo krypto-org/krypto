@@ -8,8 +8,8 @@ import java.io.File;
 
 public class FileChooserActionListener implements ActionListener
 {
-	private Component parent;
-	private JTextField textField;
+	private final Component parent;
+	private final JTextField textField;
 	private String defaultPath = ".";
 
 	public FileChooserActionListener(Component parent, JTextField textField)

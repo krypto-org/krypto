@@ -2,6 +2,7 @@ package krypto.ui;
 
 import krypto.ui.components.ImageButton;
 import krypto.ui.instruments.InstrumentsView;
+import krypto.ui.pricing.PricingView;
 import net.miginfocom.swing.MigLayout;
 
 import javax.swing.*;
@@ -11,7 +12,7 @@ import java.awt.event.ActionListener;
 
 public class NavigationPanel extends JPanel {
 
-    private static final String ANALYTICS_ICON_PATH = "/option_analytics.png";
+    private static final String PRICING_ICON_PATH = "/option_analytics.png";
     private static final String RISK_ICON_PATH = "/risk.png";
     private static final String INSTRUMENTS_ICON_PATH = "/instruments.png";
     private static final String MARKET_DATA_ICON_PATH = "/market_data.png";
@@ -20,16 +21,16 @@ public class NavigationPanel extends JPanel {
     private static final String TRADE_SHEETS_ICON_PATH = "/trade_sheets.png";
     public static final String STRATEGY_ICON_PATH = "/strategy.png";
 
-    private final UIDataCache uiDataCache;
-
     private final InstrumentsView instrumentsView;
+    private final PricingView pricingView;
     private boolean instrumentsViewVisible = false;
+    private boolean pricingViewVisible = false;
 
     NavigationPanel(final UIDataCache uiDataCache) {
         this.setLayout(new MigLayout("", "[fill,grow]", "[fill,grow]"));
-        this.uiDataCache = uiDataCache;
 
         this.instrumentsView = new InstrumentsView(uiDataCache);
+        this.pricingView = new PricingView(uiDataCache);
 
         this.initializeButtons();
     }
@@ -51,14 +52,14 @@ public class NavigationPanel extends JPanel {
         btnMarketData.setToolTipText("Market Data");
         this.add(btnMarketData, "cell 1 0 1 1");
 
-        final JButton btnCurves = new ImageButton(
+        final JButton btnPricing = new ImageButton(
                 Toolkit.getDefaultToolkit()
                         .getImage(this.getClass()
-                                .getResource(ANALYTICS_ICON_PATH)),
+                                .getResource(PRICING_ICON_PATH)),
                 40, 40);
-        btnCurves.addActionListener(e -> initializePricingWindow());
-        btnCurves.setToolTipText("Pricing");
-        this.add(btnCurves, "cell 2 0 1 1");
+        btnPricing.addActionListener(e -> initializePricingWindow());
+        btnPricing.setToolTipText("Pricing");
+        this.add(btnPricing, "cell 2 0 1 1");
 
         final JButton btnStrategy = new ImageButton(
                 Toolkit.getDefaultToolkit().getImage(
@@ -93,7 +94,7 @@ public class NavigationPanel extends JPanel {
         btnAudit.setToolTipText("Audit Log");
         this.add(btnAudit, "cell 6 0 1 1");
 
-        btnCurves.setEnabled(true);
+        btnPricing.setEnabled(true);
         btnRisk.setEnabled(true);
         btnInstruments.setEnabled(true);
         btnMarketData.setEnabled(true);
@@ -112,11 +113,15 @@ public class NavigationPanel extends JPanel {
     }
 
     private void initializeMarketDataWindow() {
-
     }
 
     private void initializePricingWindow() {
-
+        if (!pricingViewVisible) {
+            pricingView.setIconImage(Toolkit.getDefaultToolkit().getImage(
+                    NavigationPanel.class.getResource(PRICING_ICON_PATH)));
+            pricingViewVisible = true;
+        }
+        pricingView.setVisible(true);
     }
 
     private void initializeStrategyWindow() {
@@ -137,5 +142,6 @@ public class NavigationPanel extends JPanel {
 
     void refresh() {
         this.instrumentsView.refresh();
+        this.pricingView.startUpdates();
     }
 }

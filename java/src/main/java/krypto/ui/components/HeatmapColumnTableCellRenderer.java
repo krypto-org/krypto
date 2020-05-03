@@ -8,11 +8,8 @@ import java.util.Map;
 
 public class HeatmapColumnTableCellRenderer extends DefaultTableCellRenderer {
 
-    private static final Color BLUE = ColorConstants.CustomColors.APPLICATION_BLUE;
-    private static final Color RED = ColorConstants.CustomColors.APPLICATION_RED;
-
-//    private static final Color BLUE = new Color(0x4444ff);
-//    private static final Color RED = new Color(0xff4444);
+    private static final Color BLUE = ColorConstants.CustomColors.DARK_BLUE;
+    private static final Color RED = ColorConstants.CustomColors.DARK_RED;
 
     private static final double SCALE = 1.0;
 
@@ -47,17 +44,19 @@ public class HeatmapColumnTableCellRenderer extends DefaultTableCellRenderer {
     private static Color interpolateBgdColorSigned(final double z) {
         double ratio = Math.min(1.0, Math.abs(z / SCALE));
         Color result;
+        int red;
+        int green;
+        int blue;
         if (z > 0) {
-            int red = (int) (255 * (1 - ratio) + RED.getRed()* ratio);
-            int green = (int) (255 * (1 - ratio) + RED.getGreen() * ratio);
-            int blue = (int) (255 * (1 - ratio) + RED.getBlue() * ratio);
-            result = new Color(red, green, blue);
+            red = (int) (255 * (1 - ratio) + RED.getRed() * ratio);
+            green = (int) (255 * (1 - ratio) + RED.getGreen() * ratio);
+            blue = (int) (255 * (1 - ratio) + RED.getBlue() * ratio);
         } else {
-            int red = (int) (255 * (1 - ratio) + BLUE.getRed() * ratio);
-            int green = (int) (255 * (1 - ratio) + BLUE.getGreen() * ratio);
-            int blue = (int) (255 * (1 - ratio) + BLUE.getBlue() * ratio);
-            result = new Color(red, green, blue);
+            red = (int) (255 * (1 - ratio) + BLUE.getRed() * ratio);
+            green = (int) (255 * (1 - ratio) + BLUE.getGreen() * ratio);
+            blue = (int) (255 * (1 - ratio) + BLUE.getBlue() * ratio);
         }
+        result = new Color(red, green, blue);
 
         return result;
     }

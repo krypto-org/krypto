@@ -7,6 +7,7 @@ import krypto.serialization.*;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.stream.Collectors;
 
 public class UIDataCache implements
@@ -16,6 +17,7 @@ public class UIDataCache implements
     private final Map<Long, Quote> quotes;
     private final Map<Long, TheoreticalSnapshot> theos;
     private final SortedMap<Long, Instrument> instruments;
+    private final Map<String, Long> symbolToInstrumentIdMapping;
     private final Set<Long> activeInstruments;
 
     public UIDataCache(final InstrumentsClient instrumentsClient) {
@@ -23,7 +25,8 @@ public class UIDataCache implements
         this.instruments = new TreeMap<>();
         this.quotes = new ConcurrentHashMap<>();
         this.theos = new ConcurrentHashMap<>();
-        this.activeInstruments = new HashSet<>();
+        this.symbolToInstrumentIdMapping = new ConcurrentHashMap<>();
+        this.activeInstruments = new ConcurrentSkipListSet<>();
     }
 
     @Override
@@ -63,23 +66,28 @@ public class UIDataCache implements
             this.instruments.values().forEach(inst -> {
                 if (inst.active()) {
                     activeInstruments.add(inst.id());
+                    symbolToInstrumentIdMapping.put(inst.symbol(), inst.id());
                 }
             });
         }
         return instruments;
     }
 
-    Map<Long, Instrument> getActiveInstruments(final boolean reloadCache) {
+    public Map<Long, Instrument> getActiveInstruments(final boolean reloadCache) {
         return this.getInstruments(reloadCache).values().stream().filter(
                 Instrument::active).collect(
                         Collectors.toMap(Instrument::id, instrument -> instrument));
     }
 
-    Map<Long, Quote> getQuotes() {
+    public Map<String, Long> getSymbolToInstrumentIdMapping() {
+        return symbolToInstrumentIdMapping;
+    }
+
+    public Map<Long, Quote> getQuotes() {
         return quotes;
     }
 
-    Map<Long, TheoreticalSnapshot> getTheos() {
+    public Map<Long, TheoreticalSnapshot> getTheos() {
         return theos;
     }
 }

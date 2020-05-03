@@ -5,6 +5,7 @@ import krypto.network.MessageType;
 import krypto.serialization.Instrument;
 import krypto.serialization.Quote;
 import krypto.serialization.TheoreticalSnapshot;
+import krypto.ui.DisplayConstants;
 import krypto.ui.components.HeatmapColumnTableCellRenderer;
 import krypto.ui.components.LiveUpdatedTableModel;
 import krypto.ui.components.ReadOnlyTableModel;
@@ -16,9 +17,6 @@ import java.util.Map;
 import java.util.SortedMap;
 
 public class MktdataSheetTableModel extends ReadOnlyTableModel {
-
-    private final DecimalFormat PRICE_FORMAT = new DecimalFormat("0.0000");
-    private final DecimalFormat QUANTITY_FORMAT = new DecimalFormat("0.0000");
 
     private final Map<Long, Instrument> instruments;
     private final Map<Long, Quote> quotes;
@@ -49,7 +47,7 @@ public class MktdataSheetTableModel extends ReadOnlyTableModel {
     public void updateInstruments(final SortedMap<Long, Instrument> instruments) {
         instruments.forEach(this.instruments::put);
         int row = 0;
-        for (final Instrument inst: this.instruments.values()) {
+        for (final Instrument inst : this.instruments.values()) {
             this.instrumentIdToRowNums.put(row++, inst.id());
         }
         this.fireTableRowsUpdated(0, this.getRowCount() - 1);
@@ -67,29 +65,21 @@ public class MktdataSheetTableModel extends ReadOnlyTableModel {
                 final Quote quote = this.quotes.get(instId);
                 switch (col) {
                     case BID:
-                        return PRICE_FORMAT.format(Conversion.convertPrice(quote.bid()));
+                        return DisplayConstants.PRICE_FORMAT.format(Conversion.convertPrice(quote.bid()));
                     case BID_QUANTITY:
-                        return QUANTITY_FORMAT.format(Conversion.convertQuantity(quote.bidQuantity()));
-                    case THEO_BID:
-                        return this.theos.containsKey(instId) ?
-                                PRICE_FORMAT.format(
-                                        this.theos.get(instId).mmBaseBid()) : Double.NaN;
+                        return DisplayConstants.QUANTITY_FORMAT.format(Conversion.convertQuantity(quote.bidQuantity()));
                     case THEO:
                         return this.theos.containsKey(instId) ?
-                                PRICE_FORMAT.format(
+                                DisplayConstants.PRICE_FORMAT.format(
                                         this.theos.get(instId).price()) : Double.NaN;
-                    case THEO_ASK:
-                        return this.theos.containsKey(instId) ?
-                                PRICE_FORMAT.format(
-                                        this.theos.get(instId).mmBaseAsk()) : Double.NaN;
                     case ASK:
-                        return PRICE_FORMAT.format(Conversion.convertPrice(quote.ask()));
+                        return DisplayConstants.PRICE_FORMAT.format(Conversion.convertPrice(quote.ask()));
                     case ASK_QUANTITY:
-                        return QUANTITY_FORMAT.format(Conversion.convertQuantity(quote.askQuantity()));
+                        return DisplayConstants.QUANTITY_FORMAT.format(Conversion.convertQuantity(quote.askQuantity()));
                     case LAST:
-                        return PRICE_FORMAT.format(Conversion.convertPrice(quote.last()));
+                        return DisplayConstants.PRICE_FORMAT.format(Conversion.convertPrice(quote.last()));
                     case LAST_QUANTITY:
-                        return QUANTITY_FORMAT.format(Conversion.convertQuantity(quote.lastQuantity()));
+                        return DisplayConstants.QUANTITY_FORMAT.format(Conversion.convertQuantity(quote.lastQuantity()));
                     default:
                         return Double.NaN;
                 }
@@ -111,13 +101,13 @@ public class MktdataSheetTableModel extends ReadOnlyTableModel {
 
     public void updateScaledTheoRatio() {
         final Map<Integer, Double> theoScaledValues = new HashMap<>();
-        for (int row =0; row< this.getRowCount(); ++row) {
+        for (int row = 0; row < this.getRowCount(); ++row) {
             final long instId = this.instrumentIdToRowNums.get(row);
             if (this.quotes.containsKey(instId) && this.theos.containsKey(instId)) {
                 final Quote quote = this.quotes.get(instId);
                 final TheoreticalSnapshot theoSnapshot = this.theos.get(instId);
 
-                final double bid  = Conversion.convertPrice(quote.bid());
+                final double bid = Conversion.convertPrice(quote.bid());
                 final double ask = Conversion.convertPrice(quote.ask());
                 final double diff = (ask - bid);
 
