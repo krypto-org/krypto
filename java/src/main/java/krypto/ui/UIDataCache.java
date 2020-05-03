@@ -7,6 +7,7 @@ import krypto.serialization.*;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.stream.Collectors;
 
 public class UIDataCache implements
@@ -24,8 +25,8 @@ public class UIDataCache implements
         this.instruments = new TreeMap<>();
         this.quotes = new ConcurrentHashMap<>();
         this.theos = new ConcurrentHashMap<>();
-        this.symbolToInstrumentIdMapping = new HashMap<>();
-        this.activeInstruments = new HashSet<>();
+        this.symbolToInstrumentIdMapping = new ConcurrentHashMap<>();
+        this.activeInstruments = new ConcurrentSkipListSet<>();
     }
 
     @Override

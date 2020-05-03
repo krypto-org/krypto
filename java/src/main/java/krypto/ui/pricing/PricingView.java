@@ -13,6 +13,8 @@ import java.util.Objects;
 
 public class PricingView extends LiveFrame {
 
+    private static final int NUMBER_OF_VALUES = 30;
+
     private final UIDataCache uiDataCache;
     private final TheoreticalSnapshotTable theoreticalSnapshotTable;
     private final TheoreticalSnapshotTableModel theoreticalSnapshotTableModel;
@@ -40,17 +42,21 @@ public class PricingView extends LiveFrame {
         theoreticalSnapshotTable.getTableHeader()
                 .setDefaultRenderer(new TableColumnHeaderRenderer());
         tableScrollPane.setViewportView(theoreticalSnapshotTable);
-
-        contentPane.add(tableScrollPane, "cell 0 0 1 1");
-
-        this.chartPanel = new PricingChartPanel(4 * 10, 250);
-        contentPane.add(chartPanel, "cell 0 1 1 1");
-
         theoreticalSnapshotTable.setSelectionMode(
                 ListSelectionModel.SINGLE_INTERVAL_SELECTION);
         theoreticalSnapshotTable.getSelectionModel().addListSelectionListener(
                 event -> this.updateProductSelection(
                         theoreticalSnapshotTable.getSelectedRow()));
+
+        this.chartPanel = new PricingChartPanel(NUMBER_OF_VALUES);
+
+        final JSplitPane splitPane = new JSplitPane(
+                JSplitPane.VERTICAL_SPLIT,
+                tableScrollPane,
+                chartPanel);
+        splitPane.setDividerLocation(0.5);
+        splitPane.setResizeWeight(0.5);
+        contentPane.add(splitPane, "cell 0 0 1 1");
     }
 
     @Override
@@ -73,6 +79,7 @@ public class PricingView extends LiveFrame {
 
                     if (this.theoreticalSnapshotTable.getSelectedRows().length == 0) {
                         this.theoreticalSnapshotTable.setRowSelectionInterval(0, 0);
+                        this.updateProductSelection(0);
                     }
                 });
     }
