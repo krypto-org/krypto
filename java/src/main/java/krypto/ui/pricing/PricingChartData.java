@@ -5,7 +5,6 @@ import org.jfree.data.time.TimeSeriesCollection;
 
 public class PricingChartData {
     private final TimeSeries mmBidSeries = new TimeSeries("MM Bid");
-
     private final TimeSeries mmAskSeries = new TimeSeries("MM Ask");
     private final TimeSeries bidSeries = new TimeSeries("Bid");
     private final TimeSeries askSeries = new TimeSeries("Ask");
