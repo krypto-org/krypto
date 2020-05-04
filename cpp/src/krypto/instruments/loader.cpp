@@ -14,7 +14,7 @@ std::vector<krypto::utils::Instrument> krypto::instruments::InstrumentLoader::lo
             continue;
         }
         auto exchange = krypto::exchanges::ExchangeFactory::make(
-                et, config_, "production");
+                et, config_, "/production");
         auto instruments = exchange.instruments();
 
         result.insert(result.end(), std::begin(instruments), std::end(instruments));
