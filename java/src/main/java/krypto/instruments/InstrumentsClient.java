@@ -64,12 +64,4 @@ public class InstrumentsClient {
                 ZMQ.SNDMORE);
         socket.send(SerializationUtil.serializeInstrumentRequestRequest(fb));
     }
-
-    public static void main(String[] args) {
-        final ZMQ.Context context = ZMQ.context(1);
-        final InstrumentsClient instrumentsClient = new InstrumentsClient(context, "tcp://localhost:12000");
-        instrumentsClient.getInstruments().forEach((id, inst) -> {
-            logger.info("{}: {}@{}", id, inst.symbol(), Exchange.name( inst.exchange()));
-        });
-    }
 }

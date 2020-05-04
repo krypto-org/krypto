@@ -11,4 +11,12 @@ public class Conversion {
     public static double convertQuantity(final long quantity) {
         return quantity / QUANTITY_MULT;
     }
+
+    public static long extractPrice(final double price) {
+        return (long) (price * PRICE_MULT);
+    }
+
+    public static long extractQuantity(final double quantity) {
+        return (long) (quantity * QUANTITY_MULT);
+    }
 }

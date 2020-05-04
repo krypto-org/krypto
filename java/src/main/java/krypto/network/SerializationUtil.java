@@ -2,6 +2,7 @@ package krypto.network;
 
 import com.google.flatbuffers.FlatBufferBuilder;
 import krypto.instruments.Request;
+import krypto.mktdata.Conversion;
 import krypto.serialization.*;
 
 public class SerializationUtil {
@@ -24,20 +25,37 @@ public class SerializationUtil {
     }
 
     public static byte[] serializeOrderRequest(
-            final FlatBufferBuilder bufferBuilder,
+            final FlatBufferBuilder builder,
+            final String orderId,
             final long securityId,
             final double price,
-            final int size,
-            final Side side,
-            final TimeInForce timeInForce) {
-        bufferBuilder.clear();
-        return bufferBuilder.sizedByteArray();
+            final double size,
+            final byte side,
+            final byte timeInForce) {
+        builder.clear();
+        int orderIdOffset = builder.createString(orderId);
+        OrderRequest.startOrderRequest(builder);
+        OrderRequest.addSecurityId(builder, securityId);
+        OrderRequest.addPrice(builder, Conversion.extractPrice(price));
+        OrderRequest.addQuantity(builder, Conversion.extractQuantity(size));
+        OrderRequest.addSide(builder, side);
+        OrderRequest.addTif(builder, timeInForce);
+        OrderRequest.addOrderId(builder, orderIdOffset);
+        int offset = OrderRequest.endOrderRequest(builder);
+        builder.finish(offset);
+        return builder.sizedByteArray();
     }
 
     public static byte[] serializeOrderCancelRequest(
-            final FlatBufferBuilder bufferBuilder, final String orderId) {
-        bufferBuilder.clear();
-        return bufferBuilder.sizedByteArray();
+            final FlatBufferBuilder builder, final String orderId) {
+        builder.clear();
+        int orderIdOffset = builder.createString(orderId);
+        OrderCancelRequest.startOrderCancelRequest(builder);
+        OrderCancelRequest.addOrderId(builder, orderIdOffset);
+        OrderCancelRequest.addTimestamp(builder, System.currentTimeMillis() * 1000000L);
+        int offset = OrderCancelRequest.endOrderCancelRequest(builder);
+        builder.finish(offset);
+        return builder.sizedByteArray();
     }
 
     public static byte[] serializeOrderReplaceRequest(
