@@ -1,0 +1,156 @@
+package krypto.orders;
+
+import com.google.flatbuffers.FlatBufferBuilder;
+import krypto.network.MessageType;
+import krypto.network.SerializationUtil;
+import krypto.network.SocketUtils;
+import krypto.serialization.OrderUpdate;
+import krypto.serialization.Side;
+import krypto.serialization.TimeInForce;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.zeromq.SocketType;
+import org.zeromq.ZMQ;
+
+import java.nio.ByteBuffer;
+import java.util.HashSet;
+import java.util.Set;
+
+public class OrderClient {
+    private static final Logger logger = LogManager.getLogger(OrderClient.class);
+    private static final int ORDER_ID_SIZE = 10;
+    private static final String queueEndpoint = "inproc://orders_queue";
+
+    private final Set<OrderListener> listeners = new HashSet<>();
+    private final FlatBufferBuilder fb = new FlatBufferBuilder();
+    private final OrderIdGenerator orderIdGenerator = new OrderIdGenerator(ORDER_ID_SIZE);
+    private final ZMQ.Context context;
+    private final ZMQ.Socket sender;
+    private final ZMQ.Socket queuePush;
+    private final ZMQ.Socket queuePull;
+    private final String orderGatewayEndpoint;
+    private final int timeoutInMillis;
+
+    private final Thread socketThread;
+
+    private volatile boolean running = false;
+
+    public OrderClient(
+            final ZMQ.Context context,
+            final String orderGatewayEndpoint,
+            final int timeoutInMillis) {
+        this.context = context;
+        this.sender = context.socket(SocketType.DEALER);
+        this.queuePush = context.socket(SocketType.PUSH);
+        this.queuePull = context.socket(SocketType.PULL);
+        this.orderGatewayEndpoint = orderGatewayEndpoint;
+        this.timeoutInMillis = timeoutInMillis;
+        this.socketThread = new Thread(this::pollSockets);
+    }
+
+    public void start() {
+        if (!this.running) {
+            this.socketThread.start();
+            this.running = true;
+        }
+    }
+
+    public void stop() {
+        if (this.running) {
+            this.running = false;
+            try {
+                this.socketThread.join();
+            } catch (final InterruptedException e) {
+                logger.error("Socket joining failed with error: {}", e.getMessage());
+            }
+        }
+    }
+
+    private void pollSockets() {
+        final var identity = SocketUtils.generateIdentity("orders");
+        SocketUtils.connect(sender, orderGatewayEndpoint, identity);
+        queuePull.bind(queueEndpoint);
+        queuePush.connect(queueEndpoint);
+
+        final ZMQ.Poller poller = context.poller(2);
+        poller.register(queuePull, ZMQ.Poller.POLLIN);
+        poller.register(sender, ZMQ.Poller.POLLIN);
+        poller.poll(this.timeoutInMillis);
+        while (running && !Thread.currentThread().isInterrupted()) {
+            if (poller.pollin(0)) {
+                final var exchange = queuePull.recvStr(ZMQ.DONTWAIT);
+                final var messageType = queuePull.recv(ZMQ.DONTWAIT)[0];
+                final var payload = queuePull.recv(ZMQ.DONTWAIT);
+
+                SocketUtils.sendEmptyFrame(sender, ZMQ.SNDMORE);
+                sender.sendMore(exchange);
+                SocketUtils.sendMessageType(sender, messageType, ZMQ.SNDMORE);
+                sender.send(payload);
+            }
+            if (poller.pollin(1)) {
+                final var empty = sender.recv(ZMQ.DONTWAIT);
+                final var exchange = sender.recvStr(ZMQ.DONTWAIT);
+                final var messageType = SocketUtils.receiveMessageType(sender);
+
+                if (messageType == MessageType.UNDEFINED) {
+                    logger.warn("Received undefine message type");
+                    continue;
+                }
+
+                if (messageType == MessageType.NO_PAYLOAD) {
+                    logger.warn("Received message with message type = NO_PAYLOAD");
+                    continue;
+                }
+
+                final var orderUpdate =
+                        OrderUpdate.getRootAsOrderUpdate(
+                                ByteBuffer.wrap(sender.recv(ZMQ.DONTWAIT)));
+
+                this.listeners.forEach(listener -> listener.handleOrderEvent(orderUpdate));
+            }
+        }
+    }
+
+    public String newOrder(
+            final String exchange,
+            final long securityId,
+            final double price,
+            final int size,
+            final Side side,
+            final TimeInForce timeInForce) {
+        final var orderId = orderIdGenerator.generate();
+        queuePush.send(exchange, ZMQ.SNDMORE);
+        SocketUtils.sendMessageType(queuePush, MessageType.ORDER_REQUEST, ZMQ.SNDMORE);
+        queuePush.send(
+                SerializationUtil.serializeOrderRequest(
+                        fb, securityId, price, size, side, timeInForce));
+        return orderId;
+    }
+
+    public void cancelOrder(final String exchange, final String orderId) {
+        queuePush.send(exchange, ZMQ.SNDMORE);
+        SocketUtils.sendMessageType(queuePush, MessageType.ORDER_CANCEL_REQUEST, ZMQ.SNDMORE);
+        queuePush.send(SerializationUtil.serializeOrderCancelRequest(fb, orderId));
+    }
+
+    public void replaceOrder(
+            final String exchange,
+            final String orderId,
+            final long securityId,
+            final double price,
+            final int size,
+            final Side side,
+            final TimeInForce timeInForce) {
+        queuePush.send(exchange, ZMQ.SNDMORE);
+        SocketUtils.sendMessageType(queuePush, MessageType.ORDER_REPLACE_REQUEST, ZMQ.SNDMORE);
+        queuePush.send(SerializationUtil.serializeOrderCancelRequest(fb, orderId));
+    }
+
+    public void registerListener(final OrderListener listener) {
+        this.listeners.add(listener);
+    }
+
+    public void unregisterListener(final OrderListener listener) {
+        this.listeners.remove(listener);
+    }
+}

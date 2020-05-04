@@ -23,7 +23,7 @@ public class InstrumentsClient {
         System.setProperty("logFilename", "krypto.instrument.client.test.log");
     }
 
-    private static Logger logger = LogManager.getLogger(InstrumentsClient.class);
+    private static final Logger logger = LogManager.getLogger(InstrumentsClient.class);
 
     private final FlatBufferBuilder fb = new FlatBufferBuilder();
     private final ZMQ.Socket socket;
