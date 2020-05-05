@@ -11,7 +11,7 @@ krypto::mktdata::coinbase::WsConnection::WsConnection(
         zmq::context_t& context,
         const krypto::Config &config,
         krypto::mktdata::coinbase::WsConnection::channel_t &update_channel) :
-        uri_{config.at<std::string>("/exchanges/coinbase/ws/base_url")},
+        uri_{config.at<std::string>("/exchanges/coinbase/ws/base_url/production")},
         status_{WsConnectionStatus::CLOSE},
         update_channel_{update_channel} {
 

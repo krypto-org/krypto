@@ -23,7 +23,7 @@ public class InstrumentsClient {
         System.setProperty("logFilename", "krypto.instrument.client.test.log");
     }
 
-    private static Logger logger = LogManager.getLogger(InstrumentsClient.class);
+    private static final Logger logger = LogManager.getLogger(InstrumentsClient.class);
 
     private final FlatBufferBuilder fb = new FlatBufferBuilder();
     private final ZMQ.Socket socket;
@@ -63,13 +63,5 @@ public class InstrumentsClient {
         SocketUtils.sendMessageType(socket, MessageType.INSTRUMENT_REQUEST,
                 ZMQ.SNDMORE);
         socket.send(SerializationUtil.serializeInstrumentRequestRequest(fb));
-    }
-
-    public static void main(String[] args) {
-        final ZMQ.Context context = ZMQ.context(1);
-        final InstrumentsClient instrumentsClient = new InstrumentsClient(context, "tcp://localhost:12000");
-        instrumentsClient.getInstruments().forEach((id, inst) -> {
-            logger.info("{}: {}@{}", id, inst.symbol(), Exchange.name( inst.exchange()));
-        });
     }
 }

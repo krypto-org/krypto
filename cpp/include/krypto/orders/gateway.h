@@ -96,7 +96,7 @@ namespace krypto::orders {
                 auto status = krypto::network::recv_status(*backend_);
 
                 if (status == krypto::network::SocketStatus::READY) {
-                    KRYP_LOG(info, "{} :: ready @ address", exchange);
+                    KRYP_LOG(info, "* <= {} :: ready @ address", exchange);
                     workers_[exchange] = exchange;
                 } else if (status == krypto::network::SocketStatus::DISCONNECT) {
                     KRYP_LOG(info, "{} :: disconnected", exchange);
@@ -118,8 +118,9 @@ namespace krypto::orders {
                     zmq::message_t payload;
                     backend_->recv(&payload);
                     if constexpr (Verbose) {
-                        KRYP_LOG(info, "{} :: received reply payload of size {}",
-                                 exchange, payload.size());
+                        KRYP_LOG(info, "{} <= * <= {} :: {} + Payload Size: {}",
+                                 client_addr, exchange,
+                                 krypto::utils::MsgTypeNames[static_cast<int>(msg_type)], payload.size());
                     }
                     frontend_->send(payload);
                 }
@@ -145,8 +146,12 @@ namespace krypto::orders {
                     krypto::network::send_empty_frame(*backend_, ZMQ_SNDMORE);
                     krypto::network::send_string(*backend_, client_addr, ZMQ_SNDMORE);
                     if constexpr (Verbose) {
-                        KRYP_LOG(info, "{} sending request to {}@{} with payload size {}",
-                                 client_addr, exchange, worker_addr, request_payload.size());
+                        KRYP_LOG(info, "{} => * => {} @ {} : {} + Payload Size: {}",
+                                 client_addr,
+                                 exchange,
+                                 worker_addr,
+                                 krypto::utils::MsgTypeNames[static_cast<int>(msg_type)],
+                                 request_payload.size());
                     }
                     krypto::network::send_msg_type(*backend_, msg_type, ZMQ_SNDMORE);
                     backend_->send(request_payload);
@@ -156,6 +161,11 @@ namespace krypto::orders {
                     krypto::network::send_empty_frame(*frontend_, ZMQ_SNDMORE);
                     krypto::network::send_string(*frontend_, exchange, ZMQ_SNDMORE);
                     krypto::network::send_msg_type(*frontend_, krypto::utils::MsgType::UNDEFINED);
+                    if constexpr (Verbose) {
+                        KRYP_LOG(info, "{} <= *",
+                                 client_addr,
+                                 krypto::utils::MsgTypeNames[static_cast<int>(msg_type)]);
+                    }
                 }
             }
         }
