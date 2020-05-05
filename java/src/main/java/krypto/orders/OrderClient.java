@@ -50,9 +50,10 @@ public class OrderClient {
 
     public void start() {
         if (!this.running) {
+            queuePush.setLinger(0);
             queuePush.connect(queueEndpoint);
-            this.socketThread.start();
             this.running = true;
+            this.socketThread.start();
         }
     }
 
@@ -71,28 +72,34 @@ public class OrderClient {
         final var identity = SocketUtils.generateIdentity("orders");
         SocketUtils.connect(sender, orderGatewayEndpoint, identity);
         queuePull.bind(queueEndpoint);
+        queuePull.setLinger(0);
+
+//        queuePull.setReceiveTimeOut(100);
+//        sender.setReceiveTimeOut(100);
 
         final ZMQ.Poller poller = context.poller(2);
         poller.register(queuePull, ZMQ.Poller.POLLIN);
-        poller.register(sender, ZMQ.Poller.POLLIN);
-        poller.poll();
-        while (running && !Thread.currentThread().isInterrupted()) {
+        poller.register(sender, ZMQ.Poller.POLLIN | ZMQ.Poller.POLLOUT);
+        poller.poll(1000);
+        while (running) {
+            logger.info("Poll 0");
             if (poller.pollin(0)) {
+                logger.info("Waiting for message .. ");
                 final var exchange = queuePull.recvStr();
+                logger.info("received {}", exchange);
                 final var messageType = queuePull.recv()[0];
+                logger.info("received {}", messageType);
                 final var payload = queuePull.recv();
-
-                logger.info("Pulled data... sending ...");
-
+                logger.info("received payload {}", payload.length);
                 SocketUtils.sendEmptyFrame(sender, ZMQ.SNDMORE);
                 sender.sendMore(exchange);
                 SocketUtils.sendMessageType(sender, messageType, ZMQ.SNDMORE);
                 sender.send(payload);
-
-                logger.info("Sent!");
             }
+            logger.info("Poll 1");
             if (poller.pollin(1)) {
-                final var empty = sender.recv();
+                logger.info("Received something...");
+                final var empty = sender.recvStr();
                 final var exchange = sender.recvStr();
                 final var messageType = SocketUtils.receiveMessageType(sender);
 
@@ -108,7 +115,7 @@ public class OrderClient {
 
                 final var orderUpdate =
                         OrderUpdate.getRootAsOrderUpdate(
-                                ByteBuffer.wrap(sender.recv()));
+                                ByteBuffer.wrap(sender.recv(0)));
 
                 this.listeners.forEach(listener -> listener.handleOrderEvent(orderUpdate));
             }
@@ -123,11 +130,8 @@ public class OrderClient {
             final byte side,
             final byte timeInForce) {
         final var orderId = orderIdGenerator.generate();
-        logger.info("Sending exchange");
         queuePush.sendMore(exchange);
-        logger.info("Sending message type");
         SocketUtils.sendMessageType(queuePush, MessageType.ORDER_REQUEST, ZMQ.SNDMORE);
-        logger.info("Sending payload");
         queuePush.send(
                 SerializationUtil.serializeOrderRequest(
                         fb, orderId, securityId, price, size, side, timeInForce));

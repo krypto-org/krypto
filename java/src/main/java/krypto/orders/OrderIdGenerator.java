@@ -22,7 +22,7 @@ public class OrderIdGenerator {
         }
         final long multiplier = (long) Math.pow(10.0, size - 6);
         final var date = Calendar.getInstance().getTime();
-        final var formatter = new SimpleDateFormat("hhmmss");
+        final var formatter = new SimpleDateFormat("HHmmss");
         final var dateStr = formatter.format(date);
         return Integer.parseInt(dateStr) * multiplier;
     }

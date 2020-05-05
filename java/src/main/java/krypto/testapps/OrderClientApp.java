@@ -2,12 +2,9 @@ package krypto.testapps;
 
 import com.typesafe.config.ConfigFactory;
 import krypto.orders.OrderClient;
-import krypto.orders.OrderListener;
 import krypto.serialization.OrderStatus;
-import krypto.serialization.OrderUpdate;
 import krypto.serialization.Side;
 import krypto.serialization.TimeInForce;
-import krypto.ui.StartScreen;
 import org.zeromq.ZMQ;
 
 import java.io.File;
@@ -32,23 +29,17 @@ public class OrderClientApp {
                                         + ": "
                                         + OrderStatus.name(orderUpdate.status())));
 
-
         System.out.println("Sending order");
 
         final long securityId = 10200030018L;
         final double price = 7000.0;
         final double qty = 0.01;
-
         final var orderId =
                 client.newOrder("SIM", securityId, price, qty, Side.BUY, TimeInForce.DAY);
-
         System.out.println("Waiting ..... ");
-
         Thread.sleep(2000);
-
         System.out.println("Cancel order");
-
-        client.cancelOrder("SIM", orderId);
+//        client.cancelOrder("SIM", orderId);
 
         Thread.sleep(2000);
 
