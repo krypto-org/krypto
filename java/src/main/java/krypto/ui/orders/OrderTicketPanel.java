@@ -10,8 +10,8 @@ public class OrderTicketPanel extends JPanel {
     private final OrderTicketTableModel tableModel;
     private final UIDataCache uiDataCache;
 
-    public OrderTicketPanel(final UIDataCache uiDataCache, UIDataCache uiDataCache1) {
-        this.uiDataCache = uiDataCache1;
+    public OrderTicketPanel(final UIDataCache uiDataCache) {
+        this.uiDataCache = uiDataCache;
         this.setLayout(
                 new MigLayout("",
                         "[fill,grow]",
