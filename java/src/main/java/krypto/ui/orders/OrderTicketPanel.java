@@ -9,16 +9,23 @@ import javax.swing.*;
 public class OrderTicketPanel extends JPanel {
     private final OrderTicketTableModel tableModel;
     private final UIDataCache uiDataCache;
+    private final JButton sendButton;
 
     public OrderTicketPanel(final UIDataCache uiDataCache) {
         this.uiDataCache = uiDataCache;
         this.setLayout(
                 new MigLayout("",
-                        "[fill,grow]",
+                        "[fill,grow][100,fill]",
                         "[fill,grow]"));
         this.tableModel = new OrderTicketTableModel();
         OrderTicketTable orderTicketTable = new OrderTicketTable(this.tableModel);
-        this.add(orderTicketTable, "cell 0 0 1 1");
+        final JScrollPane scrollPane = new JScrollPane();
+        scrollPane.setViewportView(orderTicketTable);
+
+        sendButton = new JButton("Send");
+
+        this.add(scrollPane );
+        this.add(sendButton);
     }
 
     public void setSelectedInstrument(final long id) {

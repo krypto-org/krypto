@@ -40,7 +40,7 @@ public class StartScreen extends LiveFrame
 
         JPanel contentPane = new JPanel();
         this.setContentPane(contentPane);
-        contentPane.setLayout(new MigLayout("", "[fill,grow]", "[50][fill,grow][50]"));
+        contentPane.setLayout(new MigLayout("", "[fill,grow]", "[50][fill,grow][75]"));
 
         this.uiDataCache = uiDataCache;
 

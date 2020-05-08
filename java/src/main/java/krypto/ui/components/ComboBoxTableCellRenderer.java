@@ -2,29 +2,25 @@ package krypto.ui.components;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.TableCellRenderer;
 import java.awt.*;
 import java.util.function.Function;
 
-public class ComboBoxTableCellRenderer<T> extends DefaultTableCellRenderer {
-
-    private final Function<T, String> getter;
-
-    public ComboBoxTableCellRenderer(final Function<T, String> getter) {
-        this.getter = getter;
+public class ComboBoxTableCellRenderer<T> extends JComboBox<T> implements TableCellRenderer {
+    public ComboBoxTableCellRenderer(final T[] items) {
+        super(items);
     }
 
-    public Component getTableCellRendererComponent(
-            JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
-        if (value != null) {
-            setText(getter.apply((T) value));
-        }
-
+    public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected,
+                                                   boolean hasFocus, int row, int column) {
         if (isSelected) {
-            setBackground(table.getSelectionBackground());
+            setForeground(table.getSelectionForeground());
+            super.setBackground(table.getSelectionBackground());
         } else {
-            setBackground(table.getSelectionForeground());
+            setForeground(table.getForeground());
+            setBackground(table.getBackground());
         }
-
+        setSelectedItem(value);
         return this;
     }
 }

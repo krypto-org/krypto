@@ -2,8 +2,6 @@ package krypto.ui.orders;
 
 import krypto.mktdata.Conversion;
 import krypto.serialization.Quote;
-import krypto.serialization.Side;
-import krypto.serialization.TimeInForce;
 
 import javax.swing.table.AbstractTableModel;
 
@@ -14,8 +12,8 @@ public class OrderTicketTableModel extends AbstractTableModel {
     private String symbol = "N/A";
     private double price = Double.NaN;
     private double size = Double.NaN;
-    private byte side = Side.BUY;
-    private byte tif = TimeInForce.DAY;
+    private Side side = Side.BUY;
+    private TimeInForce tif = TimeInForce.DAY;
 
     @Override
     public int getRowCount() {
@@ -34,7 +32,7 @@ public class OrderTicketTableModel extends AbstractTableModel {
 
     @Override
     public boolean isCellEditable(int rowIndex, int columnIndex) {
-        return true;
+        return columnIndex != OrderTicketTable.Column.Product.ordinal();
     }
 
     @Override
@@ -48,9 +46,9 @@ public class OrderTicketTableModel extends AbstractTableModel {
             case Size:
                 return size;
             case Side:
-                return Side.name(side);
+                return side.toString();
             case TIF:
-                return TimeInForce.name(tif);
+                return tif.toString();
         }
         return null;
     }
@@ -58,14 +56,14 @@ public class OrderTicketTableModel extends AbstractTableModel {
     @Override
     public void setValueAt(Object value, int rowIndex, int columnIndex) {
         if (columnIndex == OrderTicketTable.Column.Side.ordinal()) {
-            if (value instanceof Byte) {
-                this.side = (byte) value;
-            }
+            this.side = (Side) value;
         }
         else if (columnIndex == OrderTicketTable.Column.TIF.ordinal()) {
-            if (value instanceof Byte) {
-                this.tif = (byte) value;
-            }
+                this.tif = (TimeInForce) value;
+        } else if (columnIndex == OrderTicketTable.Column.Price.ordinal()) {
+            this.price = Double.parseDouble(value.toString());
+        } else if (columnIndex == OrderTicketTable.Column.Size.ordinal()) {
+            this.size = Double.parseDouble(value.toString());
         }
         super.setValueAt(value, rowIndex, columnIndex);
         this.fireTableRowsUpdated(rowIndex, rowIndex);
@@ -73,19 +71,24 @@ public class OrderTicketTableModel extends AbstractTableModel {
 
     public void update(final String symbol, final Quote quote) {
         this.symbol = symbol;
-        if (tif == TimeInForce.DAY) {
-            if (this.side == Side.BUY) {
-                this.price = Conversion.convertPrice(quote.bid());
+        if (quote != null) {
+            if (tif == TimeInForce.DAY) {
+                if (this.side == Side.BUY) {
+                    this.price = Conversion.convertPrice(quote.bid());
+                } else {
+                    this.price = Conversion.convertPrice(quote.ask());
+                }
             } else {
-                this.price = Conversion.convertPrice(quote.ask());
+                if (this.side == Side.BUY) {
+                    this.price = Conversion.convertPrice(quote.ask());
+                } else {
+                    this.price = Conversion.convertPrice(quote.bid());
+                }
             }
         } else {
-            if (this.side == Side.BUY) {
-                this.price = Conversion.convertPrice(quote.ask());
-            } else {
-                this.price = Conversion.convertPrice(quote.bid());
-            }
+            this.price = Double.NaN;
         }
         this.size = MIN_SIZE;
+        this.fireTableRowsUpdated(0, 0);
     }
 }

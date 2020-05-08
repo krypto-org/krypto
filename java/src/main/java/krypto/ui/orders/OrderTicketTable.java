@@ -1,10 +1,6 @@
 package krypto.ui.orders;
 
-import krypto.serialization.TimeInForce;
-import krypto.ui.components.CenterAlignedTableCellRenderer;
-import krypto.ui.components.ComboBoxTableCellEditor;
-import krypto.ui.components.ComboBoxTableCellRenderer;
-import krypto.ui.components.ToggleTableCellRenderer;
+import krypto.ui.components.*;
 
 import javax.swing.*;
 import java.util.Arrays;
@@ -14,22 +10,13 @@ public class OrderTicketTable extends JTable {
     public OrderTicketTable(final OrderTicketTableModel model) {
         super(model);
         this.getColumnModel()
+                .getColumn(Column.TIF.ordinal())
+                .setCellEditor(new ComboBoxTableCellEditor<>(TimeInForce.values()));
+
+        this.getColumnModel()
                 .getColumn(Column.Side.ordinal())
-                .setCellRenderer(new ToggleTableCellRenderer(Column.Side.ordinal(), "BUY", "SELL"));
-        this.getColumnModel()
-                .getColumn(Column.TIF.ordinal())
-                .setCellRenderer(new ComboBoxTableCellRenderer<Byte>(TimeInForce::name));
-        this.getColumnModel()
-                .getColumn(Column.TIF.ordinal())
-                .setCellEditor(
-                        new ComboBoxTableCellEditor<Byte>(
-                                Arrays.asList(
-                                        TimeInForce.DAY,
-                                        TimeInForce.IOC,
-                                        TimeInForce.FOK,
-                                        TimeInForce.GTC,
-                                        TimeInForce.GTT),
-                                TimeInForce::name));
+                .setCellEditor(new ComboBoxTableCellEditor<>(Side.values()));
+
         final CenterAlignedTableCellRenderer centerAlignedTableCellRenderer =
                 new CenterAlignedTableCellRenderer();
         this.getColumnModel()
