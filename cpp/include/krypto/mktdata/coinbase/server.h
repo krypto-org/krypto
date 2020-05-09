@@ -14,8 +14,12 @@ namespace krypto::mktdata::coinbase {
         WsConnection::channel_t update_channel_{2};
         WsConnection ws_;
         BookBuilder<Verbose> book_builder_;
+        bool publish_market_data_;
     public:
-        explicit Server(zmq::context_t &context, const krypto::Config &config);
+        Server(zmq::context_t &context,
+               const krypto::Config &config,
+               const std::string &environment,
+               bool publish_md = true);
 
         void start();
 
@@ -23,10 +27,14 @@ namespace krypto::mktdata::coinbase {
     };
 
     template<bool Verbose>
-    Server<Verbose>::Server(zmq::context_t &context, const krypto::Config &config) :
+    Server<Verbose>::Server(zmq::context_t &context,
+                            const krypto::Config &config,
+                            const std::string &environment,
+                            const bool publish_md) :
             update_channel_{2},
-            ws_{context, config, update_channel_},
-            book_builder_{context, config} {
+            ws_{context, config, environment, update_channel_},
+            book_builder_{context, config},
+            publish_market_data_{publish_md} {
     }
 
     template<bool Verbose>
@@ -40,9 +48,13 @@ namespace krypto::mktdata::coinbase {
             while (boost::fibers::channel_op_status::success == update_channel_.pop(update)) {
                 auto type = update["type"].get<std::string>();
                 if (type == "snapshot") {
-                    book_builder_.handle_snap(std::move(update));
+                    if (publish_market_data_) {
+                        book_builder_.handle_snap(std::move(update));
+                    }
                 } else if (type == "l2update") {
-                    book_builder_.handle_incr(std::move(update));
+                    if (publish_market_data_) {
+                        book_builder_.handle_incr(std::move(update));
+                    }
                 } else if (type == "heartbeat") {
                     book_builder_.handle_heartbeat(std::move(update));
                 } else if (type == "received") {
@@ -52,7 +64,9 @@ namespace krypto::mktdata::coinbase {
                 } else if (type == "done") {
                     book_builder_.handle_order_done(update);
                 } else if (type == "match" || type == "last_match") {
-                    book_builder_.handle_trade(update);
+                    if (publish_market_data_) {
+                        book_builder_.handle_trade(update);
+                    }
                     if constexpr  (Verbose) {
                         KRYP_LOG(debug, "Match Message: {}", update.dump());
                     }

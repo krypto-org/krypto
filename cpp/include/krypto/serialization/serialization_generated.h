@@ -651,7 +651,8 @@ struct Instrument FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
     VT_MAX_SIZE = 18,
     VT_CRYPTO_BASE = 20,
     VT_CRYPTO_QUOTE = 22,
-    VT_ACTIVE = 24
+    VT_ACTIVE = 24,
+    VT_SANDBOX_ENABLED = 26
   };
   int64_t id() const {
     return GetField<int64_t>(VT_ID, 0);
@@ -686,6 +687,9 @@ struct Instrument FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   bool active() const {
     return GetField<uint8_t>(VT_ACTIVE, 0) != 0;
   }
+  bool sandbox_enabled() const {
+    return GetField<uint8_t>(VT_SANDBOX_ENABLED, 0) != 0;
+  }
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
            VerifyField<int64_t>(verifier, VT_ID) &&
@@ -701,6 +705,7 @@ struct Instrument FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
            VerifyField<int8_t>(verifier, VT_CRYPTO_BASE) &&
            VerifyField<int8_t>(verifier, VT_CRYPTO_QUOTE) &&
            VerifyField<uint8_t>(verifier, VT_ACTIVE) &&
+           VerifyField<uint8_t>(verifier, VT_SANDBOX_ENABLED) &&
            verifier.EndTable();
   }
 };
@@ -741,6 +746,9 @@ struct InstrumentBuilder {
   void add_active(bool active) {
     fbb_.AddElement<uint8_t>(Instrument::VT_ACTIVE, static_cast<uint8_t>(active), 0);
   }
+  void add_sandbox_enabled(bool sandbox_enabled) {
+    fbb_.AddElement<uint8_t>(Instrument::VT_SANDBOX_ENABLED, static_cast<uint8_t>(sandbox_enabled), 0);
+  }
   explicit InstrumentBuilder(flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
@@ -765,7 +773,8 @@ inline flatbuffers::Offset<Instrument> CreateInstrument(
     double max_size = 0.0,
     Currency crypto_base = Currency_UNKNOWN,
     Currency crypto_quote = Currency_UNKNOWN,
-    bool active = false) {
+    bool active = false,
+    bool sandbox_enabled = false) {
   InstrumentBuilder builder_(_fbb);
   builder_.add_max_size(max_size);
   builder_.add_min_size(min_size);
@@ -773,6 +782,7 @@ inline flatbuffers::Offset<Instrument> CreateInstrument(
   builder_.add_id(id);
   builder_.add_exchange_symbol(exchange_symbol);
   builder_.add_symbol(symbol);
+  builder_.add_sandbox_enabled(sandbox_enabled);
   builder_.add_active(active);
   builder_.add_crypto_quote(crypto_quote);
   builder_.add_crypto_base(crypto_base);
@@ -793,7 +803,8 @@ inline flatbuffers::Offset<Instrument> CreateInstrumentDirect(
     double max_size = 0.0,
     Currency crypto_base = Currency_UNKNOWN,
     Currency crypto_quote = Currency_UNKNOWN,
-    bool active = false) {
+    bool active = false,
+    bool sandbox_enabled = false) {
   auto symbol__ = symbol ? _fbb.CreateString(symbol) : 0;
   auto exchange_symbol__ = exchange_symbol ? _fbb.CreateString(exchange_symbol) : 0;
   return krypto::serialization::CreateInstrument(
@@ -808,7 +819,8 @@ inline flatbuffers::Offset<Instrument> CreateInstrumentDirect(
       max_size,
       crypto_base,
       crypto_quote,
-      active);
+      active,
+      sandbox_enabled);
 }
 
 struct Quote FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {

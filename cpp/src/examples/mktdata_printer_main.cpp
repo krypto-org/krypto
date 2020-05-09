@@ -14,11 +14,11 @@ namespace {
         using krypto::network::Subscriber<MktdataPrinter, krypto::mktdata::Parser, true>::Subscriber;
 
         void process(const krypto::serialization::Quote *quote) {
-//            std::cout << "QUOTE: " << quote->security_id() << '\n';
+            std::cout << "QUOTE: " << quote->security_id() << '\n';
         }
 
         void process(const krypto::serialization::Trade *trade) {
-//            std::cout << "TRADE: " << trade->security_id() << '\n';
+            std::cout << "TRADE: " << trade->security_id() << '\n';
         }
 
         void process(const krypto::serialization::Heartbeat *hb) {

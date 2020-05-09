@@ -56,7 +56,6 @@ namespace krypto::exchanges {
 
                 auto id = krypto::utils::instrument_id(key, base, quote);
 
-
                 result.push_back({id,
                                   inst_type,
                                   symbol,
@@ -66,7 +65,9 @@ namespace krypto::exchanges {
                                   min_size,
                                   max_size,
                                   base,
-                                  quote}
+                                  quote,
+                                  true,
+                                  true}
                 );
             }
         }

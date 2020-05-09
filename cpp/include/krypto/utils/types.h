@@ -91,6 +91,7 @@ namespace krypto::utils {
         krypto::serialization::Currency crypto_base;
         krypto::serialization::Currency crypto_quote;
         bool active;
+        bool sandbox_enabled;
 
         friend std::ostream &operator<<(std::ostream &os, const Instrument &instrument) {
             os << "id: " << instrument.id << " symbol: " << instrument.symbol
