@@ -74,49 +74,42 @@ public class OrderClient {
         queuePull.bind(queueEndpoint);
         queuePull.setLinger(0);
 
-//        queuePull.setReceiveTimeOut(100);
-//        sender.setReceiveTimeOut(100);
-
-        final ZMQ.Poller poller = context.poller(2);
-        poller.register(queuePull, ZMQ.Poller.POLLIN);
-        poller.register(sender, ZMQ.Poller.POLLIN | ZMQ.Poller.POLLOUT);
-        poller.poll(1000);
+        ZMQ.PollItem[] items = {
+            new ZMQ.PollItem(queuePull, ZMQ.Poller.POLLIN),
+            new ZMQ.PollItem(sender, ZMQ.Poller.POLLIN)
+        };
         while (running) {
-            logger.info("Poll 0");
-            if (poller.pollin(0)) {
-                logger.info("Waiting for message .. ");
+            int rc = ZMQ.poll(context.selector(), items, timeoutInMillis);
+            if (rc == -1) {
+                break;
+            }
+            if (items[0].isReadable()) {
                 final var exchange = queuePull.recvStr();
-                logger.info("received {}", exchange);
                 final var messageType = queuePull.recv()[0];
-                logger.info("received {}", messageType);
                 final var payload = queuePull.recv();
-                logger.info("received payload {}", payload.length);
                 SocketUtils.sendEmptyFrame(sender, ZMQ.SNDMORE);
                 sender.sendMore(exchange);
                 SocketUtils.sendMessageType(sender, messageType, ZMQ.SNDMORE);
                 sender.send(payload);
             }
-            logger.info("Poll 1");
-            if (poller.pollin(1)) {
-                logger.info("Received something...");
-                final var empty = sender.recvStr();
+            if (items[1].isReadable()) {
+                sender.recvStr();
                 final var exchange = sender.recvStr();
+
+                logger.info("Received order update from {}", exchange);
+
                 final var messageType = SocketUtils.receiveMessageType(sender);
 
                 if (messageType == MessageType.UNDEFINED) {
                     logger.warn("Received undefine message type");
                     continue;
                 }
-
                 if (messageType == MessageType.NO_PAYLOAD) {
                     logger.warn("Received message with message type = NO_PAYLOAD");
                     continue;
                 }
-
                 final var orderUpdate =
-                        OrderUpdate.getRootAsOrderUpdate(
-                                ByteBuffer.wrap(sender.recv(0)));
-
+                        OrderUpdate.getRootAsOrderUpdate(ByteBuffer.wrap(sender.recv(0)));
                 this.listeners.forEach(listener -> listener.handleOrderEvent(orderUpdate));
             }
         }

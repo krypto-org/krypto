@@ -4,6 +4,7 @@ import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
 import krypto.instruments.InstrumentsClient;
 import krypto.mktdata.Subscriber;
+import krypto.orders.OrderClient;
 import krypto.pricing.PricingClient;
 import krypto.ui.StartScreen;
 import krypto.ui.UIDataCache;
@@ -18,9 +19,7 @@ public class KryptoGui {
     public static void main(String[] args) {
         final var config = ConfigFactory.parseFile(new File(args[0])).resolve();
 
-        final var context = ZMQ.context(1);
-
-        System.err.println(config);
+        final var context = ZMQ.context(3);
 
         final var instrumentsClient = new InstrumentsClient(
                 context, config.getString("services.instruments.client"));
@@ -45,13 +44,18 @@ public class KryptoGui {
         subscriber.start();
         pricingClient.start();
 
+        final OrderClient orderClient =
+                new OrderClient(
+                        context, config.getString("services.order_gateway.frontend.client"), 100);
+        orderClient.start();
+
         EventQueue.invokeLater(() -> {
             try {
                 UIManager.setLookAndFeel(
                         "com.jtattoo.plaf.noire.NoireLookAndFeel");
                 UIManager.put("InternalFrame.titleFont",
                         new Font("Cambria Math", Font.BOLD, 12));
-                final var frame = new StartScreen(uiDataCache);
+                final var frame = new StartScreen(uiDataCache, orderClient);
                 frame.setVisible(true);
             } catch (Exception e) {
                 e.printStackTrace();

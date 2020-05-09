@@ -2,6 +2,7 @@ package krypto.ui;
 
 import krypto.instruments.InstrumentsClient;
 import krypto.mktdata.Subscriber;
+import krypto.orders.OrderListener;
 import krypto.pricing.PricingClient;
 import krypto.serialization.*;
 
@@ -11,7 +12,7 @@ import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.stream.Collectors;
 
 public class UIDataCache implements
-        Subscriber.Listener, PricingClient.Listener {
+        Subscriber.Listener, PricingClient.Listener, OrderListener {
 
     private final InstrumentsClient instrumentsClient;
     private final Map<Long, Quote> quotes;
@@ -89,5 +90,10 @@ public class UIDataCache implements
 
     public Map<Long, TheoreticalSnapshot> getTheos() {
         return theos;
+    }
+
+    @Override
+    public void handleOrderEvent(OrderUpdate orderUpdate) {
+
     }
 }
