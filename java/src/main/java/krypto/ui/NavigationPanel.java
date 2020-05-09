@@ -12,7 +12,7 @@ import java.awt.event.ActionListener;
 
 public class NavigationPanel extends JPanel {
 
-    private static final String PRICING_ICON_PATH = "/option_analytics.png";
+    private static final String PRICING_ICON_PATH = "/pricing.png";
     private static final String RISK_ICON_PATH = "/risk.png";
     private static final String INSTRUMENTS_ICON_PATH = "/instruments.png";
     private static final String MARKET_DATA_ICON_PATH = "/market_data.png";
