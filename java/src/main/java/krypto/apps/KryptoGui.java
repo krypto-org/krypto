@@ -1,5 +1,9 @@
 package krypto.apps;
 
+import com.github.weisj.darklaf.LafManager;
+import com.github.weisj.darklaf.theme.DarculaTheme;
+import com.github.weisj.darklaf.theme.HighContrastDarkTheme;
+import com.github.weisj.darklaf.theme.SolarizedDarkTheme;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
 import krypto.instruments.InstrumentsClient;
@@ -51,10 +55,7 @@ public class KryptoGui {
 
         EventQueue.invokeLater(() -> {
             try {
-                UIManager.setLookAndFeel(
-                        "com.jtattoo.plaf.noire.NoireLookAndFeel");
-                UIManager.put("InternalFrame.titleFont",
-                        new Font("Cambria Math", Font.BOLD, 12));
+                LafManager.install(new DarculaTheme());
                 final var frame = new StartScreen(uiDataCache, orderClient);
                 frame.setVisible(true);
             } catch (Exception e) {

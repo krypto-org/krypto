@@ -40,9 +40,9 @@ dependencies {
     compile group: 'org.jfree', name: 'jfreechart', version: '1.5.0'
     compile group: 'com.miglayout', name: 'miglayout', version: '3.7.4'
     compile group: 'com.typesafe', name: 'config', version: '1.4.0'
-    compile group: 'com.jtattoo', name: 'JTattoo', version: '1.6.13'
 
-
+    implementation("com.github.weisj:darklaf-core:[2.1.1,)")
+    implementation("com.github.weisj:darklaf-theme:[2.1.1,)") // For the themes
     implementation 'io.grpc:grpc-netty-shaded:1.25.0'
     implementation 'io.grpc:grpc-protobuf:1.25.0'
     implementation 'io.grpc:grpc-stub:1.25.0'
