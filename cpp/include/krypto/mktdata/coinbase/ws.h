@@ -27,7 +27,11 @@ namespace krypto::mktdata::coinbase {
         using channel_t = boost::fibers::buffered_channel<nlohmann::json>;
         using ptr = websocketpp::lib::shared_ptr<WsConnection>;
 
-        WsConnection(zmq::context_t &context, const krypto::Config &config, channel_t &update_channel);
+        WsConnection(
+                zmq::context_t &context,
+                const krypto::Config &config,
+                const std::string&,
+                channel_t &update_channel);
 
         void on_open(websocketpp::connection_hdl hdl);
 
@@ -52,6 +56,7 @@ namespace krypto::mktdata::coinbase {
         ws_client_t client_;
         websocketpp::connection_hdl hdl_;
         std::mutex connection_lock_;
+        bool sandbox_only_;
 
         std::string generate_subscription();
     };

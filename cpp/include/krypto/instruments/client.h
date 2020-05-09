@@ -87,7 +87,8 @@ namespace krypto::instruments {
                         inst->max_size(),
                         convert_currency(inst->crypto_base()),
                         convert_currency(inst->crypto_quote()),
-                        inst->active()
+                        inst->active(),
+                        inst->sandbox_enabled()
                 };
                 result.push_back(to_insert);
             }

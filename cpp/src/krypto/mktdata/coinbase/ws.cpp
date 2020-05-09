@@ -8,12 +8,14 @@
 
 
 krypto::mktdata::coinbase::WsConnection::WsConnection(
-        zmq::context_t& context,
+        zmq::context_t &context,
         const krypto::Config &config,
+        const std::string &environment,
         krypto::mktdata::coinbase::WsConnection::channel_t &update_channel) :
-        uri_{config.at<std::string>("/exchanges/coinbase/ws/base_url/production")},
+        uri_{config.at<std::string>(
+                "/exchanges/coinbase/ws/base_url/" + environment)},
         status_{WsConnectionStatus::CLOSE},
-        update_channel_{update_channel} {
+        update_channel_{update_channel}, sandbox_only_{environment == "sandbox"} {
 
     krypto::instruments::InstrumentClient client{context, config};
     auto query = client.query().get();
@@ -43,19 +45,19 @@ void krypto::mktdata::coinbase::WsConnection::on_open(wpp::connection_hdl hdl) {
     send(std::move(subscription));
 }
 
-void krypto::mktdata::coinbase::WsConnection::on_close(const wpp::connection_hdl& hdl) {
+void krypto::mktdata::coinbase::WsConnection::on_close(const wpp::connection_hdl &hdl) {
     KRYP_LOG(warn, "Closed websocket connection to {}", uri_);
     std::lock_guard<std::mutex> guard(connection_lock_);
     status_ = WsConnectionStatus::CLOSE;
 }
 
-void krypto::mktdata::coinbase::WsConnection::on_fail(const wpp::connection_hdl& hdl) {
+void krypto::mktdata::coinbase::WsConnection::on_fail(const wpp::connection_hdl &hdl) {
     KRYP_LOG(error, "Websocket connection to {} failed", uri_);
     std::lock_guard<std::mutex> guard(connection_lock_);
     status_ = WsConnectionStatus::FAILED;
 }
 
-void krypto::mktdata::coinbase::WsConnection::on_message(const wpp::connection_hdl&, ws_client_t::message_ptr msg) {
+void krypto::mktdata::coinbase::WsConnection::on_message(const wpp::connection_hdl &, ws_client_t::message_ptr msg) {
     if (msg->get_opcode() == wpp::frame::opcode::text) {
         auto payload = nlohmann::json::parse(msg->get_payload());
         update_channel_.push(payload);
@@ -78,7 +80,7 @@ void krypto::mktdata::coinbase::WsConnection::start() {
     KRYP_LOG(info, "Websocket IO loop stooped");
 }
 
-void krypto::mktdata::coinbase::WsConnection::send(std::string&& message) {
+void krypto::mktdata::coinbase::WsConnection::send(std::string &&message) {
     auto json = nlohmann::json::parse(message);
     wpp::lib::error_code ec;
     client_.send(hdl_, json.dump(), wpp::frame::opcode::text, ec);
@@ -98,9 +100,15 @@ std::string krypto::mktdata::coinbase::WsConnection::generate_subscription() {
     subscription["channels"] = {"level2", "heartbeat", "full"};
     std::vector<std::string> symbols;
 
-    std::transform(instruments_.begin(), instruments_.end(), std::back_inserter(symbols), [] (auto&& inst) {
-        return inst.exchange_symbol;
-    });
+    for (auto &&inst: instruments_) {
+        if (sandbox_only_) {
+            if (inst.sandbox_enabled) {
+                symbols.emplace_back(inst.exchange_symbol);
+            }
+        } else if (inst.active) {
+            symbols.emplace_back(inst.exchange_symbol);
+        }
+    }
 
     subscription["product_ids"] = symbols;
     return subscription.dump();

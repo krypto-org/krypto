@@ -24,12 +24,13 @@ namespace krypto::instruments {
         std::atomic_bool running_;
         flatbuffers::FlatBufferBuilder fb_builder_;
         std::unordered_set<std::string> active_instruments_;
+        std::unordered_set<std::string> sandbox_instruments_;
 
         bool process(const zmq::message_t &msg, krypto::utils::MsgType msg_type);
 
         void process_request(const krypto::serialization::InstrumentRequest *request);
 
-        std::vector<std::string> parse_active_symbols(std::string list);
+        std::vector<std::string> parse_symbols(std::string list);
 
     public:
         Server(zmq::context_t &context, const krypto::Config &config);
@@ -50,13 +51,17 @@ namespace krypto::instruments {
         cache_ = store_.load();
         KRYP_LOG(info, "{}", config.get().dump());
         auto active = config.at<std::string>("/services/instruments/active_symbols");
-        for (auto&& symbol: parse_active_symbols(active)) {
+        auto sandbox_symbols = config.at<std::string>("/services/instruments/sandbox_symbols");
+        for (auto &&symbol: parse_symbols(active)) {
             active_instruments_.insert(symbol);
+        }
+        for (auto &&symbol : parse_symbols(sandbox_symbols)) {
+            sandbox_instruments_.insert(symbol);
         }
     }
 
     template<bool Verbose>
-    std::vector<std::string> Server<Verbose>::parse_active_symbols(std::string list) {
+    std::vector<std::string> Server<Verbose>::parse_symbols(std::string list) {
         std::vector<std::string> symbols;
         boost::split(symbols, list, boost::is_any_of(","));
         return symbols;
@@ -149,7 +154,9 @@ namespace krypto::instruments {
                         inst.crypto_base,
                         inst.crypto_quote,
                         active_instruments_.find(inst.symbol) !=
-                        std::end(active_instruments_));
+                        std::end(active_instruments_),
+                        sandbox_instruments_.find(inst.symbol) !=
+                        std::end(sandbox_instruments_));
                 instruments.emplace_back(inst_offset);
             }
         }

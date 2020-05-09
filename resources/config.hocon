@@ -55,6 +55,7 @@ services = {
         client = "tcp://"${global.ip}":"${services.instruments.port}
         polling_millis = 50
         active_symbols = "BTC_USD,BTC_USDC,ETH_USD,ETH_USDC,ETH_BTC,LTC_USD,LTC_BTC,XRP_USD,XRP_BTC,BCH_USD,BCH_BTC,ETC_USD,ETC_BTC"
+        sandbox_symbols = "BTC_USD,ETH_BTC"
     }
 
     order_gateway = {

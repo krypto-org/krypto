@@ -75,6 +75,7 @@ table Instrument {
   crypto_base: Currency;
   crypto_quote: Currency;
   active: bool;
+  sandbox_enabled: bool;
 }
 
 // market data
