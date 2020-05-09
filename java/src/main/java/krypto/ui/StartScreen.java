@@ -1,5 +1,6 @@
 package krypto.ui;
 
+import krypto.orders.OrderClient;
 import krypto.serialization.Instrument;
 import krypto.ui.components.HeatmapColumnTableCellRenderer;
 import krypto.ui.components.LiveFrame;
@@ -7,6 +8,7 @@ import krypto.ui.components.TableColumnHeaderRenderer;
 import krypto.ui.mktdata.MktdataSheetTable;
 import krypto.ui.mktdata.MktdataSheetTableModel;
 import krypto.ui.orders.OrderTicketPanel;
+import krypto.ui.orders.UIOrderClientListener;
 import net.miginfocom.swing.MigLayout;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -22,13 +24,16 @@ public class StartScreen extends LiveFrame {
     private static final String APPLICATION_ICON_PATH = "/krypto.png";
 
     private final UIDataCache uiDataCache;
+    private final UIOrderClientListener orderClientListener;
+    private final OrderClient orderClient;
     private final SortedMap<Long, Instrument> instruments;
     private final JTable quotesTable;
     private final MktdataSheetTableModel quotesTableModel;
     private final NavigationPanel navigationPanel;
     private final OrderTicketPanel orderTicketPanel;
 
-    public StartScreen(final UIDataCache uiDataCache) {
+    public StartScreen(final UIDataCache uiDataCache, final OrderClient orderClient) {
+        this.orderClient = orderClient;
         this.setTitle("KRYPTO");
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.setBounds(100, 100, 950, 750);
@@ -53,7 +58,7 @@ public class StartScreen extends LiveFrame {
         quotesScrollPane.setViewportView(quotesTable);
 
         this.navigationPanel = new NavigationPanel(uiDataCache);
-        this.orderTicketPanel = new OrderTicketPanel(null, uiDataCache);
+        this.orderTicketPanel = new OrderTicketPanel(orderClient, uiDataCache);
 
         quotesTable.setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
         quotesTable
@@ -64,6 +69,9 @@ public class StartScreen extends LiveFrame {
         contentPane.add(navigationPanel, "wrap");
         contentPane.add(quotesScrollPane, "wrap");
         contentPane.add(this.orderTicketPanel);
+
+        this.orderClientListener = new UIOrderClientListener();
+        this.orderClient.registerListener(this.orderClientListener);
 
         this.queryInstruments();
         this.startUpdates();

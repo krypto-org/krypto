@@ -39,8 +39,7 @@ public class OrderClientApp {
         System.out.println("Waiting ..... ");
         Thread.sleep(2000);
         System.out.println("Cancel order");
-//        client.cancelOrder("SIM", orderId);
-
+        client.cancelOrder("SIM", orderId);
         Thread.sleep(2000);
 
         client.stop();

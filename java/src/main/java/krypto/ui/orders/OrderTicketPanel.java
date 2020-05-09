@@ -62,6 +62,6 @@ public class OrderTicketPanel extends JPanel {
         final byte tif = this.tableModel.getTif().getValue();
         logger.info("Sending order for symbol {} [{}] {} {}@{} | {}",
                 symbol, id, Side.name(side), qty, price, TimeInForce.name(tif));
-//        this.client.newOrder(EXCHANGE, id, price, qty, side, tif);
+        this.client.newOrder(EXCHANGE, id, price, qty, side, tif);
     }
 }
