@@ -57,9 +57,8 @@ public class OrderTicketTableModel extends AbstractTableModel {
     public void setValueAt(Object value, int rowIndex, int columnIndex) {
         if (columnIndex == OrderTicketTable.Column.Side.ordinal()) {
             this.side = (Side) value;
-        }
-        else if (columnIndex == OrderTicketTable.Column.TIF.ordinal()) {
-                this.tif = (TimeInForce) value;
+        } else if (columnIndex == OrderTicketTable.Column.TIF.ordinal()) {
+            this.tif = (TimeInForce) value;
         } else if (columnIndex == OrderTicketTable.Column.Price.ordinal()) {
             this.price = Double.parseDouble(value.toString());
         } else if (columnIndex == OrderTicketTable.Column.Size.ordinal()) {
@@ -90,5 +89,25 @@ public class OrderTicketTableModel extends AbstractTableModel {
         }
         this.size = MIN_SIZE;
         this.fireTableRowsUpdated(0, 0);
+    }
+
+    public String getSymbol() {
+        return symbol;
+    }
+
+    public double getPrice() {
+        return price;
+    }
+
+    public double getSize() {
+        return size;
+    }
+
+    public Side getSide() {
+        return side;
+    }
+
+    public TimeInForce getTif() {
+        return tif;
     }
 }
