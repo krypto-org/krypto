@@ -2,6 +2,7 @@ package krypto.ui;
 
 import krypto.ui.components.ImageButton;
 import krypto.ui.instruments.InstrumentsView;
+import krypto.ui.orders.OrdersView;
 import krypto.ui.pricing.PricingView;
 import net.miginfocom.swing.MigLayout;
 
@@ -16,6 +17,7 @@ public class NavigationPanel extends JPanel {
     private static final String RISK_ICON_PATH = "/risk.png";
     private static final String INSTRUMENTS_ICON_PATH = "/instruments.png";
     private static final String MARKET_DATA_ICON_PATH = "/market_data.png";
+    private static final String ORDERS_ICON_PATH = "/orders.png";
     private static final String SETTINGS_ICON_PATH = "/settings.png";
     private static final String AUDIT_ICON_PATH = "/audit.png";
     private static final String TRADE_SHEETS_ICON_PATH = "/trade_sheets.png";
@@ -23,14 +25,17 @@ public class NavigationPanel extends JPanel {
 
     private final InstrumentsView instrumentsView;
     private final PricingView pricingView;
+    private final OrdersView ordersView;
     private boolean instrumentsViewVisible = false;
     private boolean pricingViewVisible = false;
+    private boolean ordersViewVisible = false;
 
     NavigationPanel(final UIDataCache uiDataCache) {
         this.setLayout(new MigLayout("", "[fill,grow]", "[fill,grow]"));
 
         this.instrumentsView = new InstrumentsView(uiDataCache);
         this.pricingView = new PricingView(uiDataCache);
+        this.ordersView = new OrdersView(uiDataCache);
 
         this.initializeButtons();
     }
@@ -61,19 +66,28 @@ public class NavigationPanel extends JPanel {
         btnPricing.setToolTipText("Pricing");
         this.add(btnPricing, "cell 2 0 1 1");
 
+        final JButton btnOrders = new ImageButton(
+                Toolkit.getDefaultToolkit()
+                        .getImage(this.getClass()
+                                .getResource(ORDERS_ICON_PATH)),
+                40, 40);
+        btnOrders.addActionListener(e -> initializeOrdersWindow());
+        btnOrders.setToolTipText("Orders");
+        this.add(btnOrders, "cell 3 0 1 1");
+
         final JButton btnStrategy = new ImageButton(
                 Toolkit.getDefaultToolkit().getImage(
                         this.getClass().getResource(STRATEGY_ICON_PATH)),
                 40, 40);
         btnStrategy.addActionListener(e -> initializeStrategyWindow());
         btnStrategy.setToolTipText("Trade Sheets");
-        this.add(btnStrategy, "cell 3 0 1 1");
+        this.add(btnStrategy, "cell 4 0 1 1");
 
         final JButton btnRisk = new ImageButton(Toolkit.getDefaultToolkit()
                 .getImage(this.getClass().getResource(RISK_ICON_PATH)), 40, 40);
         btnRisk.addActionListener(e -> initializeRiskWindow());
         btnRisk.setToolTipText("Risk");
-        this.add(btnRisk, "cell 4 0 1 1");
+        this.add(btnRisk, "cell 5 0 1 1");
 
         final JButton btnSettings = new ImageButton(
                 Toolkit.getDefaultToolkit().getImage(
@@ -81,7 +95,7 @@ public class NavigationPanel extends JPanel {
                 40, 40);
         btnSettings.addActionListener(e -> initializeSettingsWindow());
         btnSettings.setToolTipText("Settings");
-        this.add(btnSettings, "cell 5 0 1 1");
+        this.add(btnSettings, "cell 6 0 1 1");
 
         final JButton btnAudit = new ImageButton(Toolkit.getDefaultToolkit().getImage(
                 this.getClass().getResource(AUDIT_ICON_PATH)), 40, 40);
@@ -92,7 +106,7 @@ public class NavigationPanel extends JPanel {
             }
         });
         btnAudit.setToolTipText("Audit Log");
-        this.add(btnAudit, "cell 6 0 1 1");
+        this.add(btnAudit, "cell 7 0 1 1");
 
         btnPricing.setEnabled(true);
         btnRisk.setEnabled(true);
@@ -122,6 +136,15 @@ public class NavigationPanel extends JPanel {
             pricingViewVisible = true;
         }
         pricingView.setVisible(true);
+    }
+
+    private void initializeOrdersWindow() {
+        if (!ordersViewVisible) {
+            ordersView.setIconImage(Toolkit.getDefaultToolkit().getImage(
+                    NavigationPanel.class.getResource(ORDERS_ICON_PATH)));
+            ordersViewVisible = true;
+        }
+        ordersView.setVisible(true);
     }
 
     private void initializeStrategyWindow() {

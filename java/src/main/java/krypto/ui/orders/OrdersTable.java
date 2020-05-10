@@ -1,6 +1,14 @@
 package krypto.ui.orders;
 
-public class OrdersTable {
+import javax.swing.*;
+import javax.swing.table.TableModel;
+
+public class OrdersTable extends JTable {
+
+    public OrdersTable(final TableModel model) {
+        super(model);
+    }
+
     public enum Column {
         Timestamp,
         Product,

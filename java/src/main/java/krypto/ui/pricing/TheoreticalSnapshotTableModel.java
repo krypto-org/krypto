@@ -35,22 +35,6 @@ public class TheoreticalSnapshotTableModel extends ReadOnlyTableModel {
         return TheoreticalSnapshotTable.Column.values()[column].toString();
     }
 
-//    public void updateInstruments(final SortedMap<Long, Instrument> instruments) {
-//        instruments.forEach(this.instruments::put);
-//        int row = 0;
-//        for (final Instrument inst : this.instruments.values()) {
-//            if (inst.active()) {
-//                this.instrumentIdToRowNums.put(row++, inst.id());
-//            }
-//        }
-//        this.fireTableRowsUpdated(0, this.getRowCount() - 1);
-//    }
-//
-//    public void updateTheos(final Map<Long, TheoreticalSnapshot> snapshots) {
-//        this.theos.putAll(snapshots);
-//        this.fireTableRowsUpdated(0, this.getRowCount() - 1);
-//    }
-
     public void updateScaledTheoRatio() {
         final Map<Integer, Double> theoScaledValues = new HashMap<>();
         for (int row = 0; row < this.getRowCount(); ++row) {
