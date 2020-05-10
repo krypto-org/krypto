@@ -102,6 +102,9 @@ namespace krypto::orders::coinbase {
                 krypto::mktdata::extract_quantity(request->quantity()),
                 "limit", request->order_id()->str()
         };
+
+        KRYP_LOG(info, "Received a new order request from {} ", order);
+
         if (request->tif() != krypto::serialization::TimeInForce_DAY) {
             order.tif = krypto::serialization::EnumNameTimeInForce(request->tif());
         }
@@ -119,10 +122,11 @@ namespace krypto::orders::coinbase {
             order_id_cl_order_id_map_[order_id] = request->order_id()->str();
             client_identity_map_[order_id] = client_identity;
         } else {
+            KRYP_LOG(info, "No ack received for clordid: {}", request->order_id()->str());
             const krypto::utils::OrderUpdate reject{
                     krypto::utils::current_time_in_nanoseconds(),
                     request->order_id()->str(),
-                    order_ack.value(),
+                    "",
                     krypto::serialization::OrderStatus::OrderStatus_REJECTED,
                     0};
             send(reject, client_identity);
@@ -133,6 +137,8 @@ namespace krypto::orders::coinbase {
     void
     OrderServer<Verbose>::process(const krypto::serialization::OrderCancelRequest * request,
                                   const std::string &client_identity) {
+        KRYP_LOG(info, "Cancel order: {}", request->order_id()->str());
+
         auto status = api_.cancel_order(request->order_id()->str());
         if (status.has_value()) {
             const krypto::utils::OrderUpdate in_flight{
@@ -147,9 +153,16 @@ namespace krypto::orders::coinbase {
 
     template<bool Verbose>
     void
-    OrderServer<Verbose>::process(const krypto::serialization::OrderReplaceRequest *,
+    OrderServer<Verbose>::process(const krypto::serialization::OrderReplaceRequest * request,
                                   const std::string &client_identity) {
-
+        KRYP_LOG(warn, "Replace not supported. Sending reject");
+        const krypto::utils::OrderUpdate reject{
+                krypto::utils::current_time_in_nanoseconds(),
+                request->order_id()->str(),
+                "",
+                krypto::serialization::OrderStatus::OrderStatus_REPLACE_REJECTED,
+                0};
+        send(reject, client_identity);
     }
 
     template<bool Verbose>
@@ -257,9 +270,11 @@ namespace krypto::orders::coinbase {
     template<bool Verbose>
     void OrderServer<Verbose>::send(const utils::OrderUpdate &order_update, const std::string &client_identity) {
         if constexpr (Verbose) {
-            KRYP_LOG(info, "{} :: {}",
+            KRYP_LOG(info, "{} :: {} || {}",
                      krypto::serialization::EnumNameOrderStatus(
-                             order_update.status), order_update.order_id);
+                             order_update.status),
+                             order_update.order_id,
+                             order_update.exchange_order_id);
         }
         krypto::network::send_empty_frame(*receiver_, ZMQ_SNDMORE);
         krypto::network::send_status(*receiver_, krypto::network::SocketStatus::REPLY, ZMQ_SNDMORE);
@@ -314,7 +329,7 @@ namespace krypto::orders::coinbase {
             if (order_update->status() == krypto::serialization::OrderStatus_DONE ||
                 order_update->status() == krypto::serialization::OrderStatus_CANCELLED ||
                 order_update->status() == krypto::serialization::OrderStatus_REPLACED) {
-                KRYP_LOG(info, "Order id - {} - done --- removing from cache");
+                KRYP_LOG(info, "Order id - {} - done --- removing from cache", exchange_order_id);
                 order_id_cl_order_id_map_.erase(exchange_order_id);
                 client_identity_map_.erase(exchange_order_id);
             }
