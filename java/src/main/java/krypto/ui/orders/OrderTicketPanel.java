@@ -15,7 +15,7 @@ public class OrderTicketPanel extends JPanel {
 
     private static final Logger logger = LogManager.getLogger(OrderTicketPanel.class);
 
-    private static final String EXCHANGE = "SIM";
+    private static final String EXCHANGE = "COINBASE_SANDBOX";
 
     private final OrderTicketTableModel tableModel;
     private final OrderClient client;

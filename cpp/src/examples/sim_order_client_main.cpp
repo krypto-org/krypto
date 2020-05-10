@@ -52,9 +52,9 @@ int main(int argc, char **argv) {
 
     int64_t security_id = 10200030018;
     int64_t price = krypto::mktdata::convert_price(7000.0);
-    int64_t qty = krypto::mktdata::convert_price(0.01);
+    int64_t qty = krypto::mktdata::convert_quantity(0.01);
 
-    auto order_id = client.new_order("SIM",
+    auto order_id = client.new_order("COINBASE_SANDBOX",
                                      security_id,
                                      price,
                                      qty,
@@ -66,7 +66,7 @@ int main(int argc, char **argv) {
     std::this_thread::sleep_for(std::chrono::seconds{2});
 
     if (send_cancel) {
-        client.cancel_order("SIM", order_id);
+        client.cancel_order("COINBASE_SANDBOX", order_id);
         std::this_thread::sleep_for(std::chrono::seconds{2});
     }
 

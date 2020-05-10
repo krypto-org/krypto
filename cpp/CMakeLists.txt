@@ -142,6 +142,10 @@ target_link_libraries(krypto-ws-server krypto CONAN_PKG::boost ssl crypto dl CON
 add_executable(krypto-sim-orders src/apps/orders/sim_main.cpp)
 target_link_libraries(krypto-sim-orders krypto CONAN_PKG::boost ssl crypto dl CONAN_PKG::bzip2 CONAN_PKG::zlib CONAN_PKG::tbb CONAN_PKG::zmq CONAN_PKG::cppzmq Threads::Threads)
 
+add_executable(krypto-coinbase-orders src/apps/orders/coinbase_main.cpp)
+target_link_libraries(krypto-coinbase-orders krypto CONAN_PKG::boost ssl crypto dl CONAN_PKG::bzip2 CONAN_PKG::zlib CONAN_PKG::tbb CONAN_PKG::zmq CONAN_PKG::cppzmq  CONAN_PKG::cryptopp Threads::Threads)
+
+
 add_executable(krypto-pricing-server src/apps/pricing/krypto_pricing_server_main.cpp)
 target_link_libraries(krypto-pricing-server krypto CONAN_PKG::boost ssl crypto dl CONAN_PKG::bzip2 CONAN_PKG::zlib CONAN_PKG::tbb CONAN_PKG::zmq CONAN_PKG::cppzmq Threads::Threads)
 
