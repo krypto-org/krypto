@@ -10,9 +10,7 @@ import javax.swing.border.EmptyBorder;
 public class OrdersView extends LiveFrame {
 
     private final UIDataCache uiDataCache;
-    private final FillsTable fillsTable;
     private final FillsTableModel fillsTableModel;
-    private final OrdersTable ordersTable;
     private final OrdersTableModel ordersTableModel;
 
     public OrdersView(final UIDataCache uiDataCache) {
@@ -29,13 +27,13 @@ public class OrdersView extends LiveFrame {
         final var splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
         final var ordersTableScrollPane = new JScrollPane();
         this.ordersTableModel = new OrdersTableModel();
-        this.ordersTable = new OrdersTable(this.ordersTableModel);
-        ordersTableScrollPane.setViewportView(this.ordersTable);
+        OrdersTable ordersTable = new OrdersTable(this.ordersTableModel);
+        ordersTableScrollPane.setViewportView(ordersTable);
 
         final var fillsTableScrollPane = new JScrollPane();
         this.fillsTableModel = new FillsTableModel();
-        this.fillsTable = new FillsTable(this.fillsTableModel);
-        fillsTableScrollPane.setViewportView(this.fillsTable);
+        FillsTable fillsTable = new FillsTable(this.fillsTableModel);
+        fillsTableScrollPane.setViewportView(fillsTable);
 
         splitPane.setLeftComponent(ordersTableScrollPane);
         splitPane.setRightComponent(fillsTableScrollPane);
@@ -49,6 +47,11 @@ public class OrdersView extends LiveFrame {
         SwingUtilities.invokeLater(
                 () -> {
                     this.ordersTableModel.updateOrders(this.uiDataCache.getOrders());
+                    while (this.uiDataCache.getFills().size()
+                            != this.fillsTableModel.getRowCount()) {
+                        this.fillsTableModel.addFill(
+                                uiDataCache.getFills().get(this.fillsTableModel.getRowCount()));
+                    }
                 });
     }
 }

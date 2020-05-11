@@ -10,7 +10,7 @@ import java.util.stream.IntStream;
 public class FillsTable extends JTable {
     public FillsTable(final TableModel model) {
         super(model);
-        final var cellRenderer = new CenterAlignedTableCellRenderer();
+        final var cellRenderer = new FillCellRenderer();
         IntStream.range(0, Column.values().length).forEach(idx -> {
             this.columnModel.getColumn(idx).setCellRenderer(cellRenderer);
         });
@@ -20,6 +20,8 @@ public class FillsTable extends JTable {
 
     public enum Column {
         ORDER_ID,
+        SIDE,
+        PRICE,
         FILLED_QTY,
         REM_QTY
     }

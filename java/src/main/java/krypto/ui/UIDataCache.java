@@ -3,6 +3,7 @@ package krypto.ui;
 import krypto.instruments.InstrumentsClient;
 import krypto.mktdata.Conversion;
 import krypto.mktdata.Subscriber;
+import krypto.orders.Fill;
 import krypto.orders.Order;
 import krypto.orders.OrderListener;
 import krypto.pricing.PricingClient;
@@ -19,6 +20,7 @@ public class UIDataCache implements Subscriber.Listener, PricingClient.Listener,
     private final Map<Long, Quote> quotes;
     private final Map<Long, TheoreticalSnapshot> theos;
     private final Map<String, Order> orders;
+    private final List<Fill> fills;
     private final SortedMap<Long, Instrument> instruments;
     private final Map<String, Long> symbolToInstrumentIdMapping;
     private final Set<Long> activeInstruments;
@@ -29,6 +31,7 @@ public class UIDataCache implements Subscriber.Listener, PricingClient.Listener,
         this.quotes = new ConcurrentHashMap<>();
         this.theos = new ConcurrentHashMap<>();
         this.orders = new ConcurrentHashMap<>();
+        this.fills = new ArrayList<>();
         this.symbolToInstrumentIdMapping = new ConcurrentHashMap<>();
         this.activeInstruments = new ConcurrentSkipListSet<>();
     }
@@ -96,14 +99,31 @@ public class UIDataCache implements Subscriber.Listener, PricingClient.Listener,
         return orders;
     }
 
+    public List<Fill> getFills() {
+        return fills;
+    }
+
     @Override
     public void handleOrderEvent(final OrderUpdate orderUpdate) {
         if (this.orders.containsKey(orderUpdate.orderId())) {
             final Order order = this.orders.get(orderUpdate.orderId());
+            final double filledQty = Conversion.convertQuantity(orderUpdate.filledQuantity());
             order.setOrderId(orderUpdate.exchangeOrderId());
             order.setStatus(orderUpdate.status());
-            order.setFilledQty(Conversion.extractQuantity(orderUpdate.filledQuantity()));
-            order.setFees(0.005 * orderUpdate.filledQuantity() * order.getPrice());
+            order.setFilledQty(filledQty);
+            order.setFees(0.005 * filledQty * order.getPrice());
+
+            if (orderUpdate.status() == OrderStatus.FILLED
+                    || orderUpdate.status() == OrderStatus.PARTIALLY_FILLED) {
+                final Fill fill =
+                        new Fill(
+                                orderUpdate.exchangeOrderId(),
+                                order.getSide(),
+                                order.getPrice(),
+                                order.getFilledQty(),
+                                order.getSize() - order.getFilledQty());
+                this.fills.add(fill);
+            }
         }
     }
 

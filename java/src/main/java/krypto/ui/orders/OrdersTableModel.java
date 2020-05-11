@@ -4,14 +4,12 @@ import krypto.orders.Order;
 import krypto.serialization.OrderStatus;
 import krypto.serialization.Side;
 import krypto.serialization.TimeInForce;
-import krypto.ui.UIDataCache;
 import krypto.ui.components.ReadOnlyTableModel;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 public class OrdersTableModel extends ReadOnlyTableModel {
 
@@ -76,6 +74,9 @@ public class OrdersTableModel extends ReadOnlyTableModel {
                 (k, v) -> {
                     if (!this.orders.containsKey(k)) {
                         this.orderIds.add(v.getClOrderId());
+                        this.fireTableRowsInserted(
+                                this.getRowCount() - 1,
+                                this.getRowCount() - 1);
                     }
                     this.orders.put(k, v);
                 });

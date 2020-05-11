@@ -13,7 +13,7 @@ public class OrdersTable extends JTable {
 
     public OrdersTable(final TableModel model) {
         super(model);
-        final var cellRenderer = new CenterAlignedTableCellRenderer();
+        final var cellRenderer = new ActiveOrderTableCellRenderer();
         IntStream.range(0, Column.values().length).forEach(idx -> {
             this.columnModel.getColumn(idx).setCellRenderer(cellRenderer);
         });
