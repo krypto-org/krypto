@@ -103,7 +103,7 @@ add_library(krypto STATIC
         include/krypto/orders/client.h
         include/krypto/utils/id_gen.h
         include/krypto/orders/gateway.h include/krypto/mktdata/gateway.h include/krypto/serialization/helper.h
-        src/krypto/serialization/helper.cpp include/krypto/pricing/ewma.h src/krypto/pricing/ewma.cpp include/krypto/pricing/pub.h src/krypto/pricing/pub.cpp include/krypto/pricing/server.h include/krypto/pricing/client.h src/krypto/pricing/client.cpp src/krypto/exchanges/coinbase/auth.cpp include/krypto/exchanges/coinbase/auth.h include/krypto/exchanges/coinbase/api.h src/krypto/exchanges/coinbase/api.cpp include/krypto/exchanges/coinbase/types.h)
+        src/krypto/serialization/helper.cpp include/krypto/pricing/ewma.h src/krypto/pricing/ewma.cpp include/krypto/pricing/pub.h src/krypto/pricing/pub.cpp include/krypto/pricing/server.h include/krypto/pricing/client.h src/krypto/pricing/client.cpp src/krypto/exchanges/coinbase/auth.cpp include/krypto/exchanges/coinbase/auth.h include/krypto/exchanges/coinbase/api.h src/krypto/exchanges/coinbase/api.cpp include/krypto/exchanges/coinbase/types.h include/krypto/orders/coinbase/server.h)
 target_link_libraries(krypto Threads::Threads)
 
 add_library(crypto STATIC IMPORTED include/krypto/mktdata/coinbase/book_builder.h)
@@ -141,6 +141,10 @@ target_link_libraries(krypto-ws-server krypto CONAN_PKG::boost ssl crypto dl CON
 
 add_executable(krypto-sim-orders src/apps/orders/sim_main.cpp)
 target_link_libraries(krypto-sim-orders krypto CONAN_PKG::boost ssl crypto dl CONAN_PKG::bzip2 CONAN_PKG::zlib CONAN_PKG::tbb CONAN_PKG::zmq CONAN_PKG::cppzmq Threads::Threads)
+
+add_executable(krypto-coinbase-orders src/apps/orders/coinbase_main.cpp)
+target_link_libraries(krypto-coinbase-orders krypto CONAN_PKG::boost ssl crypto dl CONAN_PKG::bzip2 CONAN_PKG::zlib CONAN_PKG::tbb CONAN_PKG::zmq CONAN_PKG::cppzmq  CONAN_PKG::cryptopp Threads::Threads)
+
 
 add_executable(krypto-pricing-server src/apps/pricing/krypto_pricing_server_main.cpp)
 target_link_libraries(krypto-pricing-server krypto CONAN_PKG::boost ssl crypto dl CONAN_PKG::bzip2 CONAN_PKG::zlib CONAN_PKG::tbb CONAN_PKG::zmq CONAN_PKG::cppzmq Threads::Threads)
