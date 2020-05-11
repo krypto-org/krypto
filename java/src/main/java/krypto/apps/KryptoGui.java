@@ -2,9 +2,6 @@ package krypto.apps;
 
 import com.github.weisj.darklaf.LafManager;
 import com.github.weisj.darklaf.theme.DarculaTheme;
-import com.github.weisj.darklaf.theme.HighContrastDarkTheme;
-import com.github.weisj.darklaf.theme.SolarizedDarkTheme;
-import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
 import krypto.instruments.InstrumentsClient;
 import krypto.mktdata.Subscriber;
@@ -14,7 +11,6 @@ import krypto.ui.StartScreen;
 import krypto.ui.UIDataCache;
 import org.zeromq.ZMQ;
 
-import javax.swing.*;
 import java.awt.*;
 import java.io.File;
 import java.util.Collections;
