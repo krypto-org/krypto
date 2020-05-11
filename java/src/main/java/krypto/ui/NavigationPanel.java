@@ -166,5 +166,6 @@ public class NavigationPanel extends JPanel {
     void refresh() {
         this.instrumentsView.refresh();
         this.pricingView.startUpdates();
+        this.ordersView.startUpdates();
     }
 }

@@ -24,22 +24,21 @@ public class OrdersView extends LiveFrame {
 
         contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
         setContentPane(contentPane);
-        contentPane.setLayout(
-                new MigLayout("",
-                        "[fill,grow]",
-                        "[fill,grow]"));
+        contentPane.setLayout(new MigLayout("", "[fill,grow]", "[fill,grow]"));
 
         final var splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
         final var ordersTableScrollPane = new JScrollPane();
         this.ordersTableModel = new OrdersTableModel();
         this.ordersTable = new OrdersTable(this.ordersTableModel);
+        ordersTableScrollPane.setViewportView(this.ordersTable);
 
-        final var fillssTableScrollPane = new JScrollPane();
+        final var fillsTableScrollPane = new JScrollPane();
         this.fillsTableModel = new FillsTableModel();
         this.fillsTable = new FillsTable(this.fillsTableModel);
+        fillsTableScrollPane.setViewportView(this.fillsTable);
 
         splitPane.setLeftComponent(ordersTableScrollPane);
-        splitPane.setRightComponent(fillssTableScrollPane);
+        splitPane.setRightComponent(fillsTableScrollPane);
         splitPane.setDividerLocation(0.5);
         splitPane.setResizeWeight(0.5);
         contentPane.add(splitPane, "cell 0 0 1 1");
@@ -47,6 +46,9 @@ public class OrdersView extends LiveFrame {
 
     @Override
     protected void refreshUi() {
-
+        SwingUtilities.invokeLater(
+                () -> {
+                    this.ordersTableModel.updateOrders(this.uiDataCache.getOrders());
+                });
     }
 }

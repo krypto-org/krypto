@@ -1,7 +1,9 @@
 package krypto.ui;
 
 import krypto.instruments.InstrumentsClient;
+import krypto.mktdata.Conversion;
 import krypto.mktdata.Subscriber;
+import krypto.orders.Order;
 import krypto.orders.OrderListener;
 import krypto.pricing.PricingClient;
 import krypto.serialization.*;
@@ -11,12 +13,12 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.stream.Collectors;
 
-public class UIDataCache implements
-        Subscriber.Listener, PricingClient.Listener, OrderListener {
+public class UIDataCache implements Subscriber.Listener, PricingClient.Listener, OrderListener {
 
     private final InstrumentsClient instrumentsClient;
     private final Map<Long, Quote> quotes;
     private final Map<Long, TheoreticalSnapshot> theos;
+    private final Map<String, Order> orders;
     private final SortedMap<Long, Instrument> instruments;
     private final Map<String, Long> symbolToInstrumentIdMapping;
     private final Set<Long> activeInstruments;
@@ -26,14 +28,13 @@ public class UIDataCache implements
         this.instruments = new TreeMap<>();
         this.quotes = new ConcurrentHashMap<>();
         this.theos = new ConcurrentHashMap<>();
+        this.orders = new ConcurrentHashMap<>();
         this.symbolToInstrumentIdMapping = new ConcurrentHashMap<>();
         this.activeInstruments = new ConcurrentSkipListSet<>();
     }
 
     @Override
-    public void onHeartbeat(final Heartbeat hb) {
-
-    }
+    public void onHeartbeat(final Heartbeat hb) {}
 
     @Override
     public void onQuote(final Quote quote) {
@@ -43,14 +44,10 @@ public class UIDataCache implements
     }
 
     @Override
-    public void onTrade(final Trade quote) {
-
-    }
+    public void onTrade(final Trade quote) {}
 
     @Override
-    public void onOrderUpdate(final OrderUpdate ou) {
-
-    }
+    public void onOrderUpdate(final OrderUpdate ou) {}
 
     @Override
     public void onTheoreticalSnapshot(TheoreticalSnapshot snapshot) {
@@ -64,20 +61,23 @@ public class UIDataCache implements
             this.instruments.clear();
             this.activeInstruments.clear();
             instrumentsClient.getInstruments().forEach(this.instruments::put);
-            this.instruments.values().forEach(inst -> {
-                if (inst.active()) {
-                    activeInstruments.add(inst.id());
-                    symbolToInstrumentIdMapping.put(inst.symbol(), inst.id());
-                }
-            });
+            this.instruments
+                    .values()
+                    .forEach(
+                            inst -> {
+                                if (inst.active()) {
+                                    activeInstruments.add(inst.id());
+                                    symbolToInstrumentIdMapping.put(inst.symbol(), inst.id());
+                                }
+                            });
         }
         return instruments;
     }
 
     public Map<Long, Instrument> getActiveInstruments(final boolean reloadCache) {
-        return this.getInstruments(reloadCache).values().stream().filter(
-                Instrument::active).collect(
-                        Collectors.toMap(Instrument::id, instrument -> instrument));
+        return this.getInstruments(reloadCache).values().stream()
+                .filter(Instrument::active)
+                .collect(Collectors.toMap(Instrument::id, instrument -> instrument));
     }
 
     public Map<String, Long> getSymbolToInstrumentIdMapping() {
@@ -92,8 +92,22 @@ public class UIDataCache implements
         return theos;
     }
 
-    @Override
-    public void handleOrderEvent(OrderUpdate orderUpdate) {
+    public Map<String, Order> getOrders() {
+        return orders;
+    }
 
+    @Override
+    public void handleOrderEvent(final OrderUpdate orderUpdate) {
+        if (this.orders.containsKey(orderUpdate.orderId())) {
+            final Order order = this.orders.get(orderUpdate.orderId());
+            order.setOrderId(orderUpdate.exchangeOrderId());
+            order.setStatus(orderUpdate.status());
+            order.setFilledQty(Conversion.extractQuantity(orderUpdate.filledQuantity()));
+            order.setFees(0.005 * orderUpdate.filledQuantity() * order.getPrice());
+        }
+    }
+
+    public void registerOrder(final Order order) {
+        this.orders.put(order.getClOrderId(), order);
     }
 }

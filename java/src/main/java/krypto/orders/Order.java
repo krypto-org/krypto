@@ -1,6 +1,9 @@
 package krypto.orders;
 
+import krypto.serialization.OrderUpdate;
+
 public class Order {
+    private final String clOrderId;
     private final long securityId;
     private final String symbol;
     private final double price;
@@ -15,12 +18,14 @@ public class Order {
     private double fees;
 
     public Order(
+            final String clOrderId,
             final long securityId,
             final String symbol,
             final double price,
             final double size,
             final byte side,
             final byte tif) {
+        this.clOrderId = clOrderId;
         this.securityId = securityId;
         this.symbol = symbol;
         this.price = price;
@@ -47,6 +52,10 @@ public class Order {
     public void setFees(final double fees) {
         this.fees = fees;
         this.lastUpdatedTimestamp = System.currentTimeMillis();
+    }
+
+    public String getClOrderId() {
+        return clOrderId;
     }
 
     public long getSecurityId() {

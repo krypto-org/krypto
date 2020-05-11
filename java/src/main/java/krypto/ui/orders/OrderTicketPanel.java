@@ -1,5 +1,6 @@
 package krypto.ui.orders;
 
+import krypto.orders.Order;
 import krypto.orders.OrderClient;
 import krypto.serialization.Quote;
 import krypto.serialization.Side;
@@ -15,7 +16,7 @@ public class OrderTicketPanel extends JPanel {
 
     private static final Logger logger = LogManager.getLogger(OrderTicketPanel.class);
 
-    private static final String EXCHANGE = "SIM";
+    private static final String EXCHANGE = "COINBASE_SANDBOX";
 
     private final OrderTicketTableModel tableModel;
     private final OrderClient client;
@@ -62,6 +63,7 @@ public class OrderTicketPanel extends JPanel {
         final byte tif = this.tableModel.getTif().getValue();
         logger.info("Sending order for symbol {} [{}] {} {}@{} | {}",
                 symbol, id, Side.name(side), qty, price, TimeInForce.name(tif));
-        this.client.newOrder(EXCHANGE, id, price, qty, side, tif);
+        final var orderId = this.client.newOrder(EXCHANGE, id, price, qty, side, tif);
+        this.uiDataCache.registerOrder(new Order(orderId, id, symbol,price, qty, side, tif));
     }
 }

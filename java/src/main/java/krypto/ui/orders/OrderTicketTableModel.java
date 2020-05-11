@@ -7,7 +7,7 @@ import javax.swing.table.AbstractTableModel;
 
 public class OrderTicketTableModel extends AbstractTableModel {
 
-    private static final double MIN_SIZE = 0.0001;
+    private static final double MIN_SIZE = 0.001;
 
     private String symbol = "N/A";
     private double price = Double.NaN;
