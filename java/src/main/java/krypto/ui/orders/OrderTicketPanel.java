@@ -1,5 +1,6 @@
 package krypto.ui.orders;
 
+import krypto.orders.Order;
 import krypto.orders.OrderClient;
 import krypto.serialization.Quote;
 import krypto.serialization.Side;
@@ -60,8 +61,10 @@ public class OrderTicketPanel extends JPanel {
         final double qty = this.tableModel.getSize();
         final byte side = this.tableModel.getSide().getValue();
         final byte tif = this.tableModel.getTif().getValue();
+        final String exchange = this.tableModel.getExchange().toString();
         logger.info("Sending order for symbol {} [{}] {} {}@{} | {}",
                 symbol, id, Side.name(side), qty, price, TimeInForce.name(tif));
-        this.client.newOrder(EXCHANGE, id, price, qty, side, tif);
+        final var orderId = this.client.newOrder(exchange, id, price, qty, side, tif);
+        this.uiDataCache.registerOrder(new Order(orderId, id, symbol,price, qty, side, tif));
     }
 }

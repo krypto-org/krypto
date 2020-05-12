@@ -1,5 +1,6 @@
 package krypto.ui.orders;
 
+import krypto.orders.Exchange;
 import krypto.ui.components.CenterAlignedTableCellRenderer;
 import krypto.ui.components.ComboBoxTableCellEditor;
 import krypto.ui.components.EditableCellRenderer;
@@ -44,6 +45,16 @@ public class OrderTicketTable extends JTable {
         this.getColumnModel()
                 .getColumn(Column.Size.ordinal())
                 .setCellRenderer(new EditableCellRenderer(QUANTITY_FORMAT));
+
+        this.getColumnModel()
+                .getColumn(Column.EXCHANGE.ordinal())
+                .setCellEditor(new ComboBoxTableCellEditor<>(Exchange.values()));
+        this.getColumnModel()
+                .getColumn(Column.EXCHANGE.ordinal())
+                .setCellRenderer(centerAlignedTableCellRenderer);
+        this.setRowSelectionAllowed(false);
+        this.setColumnSelectionAllowed(false);
+        this.setCellSelectionEnabled(true);
     }
 
     @Override
@@ -64,6 +75,7 @@ public class OrderTicketTable extends JTable {
         Price,
         Size,
         Side,
-        TIF
+        TIF,
+        EXCHANGE
     }
 }

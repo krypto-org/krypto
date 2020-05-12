@@ -1,19 +1,21 @@
 package krypto.ui.orders;
 
 import krypto.mktdata.Conversion;
+import krypto.orders.Exchange;
 import krypto.serialization.Quote;
 
 import javax.swing.table.AbstractTableModel;
 
 public class OrderTicketTableModel extends AbstractTableModel {
 
-    private static final double MIN_SIZE = 0.0001;
+    private static final double MIN_SIZE = 0.001;
 
     private String symbol = "N/A";
     private double price = Double.NaN;
     private double size = Double.NaN;
     private Side side = Side.BUY;
     private TimeInForce tif = TimeInForce.DAY;
+    private Exchange exchange = Exchange.SIM;
 
     @Override
     public int getRowCount() {
@@ -49,6 +51,8 @@ public class OrderTicketTableModel extends AbstractTableModel {
                 return side.toString();
             case TIF:
                 return tif.toString();
+            case EXCHANGE:
+                return exchange.toString();
         }
         return null;
     }
@@ -63,6 +67,8 @@ public class OrderTicketTableModel extends AbstractTableModel {
             this.price = Double.parseDouble(value.toString());
         } else if (columnIndex == OrderTicketTable.Column.Size.ordinal()) {
             this.size = Double.parseDouble(value.toString());
+        } else if (columnIndex == OrderTicketTable.Column.EXCHANGE.ordinal()) {
+            this.exchange = Exchange.valueOf(value.toString());
         }
         super.setValueAt(value, rowIndex, columnIndex);
         this.fireTableRowsUpdated(rowIndex, rowIndex);
@@ -109,5 +115,9 @@ public class OrderTicketTableModel extends AbstractTableModel {
 
     public TimeInForce getTif() {
         return tif;
+    }
+
+    public Exchange getExchange() {
+        return exchange;
     }
 }

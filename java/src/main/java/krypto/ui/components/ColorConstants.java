@@ -40,6 +40,9 @@ public class ColorConstants {
         public static final Color LIGHT_BLUE = new Color(127, 126, 161);
         public static final Color LIGHT_RED = new Color(213, 158, 170);
 
+        public static final Color DARK_GREEN = new Color(107,145, 71);
+        public static final Color LIGHT_GREEN = new Color(218,234,202);
+
         public static final Color APPLICATION_GOLDEN = new Color(255, 215, 0);
 
         public static final Color APPLICATION_CHARCOAL = new Color(21, 27, 31);
@@ -57,6 +60,8 @@ public class ColorConstants {
 
     public static Color THEO_ASK_BACKGROUND_COLOR = CustomColors.MEDIUM_RED;
     public static Color THEO_ASK_FOREGRPUND_COLOR = Color.WHITE;
+
+    public static Color ACTIVE_ORDER_COLOR = CustomColors.LIGHT_GREEN;
 
     public static Color CALL_COLOR = CustomColors.LIGHT_BLUE;
     public static Color PUT_COLOR = CustomColors.LIGHT_BLUE;

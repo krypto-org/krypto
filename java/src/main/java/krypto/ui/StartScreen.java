@@ -72,6 +72,7 @@ public class StartScreen extends LiveFrame {
 
         this.orderClientListener = new UIOrderClientListener();
         this.orderClient.registerListener(this.orderClientListener);
+        this.orderClient.registerListener(this.uiDataCache);
 
         this.queryInstruments();
         this.startUpdates();
