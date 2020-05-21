@@ -328,11 +328,12 @@ enum Currency {
   Currency_OXT = 27,
   Currency_ATOM = 28,
   Currency_KNC = 29,
+  Currency_OMG = 30,
   Currency_MIN = Currency_UNKNOWN,
-  Currency_MAX = Currency_KNC
+  Currency_MAX = Currency_OMG
 };
 
-inline const Currency (&EnumValuesCurrency())[30] {
+inline const Currency (&EnumValuesCurrency())[31] {
   static const Currency values[] = {
     Currency_UNKNOWN,
     Currency_BAT,
@@ -363,7 +364,8 @@ inline const Currency (&EnumValuesCurrency())[30] {
     Currency_DASH,
     Currency_OXT,
     Currency_ATOM,
-    Currency_KNC
+    Currency_KNC,
+    Currency_OMG
   };
   return values;
 }
@@ -400,13 +402,14 @@ inline const char * const *EnumNamesCurrency() {
     "OXT",
     "ATOM",
     "KNC",
+    "OMG",
     nullptr
   };
   return names;
 }
 
 inline const char *EnumNameCurrency(Currency e) {
-  if (e < Currency_UNKNOWN || e > Currency_KNC) return "";
+  if (e < Currency_UNKNOWN || e > Currency_OMG) return "";
   const size_t index = static_cast<size_t>(e);
   return EnumNamesCurrency()[index];
 }

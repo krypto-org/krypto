@@ -77,13 +77,14 @@ namespace krypto::orders {
             KRYP_LOG(info, "Started order gateway");
         }
 
-        while (running_) {
-            zmq::pollitem_t items[] = {
-                    {*backend_,  0, ZMQ_POLLIN, 0},
-                    {*frontend_, 0, ZMQ_POLLIN, 0}
-            };
+        zmq::pollitem_t items[] = {
+                {*backend_,  0, ZMQ_POLLIN, 0},
+                {*frontend_, 0, ZMQ_POLLIN, 0}
+        };
 
-            zmq::poll(&items[0], 2, 0);
+        while (running_) {
+
+            zmq::poll(&items[0], 2, 10);
 
             if (items[0].revents && ZMQ_POLLIN) {
                 /*
