@@ -329,11 +329,25 @@ enum Currency {
   Currency_ATOM = 28,
   Currency_KNC = 29,
   Currency_OMG = 30,
+  Currency_MKR = 31,
+  Currency_WBTC = 32,
+  Currency_NU = 33,
+  Currency_YFI = 34,
+  Currency_BAND = 35,
+  Currency_UMA = 36,
+  Currency_NMR = 37,
+  Currency_FIL = 38,
+  Currency_CGLD = 39,
+  Currency_LRC = 40,
+  Currency_COMP = 41,
+  Currency_UNI = 42,
+  Currency_REN = 43,
+  Currency_BAL = 44,
   Currency_MIN = Currency_UNKNOWN,
-  Currency_MAX = Currency_OMG
+  Currency_MAX = Currency_BAL
 };
 
-inline const Currency (&EnumValuesCurrency())[31] {
+inline const Currency (&EnumValuesCurrency())[45] {
   static const Currency values[] = {
     Currency_UNKNOWN,
     Currency_BAT,
@@ -365,7 +379,21 @@ inline const Currency (&EnumValuesCurrency())[31] {
     Currency_OXT,
     Currency_ATOM,
     Currency_KNC,
-    Currency_OMG
+    Currency_OMG,
+    Currency_MKR,
+    Currency_WBTC,
+    Currency_NU,
+    Currency_YFI,
+    Currency_BAND,
+    Currency_UMA,
+    Currency_NMR,
+    Currency_FIL,
+    Currency_CGLD,
+    Currency_LRC,
+    Currency_COMP,
+    Currency_UNI,
+    Currency_REN,
+    Currency_BAL
   };
   return values;
 }
@@ -403,13 +431,27 @@ inline const char * const *EnumNamesCurrency() {
     "ATOM",
     "KNC",
     "OMG",
+    "MKR",
+    "WBTC",
+    "NU",
+    "YFI",
+    "BAND",
+    "UMA",
+    "NMR",
+    "FIL",
+    "CGLD",
+    "LRC",
+    "COMP",
+    "UNI",
+    "REN",
+    "BAL",
     nullptr
   };
   return names;
 }
 
 inline const char *EnumNameCurrency(Currency e) {
-  if (e < Currency_UNKNOWN || e > Currency_OMG) return "";
+  if (e < Currency_UNKNOWN || e > Currency_BAL) return "";
   const size_t index = static_cast<size_t>(e);
   return EnumNamesCurrency()[index];
 }

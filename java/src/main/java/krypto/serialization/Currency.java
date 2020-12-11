@@ -35,8 +35,22 @@ public final class Currency {
   public static final byte ATOM = 28;
   public static final byte KNC = 29;
   public static final byte OMG = 30;
+  public static final byte MKR = 31;
+  public static final byte WBTC = 32;
+  public static final byte NU = 33;
+  public static final byte YFI = 34;
+  public static final byte BAND = 35;
+  public static final byte UMA = 36;
+  public static final byte NMR = 37;
+  public static final byte FIL = 38;
+  public static final byte CGLD = 39;
+  public static final byte LRC = 40;
+  public static final byte COMP = 41;
+  public static final byte UNI = 42;
+  public static final byte REN = 43;
+  public static final byte BAL = 44;
 
-  public static final String[] names = { "UNKNOWN", "BAT", "BCH", "BTC", "CVC", "DAI", "DNT", "EOS", "ETC", "ETH", "EUR", "GBP", "GNT", "LINK", "LOOM", "LTC", "MANA", "REP", "USD", "USDC", "XLM", "XRP", "ZEC", "ZRX", "XTZ", "ALGO", "DASH", "OXT", "ATOM", "KNC", "OMG", };
+  public static final String[] names = { "UNKNOWN", "BAT", "BCH", "BTC", "CVC", "DAI", "DNT", "EOS", "ETC", "ETH", "EUR", "GBP", "GNT", "LINK", "LOOM", "LTC", "MANA", "REP", "USD", "USDC", "XLM", "XRP", "ZEC", "ZRX", "XTZ", "ALGO", "DASH", "OXT", "ATOM", "KNC", "OMG", "MKR", "WBTC", "NU", "YFI", "BAND", "UMA", "NMR", "FIL", "CGLD", "LRC", "COMP", "UNI", "REN", "BAL", };
 
   public static String name(int e) { return names[e]; }
 }
