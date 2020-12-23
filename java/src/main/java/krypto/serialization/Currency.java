@@ -49,8 +49,12 @@ public final class Currency {
   public static final byte UNI = 42;
   public static final byte REN = 43;
   public static final byte BAL = 44;
+  public static final byte GRT = 45;
+  public static final byte BNT = 46;
+  public static final byte AAVE = 47;
+  public static final byte SNX = 48;
 
-  public static final String[] names = { "UNKNOWN", "BAT", "BCH", "BTC", "CVC", "DAI", "DNT", "EOS", "ETC", "ETH", "EUR", "GBP", "GNT", "LINK", "LOOM", "LTC", "MANA", "REP", "USD", "USDC", "XLM", "XRP", "ZEC", "ZRX", "XTZ", "ALGO", "DASH", "OXT", "ATOM", "KNC", "OMG", "MKR", "WBTC", "NU", "YFI", "BAND", "UMA", "NMR", "FIL", "CGLD", "LRC", "COMP", "UNI", "REN", "BAL", };
+  public static final String[] names = { "UNKNOWN", "BAT", "BCH", "BTC", "CVC", "DAI", "DNT", "EOS", "ETC", "ETH", "EUR", "GBP", "GNT", "LINK", "LOOM", "LTC", "MANA", "REP", "USD", "USDC", "XLM", "XRP", "ZEC", "ZRX", "XTZ", "ALGO", "DASH", "OXT", "ATOM", "KNC", "OMG", "MKR", "WBTC", "NU", "YFI", "BAND", "UMA", "NMR", "FIL", "CGLD", "LRC", "COMP", "UNI", "REN", "BAL", "GRT", "BNT", "AAVE", "SNX", };
 
   public static String name(int e) { return names[e]; }
 }

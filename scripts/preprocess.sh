@@ -15,7 +15,7 @@ SCRIPT_DIR=$(dirname "${SCRIPT_PATH}")
 KRYPTO_DIR=$(realpath "${SCRIPT_DIR}"/..)
 
 # shellcheck disable=SC2034
-GCC_VERSION=9.3
+GCC_VERSION=10.2
 FLAT_BUFFERS_VERSION=1.11.0
 FLAT_BUFFERS_BINARY_PACKAGE=flatbuffers/${FLAT_BUFFERS_VERSION}@kapilsh/release
 

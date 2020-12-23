@@ -73,7 +73,11 @@ enum Currency : byte {
     COMP,
     UNI,
     REN,
-    BAL
+    BAL,
+    GRT,
+    BNT,
+    AAVE,
+    SNX
 }
 
 enum RequestType: byte {INVALID, ALL, ID, EXCHANGE, PRODUCT}
