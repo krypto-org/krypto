@@ -79,14 +79,14 @@ namespace krypto::network::rpc {
 
                     auto msg_type = recv_msg_type(*backend_);
 
-                    send_string(*frontend_, client_addr, ZMQ_SNDMORE);
-                    send_empty_frame(*frontend_, ZMQ_SNDMORE);
-                    send_string(*frontend_, service_name, ZMQ_SNDMORE);
+                    send_string(*frontend_, client_addr, zmq::send_flags::sndmore);
+                    send_empty_frame(*frontend_, zmq::send_flags::sndmore);
+                    send_string(*frontend_, service_name, zmq::send_flags::sndmore);
 
                     bool no_more_flag = msg_type == krypto::utils::MsgType::NO_PAYLOAD ||
                                          msg_type == krypto::utils::MsgType::UNDEFINED;
 
-                    send_msg_type(*frontend_, msg_type, no_more_flag ? ZMQ_NULL : ZMQ_SNDMORE);
+                    send_msg_type(*frontend_, msg_type, no_more_flag ? zmq::send_flags::none : zmq::send_flags::sndmore);
 
                     if (no_more_flag) {
                         continue;
@@ -115,22 +115,22 @@ namespace krypto::network::rpc {
 
                 if (workers_.find(service) != std::end(workers_)) {
                     auto worker_addr = workers_.at(service);
-                    send_string(*backend_, worker_addr, ZMQ_SNDMORE);
-                    send_empty_frame(*backend_, ZMQ_SNDMORE);
-                    send_string(*backend_, client_addr, ZMQ_SNDMORE);
-                    send_empty_frame(*backend_, ZMQ_SNDMORE);
+                    send_string(*backend_, worker_addr, zmq::send_flags::sndmore);
+                    send_empty_frame(*backend_, zmq::send_flags::sndmore);
+                    send_string(*backend_, client_addr, zmq::send_flags::sndmore);
+                    send_empty_frame(*backend_, zmq::send_flags::sndmore);
 
                     if constexpr (Verbose) {
                         KRYP_LOG(info, "{} sending request to {}@{} with payload size {}",
                                  client_addr, service, worker_addr, request_payload.size());
                     }
-                    send_msg_type(*backend_, msg_type, ZMQ_SNDMORE);
+                    send_msg_type(*backend_, msg_type, zmq::send_flags::sndmore);
                     backend_->send(request_payload);
                 } else {
                     KRYP_LOG(info, "Service not available");
-                    send_string(*frontend_, client_addr, ZMQ_SNDMORE);
-                    send_empty_frame(*frontend_, ZMQ_SNDMORE);
-                    send_string(*frontend_, service, ZMQ_SNDMORE);
+                    send_string(*frontend_, client_addr, zmq::send_flags::sndmore);
+                    send_empty_frame(*frontend_, zmq::send_flags::sndmore);
+                    send_string(*frontend_, service, zmq::send_flags::sndmore);
                     send_msg_type(*frontend_, krypto::utils::MsgType::UNDEFINED);
                 }
             }

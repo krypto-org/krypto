@@ -1,6 +1,6 @@
 #define CATCH_CONFIG_MAIN
 
-#include <catch.hpp>
+#include <catch2/catch.hpp>
 #include <nlohmann/json.hpp>
 
 #include <krypto/exchanges/coinbase/auth.h>

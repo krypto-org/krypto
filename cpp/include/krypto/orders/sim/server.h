@@ -341,8 +341,7 @@ namespace krypto::orders::sim {
 
         running_ = true;
 
-        const std::string subscription = "";
-        mktdata_subscriber_->setsockopt(ZMQ_SUBSCRIBE, &subscription[0], subscription.length());
+        mktdata_subscriber_->template set(zmq::sockopt::subscribe, "");
 
         while (running_) {
             zmq::poll(&items[0], 2, 0);
@@ -353,7 +352,11 @@ namespace krypto::orders::sim {
                 auto msg_type = msg_type_ref_.at(topic_prefix);
 
                 zmq::message_t payload_msg;
-                mktdata_subscriber_->recv(&payload_msg);
+                const auto payload_size = mktdata_subscriber_->recv(payload_msg, zmq::recv_flags::none);
+
+                if (!payload_size.has_value()) {
+                    KRYP_LOG(error, "Payload has 0 size");
+                }
 
                 switch (msg_type) {
                     case krypto::utils::MsgType::QUOTE: {
@@ -383,7 +386,11 @@ namespace krypto::orders::sim {
                 auto address = krypto::network::recv_string(*receiver_);
                 auto msg_type = krypto::network::recv_msg_type(*receiver_);
                 zmq::message_t payload_msg;
-                receiver_->recv(&payload_msg);
+                const auto payload_size = receiver_->recv(payload_msg, zmq::recv_flags::none);
+
+                if (!payload_size.has_value()) {
+                    KRYP_LOG(error, "Payload has 0 size");
+                }
 
                 if constexpr (Verbose) {
                     KRYP_LOG(info, "Received request with payload size {} from {}",
@@ -444,10 +451,10 @@ namespace krypto::orders::sim {
                      krypto::serialization::EnumNameOrderStatus(
                              order_update.status), order_update.order_id);
         }
-        krypto::network::send_empty_frame(*receiver_, ZMQ_SNDMORE);
-        krypto::network::send_status(*receiver_, krypto::network::SocketStatus::REPLY, ZMQ_SNDMORE);
-        krypto::network::send_string(*receiver_, client_identity, ZMQ_SNDMORE);
-        krypto::network::send_msg_type(*receiver_, krypto::utils::MsgType::ORDER_UPDATE, ZMQ_SNDMORE);
+        krypto::network::send_empty_frame(*receiver_, zmq::send_flags::sndmore);
+        krypto::network::send_status(*receiver_, krypto::network::SocketStatus::REPLY, zmq::send_flags::sndmore);
+        krypto::network::send_string(*receiver_, client_identity, zmq::send_flags::sndmore);
+        krypto::network::send_msg_type(*receiver_, krypto::utils::MsgType::ORDER_UPDATE, zmq::send_flags::sndmore);
         serialize(order_update);
         krypto::network::send_fb_buffer(*receiver_, fb_builder_);
     }
@@ -458,7 +465,7 @@ namespace krypto::orders::sim {
             KRYP_LOG(info, "Sending ready status");
         }
 
-        krypto::network::send_empty_frame(*receiver_, ZMQ_SNDMORE);
+        krypto::network::send_empty_frame(*receiver_, zmq::send_flags::sndmore);
         krypto::network::send_status(*receiver_, krypto::network::SocketStatus::READY);
     }
 
@@ -468,7 +475,7 @@ namespace krypto::orders::sim {
             KRYP_LOG(info, "Sending disconnect status");
         }
 
-        krypto::network::send_empty_frame(*receiver_, ZMQ_SNDMORE);
+        krypto::network::send_empty_frame(*receiver_, zmq::send_flags::sndmore);
         krypto::network::send_status(*receiver_, krypto::network::SocketStatus::DISCONNECT);
     }
 }

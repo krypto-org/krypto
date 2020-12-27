@@ -31,18 +31,18 @@ namespace krypto::network {
             const std::string& endpoint,
             const std::string& identity);
 
-    void send_string(zmq::socket_t &socket, std::string &&value, int flags_ = 0);
+    void send_string(zmq::socket_t &socket, std::string &&value, zmq::send_flags flags_ = zmq::send_flags::none);
 
-    void send_string(zmq::socket_t &socket, const std::string &value, int flags_ = 0);
+    void send_string(zmq::socket_t &socket, const std::string &value, zmq::send_flags flags_ = zmq::send_flags::none);
 
-    void send_empty_frame(zmq::socket_t &socket, int flags_ = 0);
+    void send_empty_frame(zmq::socket_t &socket, zmq::send_flags flags_ = zmq::send_flags::none);
 
-    void send_status(zmq::socket_t &socket, SocketStatus &&status, int flags_ = 0);
+    void send_status(zmq::socket_t &socket, SocketStatus &&status, zmq::send_flags flags_ = zmq::send_flags::none);
 
-    void send_msg_type(zmq::socket_t &socket, const krypto::utils::MsgType &msg_type, int flags_ = 0);
+    void send_msg_type(zmq::socket_t &socket, const krypto::utils::MsgType &msg_type, zmq::send_flags flags_ = zmq::send_flags::none);
 
     void send_fb_buffer(zmq::socket_t &socket,
-            const flatbuffers::FlatBufferBuilder& fb_builder, int flags_ = 0);
+            const flatbuffers::FlatBufferBuilder& fb_builder, zmq::send_flags flags_ = zmq::send_flags::none);
 
     std::string recv_string(zmq::socket_t &socket);
 

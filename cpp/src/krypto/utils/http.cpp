@@ -104,7 +104,6 @@ namespace krypto::utils {
         req.set(http::field::host, host_);
         req.set(http::field::user_agent, BOOST_BEAST_VERSION_STRING);
         req.set(http::field::content_type, "application/json");
-        req.set(http::field::content_length, data.size());
         for (auto &&pair: custom_headers) {
             req.insert(pair.first, pair.second);
         }

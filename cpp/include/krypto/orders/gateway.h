@@ -105,25 +105,29 @@ namespace krypto::orders {
                 } else if (status == krypto::network::SocketStatus::REPLY) {
                     auto client_addr = krypto::network::recv_string(*backend_);
                     auto msg_type = krypto::network::recv_msg_type(*backend_);
-                    krypto::network::send_string(*frontend_, client_addr, ZMQ_SNDMORE);
-                    krypto::network::send_empty_frame(*frontend_, ZMQ_SNDMORE);
-                    krypto::network::send_string(*frontend_, exchange, ZMQ_SNDMORE);
+                    krypto::network::send_string(*frontend_, client_addr, zmq::send_flags::sndmore);
+                    krypto::network::send_empty_frame(*frontend_, zmq::send_flags::sndmore);
+                    krypto::network::send_string(*frontend_, exchange, zmq::send_flags::sndmore);
 
                     bool no_more_flag = msg_type == krypto::utils::MsgType::NO_PAYLOAD ||
                                         msg_type == krypto::utils::MsgType::UNDEFINED;
-                    krypto::network::send_msg_type(*frontend_, msg_type, no_more_flag ? ZMQ_NULL : ZMQ_SNDMORE);
+                    krypto::network::send_msg_type(*frontend_, msg_type, no_more_flag ? zmq::send_flags::none : zmq::send_flags::sndmore);
                     if (no_more_flag) {
                         continue;
                     }
 
                     zmq::message_t payload;
-                    backend_->recv(&payload);
+                    const auto payload_size = backend_->recv(payload, zmq::recv_flags::none);
+                    if (!payload_size.has_value()) {
+                        KRYP_LOG(error, "Payload had 0 size");
+                        break;
+                    }
                     if constexpr (Verbose) {
                         KRYP_LOG(info, "{} <= * <= {} :: {} + Payload Size: {}",
                                  client_addr, exchange,
                                  krypto::utils::MsgTypeNames[static_cast<int>(msg_type)], payload.size());
                     }
-                    frontend_->send(payload);
+                    frontend_->send(payload, zmq::send_flags::none);
                 }
             }
 
@@ -139,13 +143,18 @@ namespace krypto::orders {
                 auto msg_type = krypto::network::recv_msg_type(*frontend_);
 
                 zmq::message_t request_payload;
-                frontend_->recv(&request_payload);
+                const auto payload_size = frontend_->recv(request_payload, zmq::recv_flags::none);
+
+                if (!payload_size.has_value()) {
+                    KRYP_LOG(error, "Payload has 0 size");
+                    break;
+                }
 
                 if (workers_.find(exchange) != std::end(workers_)) {
                     auto worker_addr = workers_.at(exchange);
-                    krypto::network::send_string(*backend_, worker_addr, ZMQ_SNDMORE);
-                    krypto::network::send_empty_frame(*backend_, ZMQ_SNDMORE);
-                    krypto::network::send_string(*backend_, client_addr, ZMQ_SNDMORE);
+                    krypto::network::send_string(*backend_, worker_addr, zmq::send_flags::sndmore);
+                    krypto::network::send_empty_frame(*backend_, zmq::send_flags::sndmore);
+                    krypto::network::send_string(*backend_, client_addr, zmq::send_flags::sndmore);
                     if constexpr (Verbose) {
                         KRYP_LOG(info, "{} => * => {} @ {} : {} + Payload Size: {}",
                                  client_addr,
@@ -154,13 +163,13 @@ namespace krypto::orders {
                                  krypto::utils::MsgTypeNames[static_cast<int>(msg_type)],
                                  request_payload.size());
                     }
-                    krypto::network::send_msg_type(*backend_, msg_type, ZMQ_SNDMORE);
-                    backend_->send(request_payload);
+                    krypto::network::send_msg_type(*backend_, msg_type, zmq::send_flags::sndmore);
+                    backend_->send(request_payload, zmq::send_flags::none);
                 } else {
                     KRYP_LOG(info, "Service not available");
-                    krypto::network::send_string(*frontend_, client_addr, ZMQ_SNDMORE);
-                    krypto::network::send_empty_frame(*frontend_, ZMQ_SNDMORE);
-                    krypto::network::send_string(*frontend_, exchange, ZMQ_SNDMORE);
+                    krypto::network::send_string(*frontend_, client_addr, zmq::send_flags::sndmore);
+                    krypto::network::send_empty_frame(*frontend_, zmq::send_flags::sndmore);
+                    krypto::network::send_string(*frontend_, exchange, zmq::send_flags::sndmore);
                     krypto::network::send_msg_type(*frontend_, krypto::utils::MsgType::UNDEFINED);
                     if constexpr (Verbose) {
                         KRYP_LOG(info, "{} <= *",

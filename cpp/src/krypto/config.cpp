@@ -2,9 +2,8 @@
 
 krypto::Config::Config(std::string &&file_path) : root_{} {
     std::ifstream file(file_path);
-    root_ << file;
+    root_ = nlohmann::json::parse(file);
     root_ = root_.flatten();
-
     KRYP_LOG(info, root_.dump(4));
 }
 

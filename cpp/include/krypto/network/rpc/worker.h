@@ -81,8 +81,8 @@ namespace krypto::network::rpc {
             KRYP_LOG(info, "Sending ready status");
         }
 
-        send_empty_frame(*socket_, ZMQ_SNDMORE);
-        send_status(*socket_, SocketStatus::READY, ZMQ_SNDMORE);
+        send_empty_frame(*socket_, zmq::send_flags::sndmore);
+        send_status(*socket_, SocketStatus::READY, zmq::send_flags::sndmore);
         send_string(*socket_, service_);
     }
 
@@ -125,14 +125,14 @@ namespace krypto::network::rpc {
                     }, payload.value());
                 }
 
-                send_empty_frame(*socket_, ZMQ_SNDMORE);
-                send_status(*socket_, SocketStatus::REPLY, ZMQ_SNDMORE);
-                send_string(*socket_, service_, ZMQ_SNDMORE);
-                send_string(*socket_, address, ZMQ_SNDMORE);
-                send_empty_frame(*socket_, ZMQ_SNDMORE);
+                send_empty_frame(*socket_, zmq::send_flags::sndmore);
+                send_status(*socket_, SocketStatus::REPLY, zmq::send_flags::sndmore);
+                send_string(*socket_, service_, zmq::send_flags::sndmore);
+                send_string(*socket_, address, zmq::send_flags::sndmore);
+                send_empty_frame(*socket_, zmq::send_flags::sndmore);
 
                 bool flag = result_msg_type == krypto::utils::MsgType::NO_PAYLOAD;
-                send_msg_type(*socket_, result_msg_type, flag ? ZMQ_NULL : ZMQ_SNDMORE);
+                send_msg_type(*socket_, result_msg_type, flag ? zmq::send_flags::none : zmq::send_flags::sndmore);
 
                 if (!flag) {
                     zmq::message_t result_msg(fb_builder_.GetSize());
@@ -160,8 +160,8 @@ namespace krypto::network::rpc {
             KRYP_LOG(info, "Sending disconnect status");
         }
 
-        send_empty_frame(*socket_, ZMQ_SNDMORE);
-        send_status(*socket_, SocketStatus::DISCONNECT, ZMQ_SNDMORE);
+        send_empty_frame(*socket_, zmq::send_flags::sndmore);
+        send_status(*socket_, SocketStatus::DISCONNECT, zmq::send_flags::sndmore);
         send_string(*socket_, service_);
     }
 }

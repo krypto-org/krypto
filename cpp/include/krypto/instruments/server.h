@@ -99,19 +99,23 @@ namespace krypto::instruments {
                 krypto::network::recv_empty_frame(*socket_);
                 auto msg_type = krypto::network::recv_msg_type(*socket_);
                 zmq::message_t payload_msg;
-                socket_->recv(&payload_msg);
+                auto received = socket_->recv(payload_msg);
+                if (!received.has_value()) {
+                    KRYP_LOG(error, "No message received from server");
+                    continue;
+                }
                 if constexpr (Verbose) {
                     KRYP_LOG(info, "Received request with payload size {} from {}",
                              payload_msg.size(), address);
                 }
                 bool send_reply = process(payload_msg, msg_type);
                 if (send_reply) {
-                    krypto::network::send_string(*socket_, address, ZMQ_SNDMORE);
-                    krypto::network::send_empty_frame(*socket_, ZMQ_SNDMORE);
+                    krypto::network::send_string(*socket_, address, zmq::send_flags::sndmore);
+                    krypto::network::send_empty_frame(*socket_, zmq::send_flags::sndmore);
                     zmq::message_t result_msg(fb_builder_.GetSize());
                     std::memcpy(result_msg.data(),
                                 fb_builder_.GetBufferPointer(), fb_builder_.GetSize());
-                    socket_->send(result_msg);
+                    socket_->send(result_msg, zmq::send_flags::none);
                     if constexpr (Verbose) {
                         KRYP_LOG(info, "Sent result to {}", address);
                     }

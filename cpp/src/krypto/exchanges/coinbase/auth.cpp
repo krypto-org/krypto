@@ -1,6 +1,7 @@
 #include <krypto/exchanges/coinbase/auth.h>
 
 #include <fstream>
+#include <iostream>
 
 #include <nlohmann/json.hpp>
 #include <cryptopp/cryptlib.h>

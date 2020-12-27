@@ -107,15 +107,20 @@ namespace krypto::orders {
                 auto exchange = krypto::network::recv_string(*queue_pull_);
                 auto msg_type = krypto::network::recv_msg_type(*queue_pull_);
                 zmq::message_t payload;
-                queue_pull_->recv(&payload);
+                const auto payload_size = queue_pull_->recv(payload, zmq::recv_flags::none);
+
+                if (!payload_size.has_value()) {
+                    KRYP_LOG(error, "Payload has 0 size");
+                    break;
+                }
 
                 /*
                  * OUT: IDENTITY -> EMPTY -> EXCHANGE -> MSG_TYPE -> PAYLOAD
                  * */
-                krypto::network::send_empty_frame(*sender_, ZMQ_SNDMORE);
-                krypto::network::send_string(*sender_, exchange, ZMQ_SNDMORE);
-                krypto::network::send_msg_type(*sender_, msg_type, ZMQ_SNDMORE);
-                sender_->send(payload);
+                krypto::network::send_empty_frame(*sender_, zmq::send_flags::sndmore);
+                krypto::network::send_string(*sender_, exchange, zmq::send_flags::sndmore);
+                krypto::network::send_msg_type(*sender_, msg_type, zmq::send_flags::sndmore);
+                sender_->send(payload, zmq::send_flags::none);
             }
 
             if (items[1].revents && ZMQ_POLLIN) {
@@ -137,7 +142,13 @@ namespace krypto::orders {
                 }
 
                 zmq::message_t payload_msg;
-                sender_->recv(&payload_msg);
+                const auto payload_size = sender_->recv(payload_msg);
+
+
+                if (!payload_size.has_value()) {
+                    KRYP_LOG(error, "Payload has no frame. No message received.");
+                    return;
+                }
 
                 if (msg_type == krypto::utils::MsgType::ORDER_UPDATE) {
                     auto order_update = flatbuffers::GetRoot<
@@ -224,11 +235,11 @@ namespace krypto::orders {
 
         serialize(order_request);
         krypto::network::send_string(
-                *queue_push_, exchange, ZMQ_SNDMORE);
+                *queue_push_, exchange, zmq::send_flags::sndmore);
         krypto::network::send_msg_type(
                 *queue_push_,
                 krypto::utils::MsgType::ORDER_REQUEST,
-                ZMQ_SNDMORE);
+                zmq::send_flags::sndmore);
         if constexpr (Verbose) {
             KRYP_LOG(info, "Queue-ing order {} to send", oid);
         }
@@ -244,11 +255,11 @@ namespace krypto::orders {
                 order_id};
         serialize(cancel);
         krypto::network::send_string(
-                *queue_push_, exchange, ZMQ_SNDMORE);
+                *queue_push_, exchange, zmq::send_flags::sndmore);
         krypto::network::send_msg_type(
                 *queue_push_,
                 krypto::utils::MsgType::ORDER_CANCEL_REQUEST,
-                ZMQ_SNDMORE);
+                zmq::send_flags::sndmore);
         if constexpr (Verbose) {
             KRYP_LOG(info, "Queue-ing cancel for {} to send", order_id);
         }
@@ -269,11 +280,11 @@ namespace krypto::orders {
                 side};
         serialize(replace_request);
         krypto::network::send_string(
-                *queue_push_, exchange, ZMQ_SNDMORE);
+                *queue_push_, exchange, zmq::send_flags::sndmore);
         krypto::network::send_msg_type(
                 *queue_push_,
                 krypto::utils::MsgType::ORDER_REPLACE_REQUEST,
-                ZMQ_SNDMORE);
+                zmq::send_flags::sndmore);
         if constexpr (Verbose) {
             KRYP_LOG(info, "Queue-ing replace for {} to send", order_id);
         }

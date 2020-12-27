@@ -80,7 +80,7 @@ namespace krypto::network {
         zmq::message_t topic_nsg(topic.size());
         std::memcpy(topic_nsg.data(), topic.data(), topic.size());
 
-        status.set(0, socket_->send(topic_nsg, ZMQ_SNDMORE));
+        status.set(0, socket_->send(topic_nsg, zmq::send_flags::sndmore).has_value());
 
         auto &derived = static_cast<Derived &>(*this);
         derived.serialize(args...);
@@ -88,7 +88,7 @@ namespace krypto::network {
         zmq::message_t payload_msg(fb_builder_.GetSize());
         std::memcpy(payload_msg.data(), fb_builder_.GetBufferPointer(), fb_builder_.GetSize());
 
-        status.set(1, socket_->send(payload_msg));
+        status.set(1, socket_->send(payload_msg, zmq::send_flags::none).has_value());
 
         return status.all();
     }

@@ -90,7 +90,7 @@ bool krypto::Logging::setLevel(std::string_view lvl) {
     int idx = 0;
 
     while (idx <= spdlog::level::off) {
-        if (spdlog::level::level_names[idx] == lvl) {
+        if (spdlog::level::level_string_views[idx] == lvl) {
             break;
         }
         ++idx;

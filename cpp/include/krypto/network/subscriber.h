@@ -77,7 +77,7 @@ namespace krypto::network {
     template<typename Consumer, typename Parser, bool Verbose>
     void Subscriber<Consumer, Parser, Verbose>::subscribe(const std::string &topic) {
         KRYP_LOG(info, "Subscribing to topic: {}", topic);
-        socket_->setsockopt(ZMQ_SUBSCRIBE, &topic[0], topic.length());
+        socket_->set(zmq::sockopt::subscribe, topic);
     }
 
     template<typename Consumer, typename Parser, bool Verbose>
@@ -119,15 +119,22 @@ namespace krypto::network {
     void Subscriber<Consumer, Parser, Verbose>::recv() {
 
         zmq::message_t topic_msg;
-        socket_->recv(&topic_msg);
+        auto topic_size = socket_->recv(topic_msg);
+        if (!topic_size.has_value()) {
+            KRYP_LOG(error, "topic had 0 size");
+            return;
+        }
         auto topic = std::string(static_cast<char *>(topic_msg.data()), topic_msg.size());
 
         auto topic_prefix = topic.substr(0, 2);
         auto msg_type = msg_type_ref_.at(topic_prefix);
 
         zmq::message_t payload_msg;
-        socket_->recv(&payload_msg);
-
+        auto payload_size = socket_->recv(payload_msg, zmq::recv_flags::none);
+        if (!payload_size.has_value()) {
+            KRYP_LOG(error, "payload had 0 size");
+            return;
+        }
         auto payload = Parser::parse(payload_msg, msg_type);
 
         if (payload.has_value()) {

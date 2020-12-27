@@ -70,14 +70,14 @@ namespace krypto::network::rpc {
     template<typename Derived, typename RequestVariant, typename Parser, bool Verbose>
     void ClientBase<Derived, RequestVariant, Parser, Verbose>::send_impl(
             const std::string &service_name, const RequestVariant &request) {
-        send_empty_frame(*socket_, ZMQ_SNDMORE);
-        send_string(*socket_, service_name, ZMQ_SNDMORE);
+        send_empty_frame(*socket_, zmq::send_flags::sndmore);
+        send_string(*socket_, service_name, zmq::send_flags::sndmore);
 
         auto msg_type = std::visit(
                 [&](auto &&r) -> krypto::utils::MsgType { return std::remove_reference<decltype(r)>::type::message_type; },
                 request);
 
-        send_msg_type(*socket_, msg_type, ZMQ_SNDMORE);
+        send_msg_type(*socket_, msg_type, zmq::send_flags::sndmore);
 
         auto &derived = static_cast<Derived &>(*this);
         std::visit([&](auto &&r) { derived.serialize(r); }, request);
@@ -85,7 +85,7 @@ namespace krypto::network::rpc {
         zmq::message_t payload_msg(fb_builder_.GetSize());
         std::memcpy(payload_msg.data(), fb_builder_.GetBufferPointer(), fb_builder_.GetSize());
 
-        socket_->send(payload_msg);
+        socket_->send(payload_msg, zmq::send_flags::none);
     }
 
     template<typename Derived, typename RequestVariant, typename Parser, bool Verbose>

@@ -98,9 +98,9 @@ namespace krypto::instruments {
 
     template<bool Verbose>
     void InstrumentClient<Verbose>::refresh_cache() {
-        krypto::network::send_empty_frame(*socket_, ZMQ_SNDMORE);
+        krypto::network::send_empty_frame(*socket_, zmq::send_flags::sndmore);
         krypto::network::send_msg_type(*socket_,
-                                       krypto::utils::MsgType::INSTRUMENT_CACHE_REFRESH_REQUEST, ZMQ_SNDMORE);
+                                       krypto::utils::MsgType::INSTRUMENT_CACHE_REFRESH_REQUEST, zmq::send_flags::sndmore);
         fb_builder_.Clear();
         krypto::serialization::InstrumentRefreshRequestBuilder builder{fb_builder_};
         auto req = builder.Finish();
@@ -109,21 +109,22 @@ namespace krypto::instruments {
         std::memcpy(request_msg.data(),
                     fb_builder_.GetBufferPointer(),
                     fb_builder_.GetSize());
-        socket_->send(request_msg);
+        socket_->send(request_msg, zmq::send_flags::none);
     }
 
     template<bool Verbose>
     std::future<std::vector<krypto::utils::Instrument>>
     InstrumentClient<Verbose>::query(const krypto::serialization::RequestType request_type,
                                      int timeout) {
-        krypto::network::send_empty_frame(*socket_, ZMQ_SNDMORE);
-        krypto::network::send_msg_type(*socket_, krypto::utils::MsgType::INSTRUMENT_REQUEST, ZMQ_SNDMORE);
+        krypto::network::send_empty_frame(*socket_, zmq::send_flags::sndmore);
+        krypto::network::send_msg_type(*socket_, krypto::utils::MsgType::INSTRUMENT_REQUEST,
+                                       zmq::send_flags::sndmore);
         serialize(request_type);
         zmq::message_t request_msg(fb_builder_.GetSize());
         std::memcpy(request_msg.data(),
                     fb_builder_.GetBufferPointer(),
                     fb_builder_.GetSize());
-        socket_->send(request_msg);
+        socket_->send(request_msg, zmq::send_flags::none);
         zmq::pollitem_t items[] = {
                 {*socket_, 0, ZMQ_POLLIN, 0},
         };
@@ -132,7 +133,10 @@ namespace krypto::instruments {
         if (items[0].revents && ZMQ_POLLIN) {
             krypto::network::recv_empty_frame(*socket_);
             zmq::message_t response_msg;
-            socket_->recv(&response_msg);
+            const auto response_size = socket_->recv(response_msg, zmq::recv_flags::none);
+            if (!response_size.has_value()) {
+                KRYP_LOG(error, "Response had a size  = 0");
+            }
             auto response = flatbuffers::GetRoot<
                     krypto::serialization::InstrumentResponse>(
                     response_msg.data());

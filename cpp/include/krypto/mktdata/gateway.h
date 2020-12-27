@@ -60,7 +60,7 @@ namespace krypto::mktdata {
 
         if (bound) {
             running_ = true;
-            zmq::proxy(*frontend_, *backend_, nullptr);
+            zmq::proxy(*frontend_, *backend_);
         } else {
             KRYP_LOG(warn, "Failed to start proxy - binding problems");
         }

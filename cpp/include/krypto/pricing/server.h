@@ -154,7 +154,7 @@ namespace krypto::pricing {
 
         const std::string subscription = krypto::utils::MsgTypeNames[static_cast<uint8_t>(
                 krypto::utils::MsgType::QUOTE)];
-        mktdata_subscriber_->setsockopt(ZMQ_SUBSCRIBE, &subscription[0], subscription.length());
+        mktdata_subscriber_->set(zmq::sockopt::subscribe, subscription);
 
         zmq::pollitem_t items[] = {
                 {*mktdata_subscriber_, 0, ZMQ_POLLIN, 0}
@@ -171,7 +171,12 @@ namespace krypto::pricing {
                 auto msg_type = msg_type_ref_.at(topic_prefix);
 
                 zmq::message_t payload_msg;
-                mktdata_subscriber_->recv(&payload_msg);
+                const auto payload_size = mktdata_subscriber_->recv(payload_msg);
+
+                if (!payload_size.has_value()) {
+                    KRYP_LOG(error, "Payload has 0 size");
+                    break;
+                }
 
                 switch (msg_type) {
                     case krypto::utils::MsgType::QUOTE: {

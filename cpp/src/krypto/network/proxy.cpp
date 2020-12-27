@@ -40,7 +40,7 @@ namespace krypto::network {
         }
 
         if (bound) {
-            zmq::proxy(*frontend_, *backend_, nullptr);
+            zmq::proxy(*frontend_, *backend_);
         } else {
             KRYP_LOG(warn, "Failed to start proxy - binding problems");
         }
