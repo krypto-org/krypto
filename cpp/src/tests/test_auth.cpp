@@ -16,8 +16,7 @@ TEST_CASE("No Data", "[authenticator]") {
     std::string ts = "1587922987";
     std::string method = "GET";
     std::string path = "/orders";
-    std::string body = "";
-    auto signature = authenticator.sign(ts, method, path, body);
+    auto signature = authenticator.sign(ts, method, path, "");
     REQUIRE(signature.has_value());
     REQUIRE("tllt90Zp/RS1NWRELFywZlLoimiVI0baY63kbxBkuow=" == signature.value());
 }
@@ -54,6 +53,6 @@ TEST_CASE("Json Data", "[authenticator]") {
     KRYP_LOG(info, "Body: {}", body);
     auto signature = authenticator.sign(ts, method, path, body);
     REQUIRE(signature.has_value());
-    REQUIRE("PdwqF7ZhXrFzzbARtp0su/8N+oBflVZ/px77KOrST14=" == signature.value());
+    REQUIRE("yEAtx0icf80ztwSf7QzsUjULXe0EGUw8rVXaFCzjVFg=" == signature.value());
 }
 

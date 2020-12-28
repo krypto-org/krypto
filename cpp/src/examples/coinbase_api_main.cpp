@@ -3,7 +3,6 @@
 #include <krypto/config.h>
 #include <krypto/logger.h>
 #include <krypto/exchanges/coinbase/api.h>
-#include <gconv.h>
 
 int main(int argc, char **argv) {
     if (argc < 2) {
