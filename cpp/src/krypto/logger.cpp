@@ -129,7 +129,7 @@ krypto::LineLogger::LineLogger(::spdlog::level::level_enum level)
         : level(level),
           logger(Logging::instance().getLogger()) {}
 
-krypto::LineLogger::LineLogger(LineLogger &&rhs)
+krypto::LineLogger::LineLogger(LineLogger &&rhs) noexcept
         : level(rhs.level),
           logger(rhs.logger) {
 }

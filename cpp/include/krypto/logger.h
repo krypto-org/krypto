@@ -81,7 +81,7 @@ namespace krypto {
     public:
         explicit LineLogger(::spdlog::level::level_enum level);
 
-        LineLogger(LineLogger &&rhs);
+        LineLogger(LineLogger &&rhs) noexcept ;
 
         ~LineLogger();
 

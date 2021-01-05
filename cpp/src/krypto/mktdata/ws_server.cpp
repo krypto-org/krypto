@@ -16,9 +16,11 @@ krypto::mktdata::WebsocketServer::WebsocketServer(
         next_update_ts_{static_cast<int64_t>(krypto::utils::current_time_in_nanoseconds())},
         throttle_frequency_{config.at<uint64_t >("/services/publisher/mktdata/ws/throttle_frequency_nano")} {
     server_.init_asio();
-    server_.set_open_handler(bind(&WebsocketServer::on_open, this, ::_1));
-    server_.set_close_handler(bind(&WebsocketServer::on_close, this, ::_1));
-    server_.set_message_handler(bind(&WebsocketServer::on_message, this, ::_1, ::_2));
+    server_.set_open_handler([this](auto &&handle) { on_open(std::forward<decltype(handle)>(handle)); });
+    server_.set_close_handler([this](auto &&handle) { on_close(std::forward<decltype(handle)>(handle)); });
+    server_.set_message_handler([this](auto &&handle, auto &&message) {
+        on_message(std::forward<decltype(handle)>(handle), std::forward<decltype(message)>(message));
+    });
 
     message_queue_.set_capacity(2048);
 }

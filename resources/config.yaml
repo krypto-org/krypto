@@ -1,3 +1,9 @@
+---
+
+global:
+  tz: US/Central
+  ip: localhost
+
 exchanges:
   coinbase:
     rest:
@@ -21,21 +27,18 @@ exchanges:
         incremental: level2
         snapshot: level2
       base_url:
-        production: wss://ws-feed.pro.coinbase.com
-        sandbox: wss://ws-feed-public.sandbox.pro.coinbase.com
+        production: "wss://ws-feed.pro.coinbase.com"
+        sandbox: "wss://ws-feed-public.sandbox.pro.coinbase.com"
       services:
         instruments:
           url: api.pro.coinbase.com/products
-global:
-  tz: US/Central
-  ip: localhost
 
 services:
   instruments:
-    server: tcp://*:12000
+    server: "tcp://*:12000"
     port: 12000
-    client: tcp://localhost:12000
-    sandbox_symbols: BTC_USD,ETH_BTC
+    client: "tcp://localhost:12000"
+    sandbox_symbols: ["BTC_USD", "ETH_BTC"]
     polling_millis: 50
     active_symbols: BTC_USD,BTC_USDC,ETH_USD,ETH_USDC,ETH_BTC,LTC_USD,LTC_BTC,XRP_USD,XRP_BTC,BCH_USD,BCH_BTC,ETC_USD,ETC_BTC
   publisher:
