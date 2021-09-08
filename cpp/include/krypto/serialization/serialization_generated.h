@@ -10,46 +10,64 @@ namespace krypto {
 namespace serialization {
 
 struct Empty;
+struct EmptyBuilder;
 
 struct SequenceNumber;
+struct SequenceNumberBuilder;
 
 struct Heartbeat;
+struct HeartbeatBuilder;
 
 struct Instrument;
+struct InstrumentBuilder;
 
 struct Quote;
+struct QuoteBuilder;
 
 struct SnapshotPriceLevel;
 
 struct Snapshot;
+struct SnapshotBuilder;
 
 struct IncrementalPriceLevel;
 
 struct Incremental;
+struct IncrementalBuilder;
 
 struct Trade;
+struct TradeBuilder;
 
 struct InstrumentRequest;
+struct InstrumentRequestBuilder;
 
 struct InstrumentResponse;
+struct InstrumentResponseBuilder;
 
 struct InstrumentRefreshRequest;
+struct InstrumentRefreshRequestBuilder;
 
 struct OrderRequest;
+struct OrderRequestBuilder;
 
 struct OrderCancelRequest;
+struct OrderCancelRequestBuilder;
 
 struct OrderReplaceRequest;
+struct OrderReplaceRequestBuilder;
 
 struct OrderUpdate;
+struct OrderUpdateBuilder;
 
 struct Order;
+struct OrderBuilder;
 
 struct Position;
 
 struct RiskSummary;
+struct RiskSummaryBuilder;
 
 struct TheoreticalSnapshot;
+struct TheoreticalSnapshotBuilder;
 
 enum Exchange {
   Exchange_SIM = 0,
@@ -67,7 +85,7 @@ inline const Exchange (&EnumValuesExchange())[2] {
 }
 
 inline const char * const *EnumNamesExchange() {
-  static const char * const names[] = {
+  static const char * const names[3] = {
     "SIM",
     "COINBASE",
     nullptr
@@ -76,7 +94,7 @@ inline const char * const *EnumNamesExchange() {
 }
 
 inline const char *EnumNameExchange(Exchange e) {
-  if (e < Exchange_SIM || e > Exchange_COINBASE) return "";
+  if (flatbuffers::IsOutRange(e, Exchange_SIM, Exchange_COINBASE)) return "";
   const size_t index = static_cast<size_t>(e);
   return EnumNamesExchange()[index];
 }
@@ -99,7 +117,7 @@ inline const Side (&EnumValuesSide())[3] {
 }
 
 inline const char * const *EnumNamesSide() {
-  static const char * const names[] = {
+  static const char * const names[4] = {
     "UNKNOWN",
     "BUY",
     "SELL",
@@ -109,7 +127,7 @@ inline const char * const *EnumNamesSide() {
 }
 
 inline const char *EnumNameSide(Side e) {
-  if (e < Side_UNKNOWN || e > Side_SELL) return "";
+  if (flatbuffers::IsOutRange(e, Side_UNKNOWN, Side_SELL)) return "";
   const size_t index = static_cast<size_t>(e);
   return EnumNamesSide()[index];
 }
@@ -132,7 +150,7 @@ inline const OrderSide (&EnumValuesOrderSide())[3] {
 }
 
 inline const char * const *EnumNamesOrderSide() {
-  static const char * const names[] = {
+  static const char * const names[4] = {
     "UNKNOWN",
     "BID",
     "ASK",
@@ -142,7 +160,7 @@ inline const char * const *EnumNamesOrderSide() {
 }
 
 inline const char *EnumNameOrderSide(OrderSide e) {
-  if (e < OrderSide_UNKNOWN || e > OrderSide_ASK) return "";
+  if (flatbuffers::IsOutRange(e, OrderSide_UNKNOWN, OrderSide_ASK)) return "";
   const size_t index = static_cast<size_t>(e);
   return EnumNamesOrderSide()[index];
 }
@@ -189,7 +207,7 @@ inline const OrderStatus (&EnumValuesOrderStatus())[15] {
 }
 
 inline const char * const *EnumNamesOrderStatus() {
-  static const char * const names[] = {
+  static const char * const names[16] = {
     "UNKNOWN",
     "IN_FLIGHT",
     "CANCEL_IN_FLIGHT",
@@ -211,7 +229,7 @@ inline const char * const *EnumNamesOrderStatus() {
 }
 
 inline const char *EnumNameOrderStatus(OrderStatus e) {
-  if (e < OrderStatus_UNKNOWN || e > OrderStatus_DONE) return "";
+  if (flatbuffers::IsOutRange(e, OrderStatus_UNKNOWN, OrderStatus_DONE)) return "";
   const size_t index = static_cast<size_t>(e);
   return EnumNamesOrderStatus()[index];
 }
@@ -238,7 +256,7 @@ inline const TimeInForce (&EnumValuesTimeInForce())[5] {
 }
 
 inline const char * const *EnumNamesTimeInForce() {
-  static const char * const names[] = {
+  static const char * const names[6] = {
     "DAY",
     "IOC",
     "FOK",
@@ -250,7 +268,7 @@ inline const char * const *EnumNamesTimeInForce() {
 }
 
 inline const char *EnumNameTimeInForce(TimeInForce e) {
-  if (e < TimeInForce_DAY || e > TimeInForce_GTT) return "";
+  if (flatbuffers::IsOutRange(e, TimeInForce_DAY, TimeInForce_GTT)) return "";
   const size_t index = static_cast<size_t>(e);
   return EnumNamesTimeInForce()[index];
 }
@@ -279,7 +297,7 @@ inline const InstrumentType (&EnumValuesInstrumentType())[6] {
 }
 
 inline const char * const *EnumNamesInstrumentType() {
-  static const char * const names[] = {
+  static const char * const names[7] = {
     "UNKNOWN",
     "STOCK",
     "FUTURE",
@@ -292,7 +310,7 @@ inline const char * const *EnumNamesInstrumentType() {
 }
 
 inline const char *EnumNameInstrumentType(InstrumentType e) {
-  if (e < InstrumentType_UNKNOWN || e > InstrumentType_CRYPTO) return "";
+  if (flatbuffers::IsOutRange(e, InstrumentType_UNKNOWN, InstrumentType_CRYPTO)) return "";
   const size_t index = static_cast<size_t>(e);
   return EnumNamesInstrumentType()[index];
 }
@@ -347,11 +365,63 @@ enum Currency {
   Currency_BNT = 46,
   Currency_AAVE = 47,
   Currency_SNX = 48,
+  Currency_WLUNA = 49,
+  Currency_DOGE = 50,
+  Currency_RAD = 51,
+  Currency_GTC = 52,
+  Currency_TRU = 53,
+  Currency_SUSHI = 54,
+  Currency_SKL = 55,
+  Currency_COTI = 56,
+  Currency_REQ = 57,
+  Currency_FORTH = 58,
+  Currency_ENJ = 59,
+  Currency_USDT = 60,
+  Currency_DOT = 61,
+  Currency_CHZ = 62,
+  Currency_UST = 63,
+  Currency_MASK = 64,
+  Currency_DDX = 65,
+  Currency_SOL = 66,
+  Currency_RLY = 67,
+  Currency_AXS = 68,
+  Currency_ADA = 69,
+  Currency_STORJ = 70,
+  Currency_ICP = 71,
+  Currency_IOTX = 72,
+  Currency_CRV = 73,
+  Currency_FET = 74,
+  Currency_POLY = 75,
+  Currency_MKN = 76,
+  Currency_MIR = 77,
+  Currency_PAX = 78,
+  Currency_MATIC = 79,
+  Currency_ANKR = 80,
+  Currency_OGN = 81,
+  Currency_RLC = 82,
+  Currency_TRB = 83,
+  Currency_ORN = 84,
+  Currency_CTSI = 85,
+  Currency_YFII = 86,
+  Currency_BOND = 87,
+  Currency_CLV = 88,
+  Currency_TRIBE = 89,
+  Currency_ACH = 90,
+  Currency_PLA = 91,
+  Currency_QUICK = 92,
+  Currency_MLN = 93,
+  Currency_QNT = 94,
+  Currency_LPT = 95,
+  Currency_KEEP = 96,
+  Currency_RAI = 97,
+  Currency_NKN = 98,
+  Currency_AMP = 99,
+  Currency_FARM = 100,
   Currency_MIN = Currency_UNKNOWN,
-  Currency_MAX = Currency_SNX
+  Currency_MAX = Currency_FARM
 };
 
-inline const Currency (&EnumValuesCurrency())[49] {
+inline const Currency (&EnumValuesCurrency())[101] {
   static const Currency values[] = {
     Currency_UNKNOWN,
     Currency_BAT,
@@ -401,13 +471,65 @@ inline const Currency (&EnumValuesCurrency())[49] {
     Currency_GRT,
     Currency_BNT,
     Currency_AAVE,
-    Currency_SNX
+    Currency_SNX,
+    Currency_WLUNA,
+    Currency_DOGE,
+    Currency_RAD,
+    Currency_GTC,
+    Currency_TRU,
+    Currency_SUSHI,
+    Currency_SKL,
+    Currency_COTI,
+    Currency_REQ,
+    Currency_FORTH,
+    Currency_ENJ,
+    Currency_USDT,
+    Currency_DOT,
+    Currency_CHZ,
+    Currency_UST,
+    Currency_MASK,
+    Currency_DDX,
+    Currency_SOL,
+    Currency_RLY,
+    Currency_AXS,
+    Currency_ADA,
+    Currency_STORJ,
+    Currency_ICP,
+    Currency_IOTX,
+    Currency_CRV,
+    Currency_FET,
+    Currency_POLY,
+    Currency_MKN,
+    Currency_MIR,
+    Currency_PAX,
+    Currency_MATIC,
+    Currency_ANKR,
+    Currency_OGN,
+    Currency_RLC,
+    Currency_TRB,
+    Currency_ORN,
+    Currency_CTSI,
+    Currency_YFII,
+    Currency_BOND,
+    Currency_CLV,
+    Currency_TRIBE,
+    Currency_ACH,
+    Currency_PLA,
+    Currency_QUICK,
+    Currency_MLN,
+    Currency_QNT,
+    Currency_LPT,
+    Currency_KEEP,
+    Currency_RAI,
+    Currency_NKN,
+    Currency_AMP,
+    Currency_FARM
   };
   return values;
 }
 
 inline const char * const *EnumNamesCurrency() {
-  static const char * const names[] = {
+  static const char * const names[102] = {
     "UNKNOWN",
     "BAT",
     "BCH",
@@ -457,13 +579,65 @@ inline const char * const *EnumNamesCurrency() {
     "BNT",
     "AAVE",
     "SNX",
+    "WLUNA",
+    "DOGE",
+    "RAD",
+    "GTC",
+    "TRU",
+    "SUSHI",
+    "SKL",
+    "COTI",
+    "REQ",
+    "FORTH",
+    "ENJ",
+    "USDT",
+    "DOT",
+    "CHZ",
+    "UST",
+    "MASK",
+    "DDX",
+    "SOL",
+    "RLY",
+    "AXS",
+    "ADA",
+    "STORJ",
+    "ICP",
+    "IOTX",
+    "CRV",
+    "FET",
+    "POLY",
+    "MKN",
+    "MIR",
+    "PAX",
+    "MATIC",
+    "ANKR",
+    "OGN",
+    "RLC",
+    "TRB",
+    "ORN",
+    "CTSI",
+    "YFII",
+    "BOND",
+    "CLV",
+    "TRIBE",
+    "ACH",
+    "PLA",
+    "QUICK",
+    "MLN",
+    "QNT",
+    "LPT",
+    "KEEP",
+    "RAI",
+    "NKN",
+    "AMP",
+    "FARM",
     nullptr
   };
   return names;
 }
 
 inline const char *EnumNameCurrency(Currency e) {
-  if (e < Currency_UNKNOWN || e > Currency_SNX) return "";
+  if (flatbuffers::IsOutRange(e, Currency_UNKNOWN, Currency_FARM)) return "";
   const size_t index = static_cast<size_t>(e);
   return EnumNamesCurrency()[index];
 }
@@ -490,7 +664,7 @@ inline const RequestType (&EnumValuesRequestType())[5] {
 }
 
 inline const char * const *EnumNamesRequestType() {
-  static const char * const names[] = {
+  static const char * const names[6] = {
     "INVALID",
     "ALL",
     "ID",
@@ -502,7 +676,7 @@ inline const char * const *EnumNamesRequestType() {
 }
 
 inline const char *EnumNameRequestType(RequestType e) {
-  if (e < RequestType_INVALID || e > RequestType_PRODUCT) return "";
+  if (flatbuffers::IsOutRange(e, RequestType_INVALID, RequestType_PRODUCT)) return "";
   const size_t index = static_cast<size_t>(e);
   return EnumNamesRequestType()[index];
 }
@@ -579,6 +753,7 @@ FLATBUFFERS_MANUALLY_ALIGNED_STRUCT(8) Position FLATBUFFERS_FINAL_CLASS {
 FLATBUFFERS_STRUCT_END(Position, 16);
 
 struct Empty FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+  typedef EmptyBuilder Builder;
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
            verifier.EndTable();
@@ -586,6 +761,7 @@ struct Empty FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
 };
 
 struct EmptyBuilder {
+  typedef Empty Table;
   flatbuffers::FlatBufferBuilder &fbb_;
   flatbuffers::uoffset_t start_;
   explicit EmptyBuilder(flatbuffers::FlatBufferBuilder &_fbb)
@@ -607,6 +783,7 @@ inline flatbuffers::Offset<Empty> CreateEmpty(
 }
 
 struct SequenceNumber FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+  typedef SequenceNumberBuilder Builder;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
     VT_VALUE = 4
   };
@@ -621,6 +798,7 @@ struct SequenceNumber FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
 };
 
 struct SequenceNumberBuilder {
+  typedef SequenceNumber Table;
   flatbuffers::FlatBufferBuilder &fbb_;
   flatbuffers::uoffset_t start_;
   void add_value(int64_t value) {
@@ -647,6 +825,7 @@ inline flatbuffers::Offset<SequenceNumber> CreateSequenceNumber(
 }
 
 struct Heartbeat FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+  typedef HeartbeatBuilder Builder;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
     VT_SECURITY_ID = 4,
     VT_TIMESTAMP = 6
@@ -666,6 +845,7 @@ struct Heartbeat FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
 };
 
 struct HeartbeatBuilder {
+  typedef Heartbeat Table;
   flatbuffers::FlatBufferBuilder &fbb_;
   flatbuffers::uoffset_t start_;
   void add_security_id(int64_t security_id) {
@@ -697,6 +877,7 @@ inline flatbuffers::Offset<Heartbeat> CreateHeartbeat(
 }
 
 struct Instrument FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+  typedef InstrumentBuilder Builder;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
     VT_ID = 4,
     VT_TYPE = 6,
@@ -714,14 +895,14 @@ struct Instrument FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   int64_t id() const {
     return GetField<int64_t>(VT_ID, 0);
   }
-  InstrumentType type() const {
-    return static_cast<InstrumentType>(GetField<int8_t>(VT_TYPE, 0));
+  krypto::serialization::InstrumentType type() const {
+    return static_cast<krypto::serialization::InstrumentType>(GetField<int8_t>(VT_TYPE, 0));
   }
   const flatbuffers::String *symbol() const {
     return GetPointer<const flatbuffers::String *>(VT_SYMBOL);
   }
-  Exchange exchange() const {
-    return static_cast<Exchange>(GetField<int8_t>(VT_EXCHANGE, 0));
+  krypto::serialization::Exchange exchange() const {
+    return static_cast<krypto::serialization::Exchange>(GetField<int8_t>(VT_EXCHANGE, 0));
   }
   const flatbuffers::String *exchange_symbol() const {
     return GetPointer<const flatbuffers::String *>(VT_EXCHANGE_SYMBOL);
@@ -735,11 +916,11 @@ struct Instrument FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   double max_size() const {
     return GetField<double>(VT_MAX_SIZE, 0.0);
   }
-  Currency crypto_base() const {
-    return static_cast<Currency>(GetField<int8_t>(VT_CRYPTO_BASE, 0));
+  krypto::serialization::Currency crypto_base() const {
+    return static_cast<krypto::serialization::Currency>(GetField<int8_t>(VT_CRYPTO_BASE, 0));
   }
-  Currency crypto_quote() const {
-    return static_cast<Currency>(GetField<int8_t>(VT_CRYPTO_QUOTE, 0));
+  krypto::serialization::Currency crypto_quote() const {
+    return static_cast<krypto::serialization::Currency>(GetField<int8_t>(VT_CRYPTO_QUOTE, 0));
   }
   bool active() const {
     return GetField<uint8_t>(VT_ACTIVE, 0) != 0;
@@ -768,18 +949,19 @@ struct Instrument FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
 };
 
 struct InstrumentBuilder {
+  typedef Instrument Table;
   flatbuffers::FlatBufferBuilder &fbb_;
   flatbuffers::uoffset_t start_;
   void add_id(int64_t id) {
     fbb_.AddElement<int64_t>(Instrument::VT_ID, id, 0);
   }
-  void add_type(InstrumentType type) {
+  void add_type(krypto::serialization::InstrumentType type) {
     fbb_.AddElement<int8_t>(Instrument::VT_TYPE, static_cast<int8_t>(type), 0);
   }
   void add_symbol(flatbuffers::Offset<flatbuffers::String> symbol) {
     fbb_.AddOffset(Instrument::VT_SYMBOL, symbol);
   }
-  void add_exchange(Exchange exchange) {
+  void add_exchange(krypto::serialization::Exchange exchange) {
     fbb_.AddElement<int8_t>(Instrument::VT_EXCHANGE, static_cast<int8_t>(exchange), 0);
   }
   void add_exchange_symbol(flatbuffers::Offset<flatbuffers::String> exchange_symbol) {
@@ -794,10 +976,10 @@ struct InstrumentBuilder {
   void add_max_size(double max_size) {
     fbb_.AddElement<double>(Instrument::VT_MAX_SIZE, max_size, 0.0);
   }
-  void add_crypto_base(Currency crypto_base) {
+  void add_crypto_base(krypto::serialization::Currency crypto_base) {
     fbb_.AddElement<int8_t>(Instrument::VT_CRYPTO_BASE, static_cast<int8_t>(crypto_base), 0);
   }
-  void add_crypto_quote(Currency crypto_quote) {
+  void add_crypto_quote(krypto::serialization::Currency crypto_quote) {
     fbb_.AddElement<int8_t>(Instrument::VT_CRYPTO_QUOTE, static_cast<int8_t>(crypto_quote), 0);
   }
   void add_active(bool active) {
@@ -821,15 +1003,15 @@ struct InstrumentBuilder {
 inline flatbuffers::Offset<Instrument> CreateInstrument(
     flatbuffers::FlatBufferBuilder &_fbb,
     int64_t id = 0,
-    InstrumentType type = InstrumentType_UNKNOWN,
+    krypto::serialization::InstrumentType type = krypto::serialization::InstrumentType_UNKNOWN,
     flatbuffers::Offset<flatbuffers::String> symbol = 0,
-    Exchange exchange = Exchange_SIM,
+    krypto::serialization::Exchange exchange = krypto::serialization::Exchange_SIM,
     flatbuffers::Offset<flatbuffers::String> exchange_symbol = 0,
     double tick_size = 0.0,
     double min_size = 0.0,
     double max_size = 0.0,
-    Currency crypto_base = Currency_UNKNOWN,
-    Currency crypto_quote = Currency_UNKNOWN,
+    krypto::serialization::Currency crypto_base = krypto::serialization::Currency_UNKNOWN,
+    krypto::serialization::Currency crypto_quote = krypto::serialization::Currency_UNKNOWN,
     bool active = false,
     bool sandbox_enabled = false) {
   InstrumentBuilder builder_(_fbb);
@@ -851,15 +1033,15 @@ inline flatbuffers::Offset<Instrument> CreateInstrument(
 inline flatbuffers::Offset<Instrument> CreateInstrumentDirect(
     flatbuffers::FlatBufferBuilder &_fbb,
     int64_t id = 0,
-    InstrumentType type = InstrumentType_UNKNOWN,
+    krypto::serialization::InstrumentType type = krypto::serialization::InstrumentType_UNKNOWN,
     const char *symbol = nullptr,
-    Exchange exchange = Exchange_SIM,
+    krypto::serialization::Exchange exchange = krypto::serialization::Exchange_SIM,
     const char *exchange_symbol = nullptr,
     double tick_size = 0.0,
     double min_size = 0.0,
     double max_size = 0.0,
-    Currency crypto_base = Currency_UNKNOWN,
-    Currency crypto_quote = Currency_UNKNOWN,
+    krypto::serialization::Currency crypto_base = krypto::serialization::Currency_UNKNOWN,
+    krypto::serialization::Currency crypto_quote = krypto::serialization::Currency_UNKNOWN,
     bool active = false,
     bool sandbox_enabled = false) {
   auto symbol__ = symbol ? _fbb.CreateString(symbol) : 0;
@@ -881,6 +1063,7 @@ inline flatbuffers::Offset<Instrument> CreateInstrumentDirect(
 }
 
 struct Quote FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+  typedef QuoteBuilder Builder;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
     VT_TIMESTAMP = 4,
     VT_SECURITY_ID = 6,
@@ -930,6 +1113,7 @@ struct Quote FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
 };
 
 struct QuoteBuilder {
+  typedef Quote Table;
   flatbuffers::FlatBufferBuilder &fbb_;
   flatbuffers::uoffset_t start_;
   void add_timestamp(int64_t timestamp) {
@@ -991,6 +1175,7 @@ inline flatbuffers::Offset<Quote> CreateQuote(
 }
 
 struct Snapshot FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+  typedef SnapshotBuilder Builder;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
     VT_TIMESTAMP = 4,
     VT_SECURITY_ID = 6,
@@ -1003,11 +1188,11 @@ struct Snapshot FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   int64_t security_id() const {
     return GetField<int64_t>(VT_SECURITY_ID, 0);
   }
-  const flatbuffers::Vector<const SnapshotPriceLevel *> *bids() const {
-    return GetPointer<const flatbuffers::Vector<const SnapshotPriceLevel *> *>(VT_BIDS);
+  const flatbuffers::Vector<const krypto::serialization::SnapshotPriceLevel *> *bids() const {
+    return GetPointer<const flatbuffers::Vector<const krypto::serialization::SnapshotPriceLevel *> *>(VT_BIDS);
   }
-  const flatbuffers::Vector<const SnapshotPriceLevel *> *asks() const {
-    return GetPointer<const flatbuffers::Vector<const SnapshotPriceLevel *> *>(VT_ASKS);
+  const flatbuffers::Vector<const krypto::serialization::SnapshotPriceLevel *> *asks() const {
+    return GetPointer<const flatbuffers::Vector<const krypto::serialization::SnapshotPriceLevel *> *>(VT_ASKS);
   }
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
@@ -1022,6 +1207,7 @@ struct Snapshot FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
 };
 
 struct SnapshotBuilder {
+  typedef Snapshot Table;
   flatbuffers::FlatBufferBuilder &fbb_;
   flatbuffers::uoffset_t start_;
   void add_timestamp(int64_t timestamp) {
@@ -1030,10 +1216,10 @@ struct SnapshotBuilder {
   void add_security_id(int64_t security_id) {
     fbb_.AddElement<int64_t>(Snapshot::VT_SECURITY_ID, security_id, 0);
   }
-  void add_bids(flatbuffers::Offset<flatbuffers::Vector<const SnapshotPriceLevel *>> bids) {
+  void add_bids(flatbuffers::Offset<flatbuffers::Vector<const krypto::serialization::SnapshotPriceLevel *>> bids) {
     fbb_.AddOffset(Snapshot::VT_BIDS, bids);
   }
-  void add_asks(flatbuffers::Offset<flatbuffers::Vector<const SnapshotPriceLevel *>> asks) {
+  void add_asks(flatbuffers::Offset<flatbuffers::Vector<const krypto::serialization::SnapshotPriceLevel *>> asks) {
     fbb_.AddOffset(Snapshot::VT_ASKS, asks);
   }
   explicit SnapshotBuilder(flatbuffers::FlatBufferBuilder &_fbb)
@@ -1052,8 +1238,8 @@ inline flatbuffers::Offset<Snapshot> CreateSnapshot(
     flatbuffers::FlatBufferBuilder &_fbb,
     int64_t timestamp = 0,
     int64_t security_id = 0,
-    flatbuffers::Offset<flatbuffers::Vector<const SnapshotPriceLevel *>> bids = 0,
-    flatbuffers::Offset<flatbuffers::Vector<const SnapshotPriceLevel *>> asks = 0) {
+    flatbuffers::Offset<flatbuffers::Vector<const krypto::serialization::SnapshotPriceLevel *>> bids = 0,
+    flatbuffers::Offset<flatbuffers::Vector<const krypto::serialization::SnapshotPriceLevel *>> asks = 0) {
   SnapshotBuilder builder_(_fbb);
   builder_.add_security_id(security_id);
   builder_.add_timestamp(timestamp);
@@ -1066,10 +1252,10 @@ inline flatbuffers::Offset<Snapshot> CreateSnapshotDirect(
     flatbuffers::FlatBufferBuilder &_fbb,
     int64_t timestamp = 0,
     int64_t security_id = 0,
-    const std::vector<SnapshotPriceLevel> *bids = nullptr,
-    const std::vector<SnapshotPriceLevel> *asks = nullptr) {
-  auto bids__ = bids ? _fbb.CreateVectorOfStructs<SnapshotPriceLevel>(*bids) : 0;
-  auto asks__ = asks ? _fbb.CreateVectorOfStructs<SnapshotPriceLevel>(*asks) : 0;
+    const std::vector<krypto::serialization::SnapshotPriceLevel> *bids = nullptr,
+    const std::vector<krypto::serialization::SnapshotPriceLevel> *asks = nullptr) {
+  auto bids__ = bids ? _fbb.CreateVectorOfStructs<krypto::serialization::SnapshotPriceLevel>(*bids) : 0;
+  auto asks__ = asks ? _fbb.CreateVectorOfStructs<krypto::serialization::SnapshotPriceLevel>(*asks) : 0;
   return krypto::serialization::CreateSnapshot(
       _fbb,
       timestamp,
@@ -1079,6 +1265,7 @@ inline flatbuffers::Offset<Snapshot> CreateSnapshotDirect(
 }
 
 struct Incremental FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+  typedef IncrementalBuilder Builder;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
     VT_TIMESTAMP = 4,
     VT_SECURITY_ID = 6,
@@ -1090,8 +1277,8 @@ struct Incremental FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   int64_t security_id() const {
     return GetField<int64_t>(VT_SECURITY_ID, 0);
   }
-  const flatbuffers::Vector<const IncrementalPriceLevel *> *updates() const {
-    return GetPointer<const flatbuffers::Vector<const IncrementalPriceLevel *> *>(VT_UPDATES);
+  const flatbuffers::Vector<const krypto::serialization::IncrementalPriceLevel *> *updates() const {
+    return GetPointer<const flatbuffers::Vector<const krypto::serialization::IncrementalPriceLevel *> *>(VT_UPDATES);
   }
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
@@ -1104,6 +1291,7 @@ struct Incremental FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
 };
 
 struct IncrementalBuilder {
+  typedef Incremental Table;
   flatbuffers::FlatBufferBuilder &fbb_;
   flatbuffers::uoffset_t start_;
   void add_timestamp(int64_t timestamp) {
@@ -1112,7 +1300,7 @@ struct IncrementalBuilder {
   void add_security_id(int64_t security_id) {
     fbb_.AddElement<int64_t>(Incremental::VT_SECURITY_ID, security_id, 0);
   }
-  void add_updates(flatbuffers::Offset<flatbuffers::Vector<const IncrementalPriceLevel *>> updates) {
+  void add_updates(flatbuffers::Offset<flatbuffers::Vector<const krypto::serialization::IncrementalPriceLevel *>> updates) {
     fbb_.AddOffset(Incremental::VT_UPDATES, updates);
   }
   explicit IncrementalBuilder(flatbuffers::FlatBufferBuilder &_fbb)
@@ -1131,7 +1319,7 @@ inline flatbuffers::Offset<Incremental> CreateIncremental(
     flatbuffers::FlatBufferBuilder &_fbb,
     int64_t timestamp = 0,
     int64_t security_id = 0,
-    flatbuffers::Offset<flatbuffers::Vector<const IncrementalPriceLevel *>> updates = 0) {
+    flatbuffers::Offset<flatbuffers::Vector<const krypto::serialization::IncrementalPriceLevel *>> updates = 0) {
   IncrementalBuilder builder_(_fbb);
   builder_.add_security_id(security_id);
   builder_.add_timestamp(timestamp);
@@ -1143,8 +1331,8 @@ inline flatbuffers::Offset<Incremental> CreateIncrementalDirect(
     flatbuffers::FlatBufferBuilder &_fbb,
     int64_t timestamp = 0,
     int64_t security_id = 0,
-    const std::vector<IncrementalPriceLevel> *updates = nullptr) {
-  auto updates__ = updates ? _fbb.CreateVectorOfStructs<IncrementalPriceLevel>(*updates) : 0;
+    const std::vector<krypto::serialization::IncrementalPriceLevel> *updates = nullptr) {
+  auto updates__ = updates ? _fbb.CreateVectorOfStructs<krypto::serialization::IncrementalPriceLevel>(*updates) : 0;
   return krypto::serialization::CreateIncremental(
       _fbb,
       timestamp,
@@ -1153,6 +1341,7 @@ inline flatbuffers::Offset<Incremental> CreateIncrementalDirect(
 }
 
 struct Trade FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+  typedef TradeBuilder Builder;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
     VT_TIMESTAMP = 4,
     VT_SECURITY_ID = 6,
@@ -1173,8 +1362,8 @@ struct Trade FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   int64_t quantity() const {
     return GetField<int64_t>(VT_QUANTITY, 0);
   }
-  Side side() const {
-    return static_cast<Side>(GetField<int8_t>(VT_SIDE, 0));
+  krypto::serialization::Side side() const {
+    return static_cast<krypto::serialization::Side>(GetField<int8_t>(VT_SIDE, 0));
   }
   const flatbuffers::String *trade_id() const {
     return GetPointer<const flatbuffers::String *>(VT_TRADE_ID);
@@ -1193,6 +1382,7 @@ struct Trade FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
 };
 
 struct TradeBuilder {
+  typedef Trade Table;
   flatbuffers::FlatBufferBuilder &fbb_;
   flatbuffers::uoffset_t start_;
   void add_timestamp(int64_t timestamp) {
@@ -1207,7 +1397,7 @@ struct TradeBuilder {
   void add_quantity(int64_t quantity) {
     fbb_.AddElement<int64_t>(Trade::VT_QUANTITY, quantity, 0);
   }
-  void add_side(Side side) {
+  void add_side(krypto::serialization::Side side) {
     fbb_.AddElement<int8_t>(Trade::VT_SIDE, static_cast<int8_t>(side), 0);
   }
   void add_trade_id(flatbuffers::Offset<flatbuffers::String> trade_id) {
@@ -1231,7 +1421,7 @@ inline flatbuffers::Offset<Trade> CreateTrade(
     int64_t security_id = 0,
     int64_t price = 0,
     int64_t quantity = 0,
-    Side side = Side_UNKNOWN,
+    krypto::serialization::Side side = krypto::serialization::Side_UNKNOWN,
     flatbuffers::Offset<flatbuffers::String> trade_id = 0) {
   TradeBuilder builder_(_fbb);
   builder_.add_quantity(quantity);
@@ -1249,7 +1439,7 @@ inline flatbuffers::Offset<Trade> CreateTradeDirect(
     int64_t security_id = 0,
     int64_t price = 0,
     int64_t quantity = 0,
-    Side side = Side_UNKNOWN,
+    krypto::serialization::Side side = krypto::serialization::Side_UNKNOWN,
     const char *trade_id = nullptr) {
   auto trade_id__ = trade_id ? _fbb.CreateString(trade_id) : 0;
   return krypto::serialization::CreateTrade(
@@ -1263,11 +1453,12 @@ inline flatbuffers::Offset<Trade> CreateTradeDirect(
 }
 
 struct InstrumentRequest FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+  typedef InstrumentRequestBuilder Builder;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
     VT_TYPE = 4
   };
-  RequestType type() const {
-    return static_cast<RequestType>(GetField<int8_t>(VT_TYPE, 0));
+  krypto::serialization::RequestType type() const {
+    return static_cast<krypto::serialization::RequestType>(GetField<int8_t>(VT_TYPE, 0));
   }
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
@@ -1277,9 +1468,10 @@ struct InstrumentRequest FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
 };
 
 struct InstrumentRequestBuilder {
+  typedef InstrumentRequest Table;
   flatbuffers::FlatBufferBuilder &fbb_;
   flatbuffers::uoffset_t start_;
-  void add_type(RequestType type) {
+  void add_type(krypto::serialization::RequestType type) {
     fbb_.AddElement<int8_t>(InstrumentRequest::VT_TYPE, static_cast<int8_t>(type), 0);
   }
   explicit InstrumentRequestBuilder(flatbuffers::FlatBufferBuilder &_fbb)
@@ -1296,18 +1488,19 @@ struct InstrumentRequestBuilder {
 
 inline flatbuffers::Offset<InstrumentRequest> CreateInstrumentRequest(
     flatbuffers::FlatBufferBuilder &_fbb,
-    RequestType type = RequestType_INVALID) {
+    krypto::serialization::RequestType type = krypto::serialization::RequestType_INVALID) {
   InstrumentRequestBuilder builder_(_fbb);
   builder_.add_type(type);
   return builder_.Finish();
 }
 
 struct InstrumentResponse FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+  typedef InstrumentResponseBuilder Builder;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
     VT_INSTRUMENTS = 4
   };
-  const flatbuffers::Vector<flatbuffers::Offset<Instrument>> *instruments() const {
-    return GetPointer<const flatbuffers::Vector<flatbuffers::Offset<Instrument>> *>(VT_INSTRUMENTS);
+  const flatbuffers::Vector<flatbuffers::Offset<krypto::serialization::Instrument>> *instruments() const {
+    return GetPointer<const flatbuffers::Vector<flatbuffers::Offset<krypto::serialization::Instrument>> *>(VT_INSTRUMENTS);
   }
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
@@ -1319,9 +1512,10 @@ struct InstrumentResponse FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
 };
 
 struct InstrumentResponseBuilder {
+  typedef InstrumentResponse Table;
   flatbuffers::FlatBufferBuilder &fbb_;
   flatbuffers::uoffset_t start_;
-  void add_instruments(flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<Instrument>>> instruments) {
+  void add_instruments(flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<krypto::serialization::Instrument>>> instruments) {
     fbb_.AddOffset(InstrumentResponse::VT_INSTRUMENTS, instruments);
   }
   explicit InstrumentResponseBuilder(flatbuffers::FlatBufferBuilder &_fbb)
@@ -1338,7 +1532,7 @@ struct InstrumentResponseBuilder {
 
 inline flatbuffers::Offset<InstrumentResponse> CreateInstrumentResponse(
     flatbuffers::FlatBufferBuilder &_fbb,
-    flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<Instrument>>> instruments = 0) {
+    flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<krypto::serialization::Instrument>>> instruments = 0) {
   InstrumentResponseBuilder builder_(_fbb);
   builder_.add_instruments(instruments);
   return builder_.Finish();
@@ -1346,14 +1540,15 @@ inline flatbuffers::Offset<InstrumentResponse> CreateInstrumentResponse(
 
 inline flatbuffers::Offset<InstrumentResponse> CreateInstrumentResponseDirect(
     flatbuffers::FlatBufferBuilder &_fbb,
-    const std::vector<flatbuffers::Offset<Instrument>> *instruments = nullptr) {
-  auto instruments__ = instruments ? _fbb.CreateVector<flatbuffers::Offset<Instrument>>(*instruments) : 0;
+    const std::vector<flatbuffers::Offset<krypto::serialization::Instrument>> *instruments = nullptr) {
+  auto instruments__ = instruments ? _fbb.CreateVector<flatbuffers::Offset<krypto::serialization::Instrument>>(*instruments) : 0;
   return krypto::serialization::CreateInstrumentResponse(
       _fbb,
       instruments__);
 }
 
 struct InstrumentRefreshRequest FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+  typedef InstrumentRefreshRequestBuilder Builder;
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
            verifier.EndTable();
@@ -1361,6 +1556,7 @@ struct InstrumentRefreshRequest FLATBUFFERS_FINAL_CLASS : private flatbuffers::T
 };
 
 struct InstrumentRefreshRequestBuilder {
+  typedef InstrumentRefreshRequest Table;
   flatbuffers::FlatBufferBuilder &fbb_;
   flatbuffers::uoffset_t start_;
   explicit InstrumentRefreshRequestBuilder(flatbuffers::FlatBufferBuilder &_fbb)
@@ -1382,6 +1578,7 @@ inline flatbuffers::Offset<InstrumentRefreshRequest> CreateInstrumentRefreshRequ
 }
 
 struct OrderRequest FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+  typedef OrderRequestBuilder Builder;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
     VT_TIMESTAMP = 4,
     VT_SECURITY_ID = 6,
@@ -1403,14 +1600,14 @@ struct OrderRequest FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   int64_t quantity() const {
     return GetField<int64_t>(VT_QUANTITY, 0);
   }
-  Side side() const {
-    return static_cast<Side>(GetField<int8_t>(VT_SIDE, 0));
+  krypto::serialization::Side side() const {
+    return static_cast<krypto::serialization::Side>(GetField<int8_t>(VT_SIDE, 0));
   }
   const flatbuffers::String *order_id() const {
     return GetPointer<const flatbuffers::String *>(VT_ORDER_ID);
   }
-  TimeInForce tif() const {
-    return static_cast<TimeInForce>(GetField<int8_t>(VT_TIF, 0));
+  krypto::serialization::TimeInForce tif() const {
+    return static_cast<krypto::serialization::TimeInForce>(GetField<int8_t>(VT_TIF, 0));
   }
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
@@ -1427,6 +1624,7 @@ struct OrderRequest FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
 };
 
 struct OrderRequestBuilder {
+  typedef OrderRequest Table;
   flatbuffers::FlatBufferBuilder &fbb_;
   flatbuffers::uoffset_t start_;
   void add_timestamp(int64_t timestamp) {
@@ -1441,13 +1639,13 @@ struct OrderRequestBuilder {
   void add_quantity(int64_t quantity) {
     fbb_.AddElement<int64_t>(OrderRequest::VT_QUANTITY, quantity, 0);
   }
-  void add_side(Side side) {
+  void add_side(krypto::serialization::Side side) {
     fbb_.AddElement<int8_t>(OrderRequest::VT_SIDE, static_cast<int8_t>(side), 0);
   }
   void add_order_id(flatbuffers::Offset<flatbuffers::String> order_id) {
     fbb_.AddOffset(OrderRequest::VT_ORDER_ID, order_id);
   }
-  void add_tif(TimeInForce tif) {
+  void add_tif(krypto::serialization::TimeInForce tif) {
     fbb_.AddElement<int8_t>(OrderRequest::VT_TIF, static_cast<int8_t>(tif), 0);
   }
   explicit OrderRequestBuilder(flatbuffers::FlatBufferBuilder &_fbb)
@@ -1468,9 +1666,9 @@ inline flatbuffers::Offset<OrderRequest> CreateOrderRequest(
     int64_t security_id = 0,
     int64_t price = 0,
     int64_t quantity = 0,
-    Side side = Side_UNKNOWN,
+    krypto::serialization::Side side = krypto::serialization::Side_UNKNOWN,
     flatbuffers::Offset<flatbuffers::String> order_id = 0,
-    TimeInForce tif = TimeInForce_DAY) {
+    krypto::serialization::TimeInForce tif = krypto::serialization::TimeInForce_DAY) {
   OrderRequestBuilder builder_(_fbb);
   builder_.add_quantity(quantity);
   builder_.add_price(price);
@@ -1488,9 +1686,9 @@ inline flatbuffers::Offset<OrderRequest> CreateOrderRequestDirect(
     int64_t security_id = 0,
     int64_t price = 0,
     int64_t quantity = 0,
-    Side side = Side_UNKNOWN,
+    krypto::serialization::Side side = krypto::serialization::Side_UNKNOWN,
     const char *order_id = nullptr,
-    TimeInForce tif = TimeInForce_DAY) {
+    krypto::serialization::TimeInForce tif = krypto::serialization::TimeInForce_DAY) {
   auto order_id__ = order_id ? _fbb.CreateString(order_id) : 0;
   return krypto::serialization::CreateOrderRequest(
       _fbb,
@@ -1504,6 +1702,7 @@ inline flatbuffers::Offset<OrderRequest> CreateOrderRequestDirect(
 }
 
 struct OrderCancelRequest FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+  typedef OrderCancelRequestBuilder Builder;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
     VT_TIMESTAMP = 4,
     VT_ORDER_ID = 6
@@ -1524,6 +1723,7 @@ struct OrderCancelRequest FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
 };
 
 struct OrderCancelRequestBuilder {
+  typedef OrderCancelRequest Table;
   flatbuffers::FlatBufferBuilder &fbb_;
   flatbuffers::uoffset_t start_;
   void add_timestamp(int64_t timestamp) {
@@ -1566,6 +1766,7 @@ inline flatbuffers::Offset<OrderCancelRequest> CreateOrderCancelRequestDirect(
 }
 
 struct OrderReplaceRequest FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+  typedef OrderReplaceRequestBuilder Builder;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
     VT_TIMESTAMP = 4,
     VT_ORDER_ID = 6,
@@ -1585,8 +1786,8 @@ struct OrderReplaceRequest FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table 
   int64_t quantity() const {
     return GetField<int64_t>(VT_QUANTITY, 0);
   }
-  Side side() const {
-    return static_cast<Side>(GetField<int8_t>(VT_SIDE, 0));
+  krypto::serialization::Side side() const {
+    return static_cast<krypto::serialization::Side>(GetField<int8_t>(VT_SIDE, 0));
   }
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
@@ -1601,6 +1802,7 @@ struct OrderReplaceRequest FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table 
 };
 
 struct OrderReplaceRequestBuilder {
+  typedef OrderReplaceRequest Table;
   flatbuffers::FlatBufferBuilder &fbb_;
   flatbuffers::uoffset_t start_;
   void add_timestamp(int64_t timestamp) {
@@ -1615,7 +1817,7 @@ struct OrderReplaceRequestBuilder {
   void add_quantity(int64_t quantity) {
     fbb_.AddElement<int64_t>(OrderReplaceRequest::VT_QUANTITY, quantity, 0);
   }
-  void add_side(Side side) {
+  void add_side(krypto::serialization::Side side) {
     fbb_.AddElement<int8_t>(OrderReplaceRequest::VT_SIDE, static_cast<int8_t>(side), 0);
   }
   explicit OrderReplaceRequestBuilder(flatbuffers::FlatBufferBuilder &_fbb)
@@ -1636,7 +1838,7 @@ inline flatbuffers::Offset<OrderReplaceRequest> CreateOrderReplaceRequest(
     flatbuffers::Offset<flatbuffers::String> order_id = 0,
     int64_t price = 0,
     int64_t quantity = 0,
-    Side side = Side_UNKNOWN) {
+    krypto::serialization::Side side = krypto::serialization::Side_UNKNOWN) {
   OrderReplaceRequestBuilder builder_(_fbb);
   builder_.add_quantity(quantity);
   builder_.add_price(price);
@@ -1652,7 +1854,7 @@ inline flatbuffers::Offset<OrderReplaceRequest> CreateOrderReplaceRequestDirect(
     const char *order_id = nullptr,
     int64_t price = 0,
     int64_t quantity = 0,
-    Side side = Side_UNKNOWN) {
+    krypto::serialization::Side side = krypto::serialization::Side_UNKNOWN) {
   auto order_id__ = order_id ? _fbb.CreateString(order_id) : 0;
   return krypto::serialization::CreateOrderReplaceRequest(
       _fbb,
@@ -1664,6 +1866,7 @@ inline flatbuffers::Offset<OrderReplaceRequest> CreateOrderReplaceRequestDirect(
 }
 
 struct OrderUpdate FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+  typedef OrderUpdateBuilder Builder;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
     VT_TIMESTAMP = 4,
     VT_ORDER_ID = 6,
@@ -1680,8 +1883,8 @@ struct OrderUpdate FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   const flatbuffers::String *exchange_order_id() const {
     return GetPointer<const flatbuffers::String *>(VT_EXCHANGE_ORDER_ID);
   }
-  OrderStatus status() const {
-    return static_cast<OrderStatus>(GetField<int8_t>(VT_STATUS, 0));
+  krypto::serialization::OrderStatus status() const {
+    return static_cast<krypto::serialization::OrderStatus>(GetField<int8_t>(VT_STATUS, 0));
   }
   int64_t filled_quantity() const {
     return GetField<int64_t>(VT_FILLED_QUANTITY, 0);
@@ -1700,6 +1903,7 @@ struct OrderUpdate FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
 };
 
 struct OrderUpdateBuilder {
+  typedef OrderUpdate Table;
   flatbuffers::FlatBufferBuilder &fbb_;
   flatbuffers::uoffset_t start_;
   void add_timestamp(int64_t timestamp) {
@@ -1711,7 +1915,7 @@ struct OrderUpdateBuilder {
   void add_exchange_order_id(flatbuffers::Offset<flatbuffers::String> exchange_order_id) {
     fbb_.AddOffset(OrderUpdate::VT_EXCHANGE_ORDER_ID, exchange_order_id);
   }
-  void add_status(OrderStatus status) {
+  void add_status(krypto::serialization::OrderStatus status) {
     fbb_.AddElement<int8_t>(OrderUpdate::VT_STATUS, static_cast<int8_t>(status), 0);
   }
   void add_filled_quantity(int64_t filled_quantity) {
@@ -1734,7 +1938,7 @@ inline flatbuffers::Offset<OrderUpdate> CreateOrderUpdate(
     int64_t timestamp = 0,
     flatbuffers::Offset<flatbuffers::String> order_id = 0,
     flatbuffers::Offset<flatbuffers::String> exchange_order_id = 0,
-    OrderStatus status = OrderStatus_UNKNOWN,
+    krypto::serialization::OrderStatus status = krypto::serialization::OrderStatus_UNKNOWN,
     int64_t filled_quantity = 0) {
   OrderUpdateBuilder builder_(_fbb);
   builder_.add_filled_quantity(filled_quantity);
@@ -1750,7 +1954,7 @@ inline flatbuffers::Offset<OrderUpdate> CreateOrderUpdateDirect(
     int64_t timestamp = 0,
     const char *order_id = nullptr,
     const char *exchange_order_id = nullptr,
-    OrderStatus status = OrderStatus_UNKNOWN,
+    krypto::serialization::OrderStatus status = krypto::serialization::OrderStatus_UNKNOWN,
     int64_t filled_quantity = 0) {
   auto order_id__ = order_id ? _fbb.CreateString(order_id) : 0;
   auto exchange_order_id__ = exchange_order_id ? _fbb.CreateString(exchange_order_id) : 0;
@@ -1764,16 +1968,17 @@ inline flatbuffers::Offset<OrderUpdate> CreateOrderUpdateDirect(
 }
 
 struct Order FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+  typedef OrderBuilder Builder;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
     VT_REQUEST = 4,
     VT_UPDATES = 6,
     VT_FEES = 8
   };
-  const OrderRequest *request() const {
-    return GetPointer<const OrderRequest *>(VT_REQUEST);
+  const krypto::serialization::OrderRequest *request() const {
+    return GetPointer<const krypto::serialization::OrderRequest *>(VT_REQUEST);
   }
-  const flatbuffers::Vector<flatbuffers::Offset<OrderUpdate>> *updates() const {
-    return GetPointer<const flatbuffers::Vector<flatbuffers::Offset<OrderUpdate>> *>(VT_UPDATES);
+  const flatbuffers::Vector<flatbuffers::Offset<krypto::serialization::OrderUpdate>> *updates() const {
+    return GetPointer<const flatbuffers::Vector<flatbuffers::Offset<krypto::serialization::OrderUpdate>> *>(VT_UPDATES);
   }
   double fees() const {
     return GetField<double>(VT_FEES, 0.0);
@@ -1791,12 +1996,13 @@ struct Order FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
 };
 
 struct OrderBuilder {
+  typedef Order Table;
   flatbuffers::FlatBufferBuilder &fbb_;
   flatbuffers::uoffset_t start_;
-  void add_request(flatbuffers::Offset<OrderRequest> request) {
+  void add_request(flatbuffers::Offset<krypto::serialization::OrderRequest> request) {
     fbb_.AddOffset(Order::VT_REQUEST, request);
   }
-  void add_updates(flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<OrderUpdate>>> updates) {
+  void add_updates(flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<krypto::serialization::OrderUpdate>>> updates) {
     fbb_.AddOffset(Order::VT_UPDATES, updates);
   }
   void add_fees(double fees) {
@@ -1816,8 +2022,8 @@ struct OrderBuilder {
 
 inline flatbuffers::Offset<Order> CreateOrder(
     flatbuffers::FlatBufferBuilder &_fbb,
-    flatbuffers::Offset<OrderRequest> request = 0,
-    flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<OrderUpdate>>> updates = 0,
+    flatbuffers::Offset<krypto::serialization::OrderRequest> request = 0,
+    flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<krypto::serialization::OrderUpdate>>> updates = 0,
     double fees = 0.0) {
   OrderBuilder builder_(_fbb);
   builder_.add_fees(fees);
@@ -1828,10 +2034,10 @@ inline flatbuffers::Offset<Order> CreateOrder(
 
 inline flatbuffers::Offset<Order> CreateOrderDirect(
     flatbuffers::FlatBufferBuilder &_fbb,
-    flatbuffers::Offset<OrderRequest> request = 0,
-    const std::vector<flatbuffers::Offset<OrderUpdate>> *updates = nullptr,
+    flatbuffers::Offset<krypto::serialization::OrderRequest> request = 0,
+    const std::vector<flatbuffers::Offset<krypto::serialization::OrderUpdate>> *updates = nullptr,
     double fees = 0.0) {
-  auto updates__ = updates ? _fbb.CreateVector<flatbuffers::Offset<OrderUpdate>>(*updates) : 0;
+  auto updates__ = updates ? _fbb.CreateVector<flatbuffers::Offset<krypto::serialization::OrderUpdate>>(*updates) : 0;
   return krypto::serialization::CreateOrder(
       _fbb,
       request,
@@ -1840,6 +2046,7 @@ inline flatbuffers::Offset<Order> CreateOrderDirect(
 }
 
 struct RiskSummary FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+  typedef RiskSummaryBuilder Builder;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
     VT_TIMESTAMP = 4,
     VT_POSITIONS = 6,
@@ -1848,8 +2055,8 @@ struct RiskSummary FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   int64_t timestamp() const {
     return GetField<int64_t>(VT_TIMESTAMP, 0);
   }
-  const flatbuffers::Vector<const Position *> *positions() const {
-    return GetPointer<const flatbuffers::Vector<const Position *> *>(VT_POSITIONS);
+  const flatbuffers::Vector<const krypto::serialization::Position *> *positions() const {
+    return GetPointer<const flatbuffers::Vector<const krypto::serialization::Position *> *>(VT_POSITIONS);
   }
   double pnl() const {
     return GetField<double>(VT_PNL, 0.0);
@@ -1865,12 +2072,13 @@ struct RiskSummary FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
 };
 
 struct RiskSummaryBuilder {
+  typedef RiskSummary Table;
   flatbuffers::FlatBufferBuilder &fbb_;
   flatbuffers::uoffset_t start_;
   void add_timestamp(int64_t timestamp) {
     fbb_.AddElement<int64_t>(RiskSummary::VT_TIMESTAMP, timestamp, 0);
   }
-  void add_positions(flatbuffers::Offset<flatbuffers::Vector<const Position *>> positions) {
+  void add_positions(flatbuffers::Offset<flatbuffers::Vector<const krypto::serialization::Position *>> positions) {
     fbb_.AddOffset(RiskSummary::VT_POSITIONS, positions);
   }
   void add_pnl(double pnl) {
@@ -1891,7 +2099,7 @@ struct RiskSummaryBuilder {
 inline flatbuffers::Offset<RiskSummary> CreateRiskSummary(
     flatbuffers::FlatBufferBuilder &_fbb,
     int64_t timestamp = 0,
-    flatbuffers::Offset<flatbuffers::Vector<const Position *>> positions = 0,
+    flatbuffers::Offset<flatbuffers::Vector<const krypto::serialization::Position *>> positions = 0,
     double pnl = 0.0) {
   RiskSummaryBuilder builder_(_fbb);
   builder_.add_pnl(pnl);
@@ -1903,9 +2111,9 @@ inline flatbuffers::Offset<RiskSummary> CreateRiskSummary(
 inline flatbuffers::Offset<RiskSummary> CreateRiskSummaryDirect(
     flatbuffers::FlatBufferBuilder &_fbb,
     int64_t timestamp = 0,
-    const std::vector<Position> *positions = nullptr,
+    const std::vector<krypto::serialization::Position> *positions = nullptr,
     double pnl = 0.0) {
-  auto positions__ = positions ? _fbb.CreateVectorOfStructs<Position>(*positions) : 0;
+  auto positions__ = positions ? _fbb.CreateVectorOfStructs<krypto::serialization::Position>(*positions) : 0;
   return krypto::serialization::CreateRiskSummary(
       _fbb,
       timestamp,
@@ -1914,6 +2122,7 @@ inline flatbuffers::Offset<RiskSummary> CreateRiskSummaryDirect(
 }
 
 struct TheoreticalSnapshot FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+  typedef TheoreticalSnapshotBuilder Builder;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
     VT_TIMESTAMP = 4,
     VT_SECURITY_ID = 6,
@@ -1973,6 +2182,7 @@ struct TheoreticalSnapshot FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table 
 };
 
 struct TheoreticalSnapshotBuilder {
+  typedef TheoreticalSnapshot Table;
   flatbuffers::FlatBufferBuilder &fbb_;
   flatbuffers::uoffset_t start_;
   void add_timestamp(int64_t timestamp) {

@@ -9,7 +9,7 @@ import com.google.flatbuffers.*;
 
 @SuppressWarnings("unused")
 public final class Position extends Struct {
-  public void __init(int _i, ByteBuffer _bb) { bb_pos = _i; bb = _bb; }
+  public void __init(int _i, ByteBuffer _bb) { __reset(_i, _bb); }
   public Position __assign(int _i, ByteBuffer _bb) { __init(_i, _bb); return this; }
 
   public long securityId() { return bb.getLong(bb_pos + 0); }
@@ -20,6 +20,13 @@ public final class Position extends Struct {
     builder.putLong(position);
     builder.putLong(securityId);
     return builder.offset();
+  }
+
+  public static final class Vector extends BaseVector {
+    public Vector __assign(int _vector, int _element_size, ByteBuffer _bb) { __reset(_vector, _element_size, _bb); return this; }
+
+    public Position get(int j) { return get(new Position(), j); }
+    public Position get(Position obj, int j) {  return obj.__assign(__element(j), bb); }
   }
 }
 

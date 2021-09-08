@@ -9,9 +9,10 @@ import com.google.flatbuffers.*;
 
 @SuppressWarnings("unused")
 public final class Trade extends Table {
+  public static void ValidateVersion() { Constants.FLATBUFFERS_1_12_0(); }
   public static Trade getRootAsTrade(ByteBuffer _bb) { return getRootAsTrade(_bb, new Trade()); }
   public static Trade getRootAsTrade(ByteBuffer _bb, Trade obj) { _bb.order(ByteOrder.LITTLE_ENDIAN); return (obj.__assign(_bb.getInt(_bb.position()) + _bb.position(), _bb)); }
-  public void __init(int _i, ByteBuffer _bb) { bb_pos = _i; bb = _bb; vtable_start = bb_pos - bb.getInt(bb_pos); vtable_size = bb.getShort(vtable_start); }
+  public void __init(int _i, ByteBuffer _bb) { __reset(_i, _bb); }
   public Trade __assign(int _i, ByteBuffer _bb) { __init(_i, _bb); return this; }
 
   public long timestamp() { int o = __offset(4); return o != 0 ? bb.getLong(o + bb_pos) : 0L; }
@@ -30,7 +31,7 @@ public final class Trade extends Table {
       long quantity,
       byte side,
       int trade_idOffset) {
-    builder.startObject(6);
+    builder.startTable(6);
     Trade.addQuantity(builder, quantity);
     Trade.addPrice(builder, price);
     Trade.addSecurityId(builder, security_id);
@@ -40,7 +41,7 @@ public final class Trade extends Table {
     return Trade.endTrade(builder);
   }
 
-  public static void startTrade(FlatBufferBuilder builder) { builder.startObject(6); }
+  public static void startTrade(FlatBufferBuilder builder) { builder.startTable(6); }
   public static void addTimestamp(FlatBufferBuilder builder, long timestamp) { builder.addLong(0, timestamp, 0L); }
   public static void addSecurityId(FlatBufferBuilder builder, long securityId) { builder.addLong(1, securityId, 0L); }
   public static void addPrice(FlatBufferBuilder builder, long price) { builder.addLong(2, price, 0L); }
@@ -48,8 +49,15 @@ public final class Trade extends Table {
   public static void addSide(FlatBufferBuilder builder, byte side) { builder.addByte(4, side, 0); }
   public static void addTradeId(FlatBufferBuilder builder, int tradeIdOffset) { builder.addOffset(5, tradeIdOffset, 0); }
   public static int endTrade(FlatBufferBuilder builder) {
-    int o = builder.endObject();
+    int o = builder.endTable();
     return o;
+  }
+
+  public static final class Vector extends BaseVector {
+    public Vector __assign(int _vector, int _element_size, ByteBuffer _bb) { __reset(_vector, _element_size, _bb); return this; }
+
+    public Trade get(int j) { return get(new Trade(), j); }
+    public Trade get(Trade obj, int j) {  return obj.__assign(__indirect(__element(j), bb), bb); }
   }
 }
 

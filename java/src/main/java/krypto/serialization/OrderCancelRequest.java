@@ -9,9 +9,10 @@ import com.google.flatbuffers.*;
 
 @SuppressWarnings("unused")
 public final class OrderCancelRequest extends Table {
+  public static void ValidateVersion() { Constants.FLATBUFFERS_1_12_0(); }
   public static OrderCancelRequest getRootAsOrderCancelRequest(ByteBuffer _bb) { return getRootAsOrderCancelRequest(_bb, new OrderCancelRequest()); }
   public static OrderCancelRequest getRootAsOrderCancelRequest(ByteBuffer _bb, OrderCancelRequest obj) { _bb.order(ByteOrder.LITTLE_ENDIAN); return (obj.__assign(_bb.getInt(_bb.position()) + _bb.position(), _bb)); }
-  public void __init(int _i, ByteBuffer _bb) { bb_pos = _i; bb = _bb; vtable_start = bb_pos - bb.getInt(bb_pos); vtable_size = bb.getShort(vtable_start); }
+  public void __init(int _i, ByteBuffer _bb) { __reset(_i, _bb); }
   public OrderCancelRequest __assign(int _i, ByteBuffer _bb) { __init(_i, _bb); return this; }
 
   public long timestamp() { int o = __offset(4); return o != 0 ? bb.getLong(o + bb_pos) : 0L; }
@@ -22,18 +23,25 @@ public final class OrderCancelRequest extends Table {
   public static int createOrderCancelRequest(FlatBufferBuilder builder,
       long timestamp,
       int order_idOffset) {
-    builder.startObject(2);
+    builder.startTable(2);
     OrderCancelRequest.addTimestamp(builder, timestamp);
     OrderCancelRequest.addOrderId(builder, order_idOffset);
     return OrderCancelRequest.endOrderCancelRequest(builder);
   }
 
-  public static void startOrderCancelRequest(FlatBufferBuilder builder) { builder.startObject(2); }
+  public static void startOrderCancelRequest(FlatBufferBuilder builder) { builder.startTable(2); }
   public static void addTimestamp(FlatBufferBuilder builder, long timestamp) { builder.addLong(0, timestamp, 0L); }
   public static void addOrderId(FlatBufferBuilder builder, int orderIdOffset) { builder.addOffset(1, orderIdOffset, 0); }
   public static int endOrderCancelRequest(FlatBufferBuilder builder) {
-    int o = builder.endObject();
+    int o = builder.endTable();
     return o;
+  }
+
+  public static final class Vector extends BaseVector {
+    public Vector __assign(int _vector, int _element_size, ByteBuffer _bb) { __reset(_vector, _element_size, _bb); return this; }
+
+    public OrderCancelRequest get(int j) { return get(new OrderCancelRequest(), j); }
+    public OrderCancelRequest get(OrderCancelRequest obj, int j) {  return obj.__assign(__indirect(__element(j), bb), bb); }
   }
 }
 

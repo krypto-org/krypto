@@ -9,36 +9,46 @@ import com.google.flatbuffers.*;
 
 @SuppressWarnings("unused")
 public final class RiskSummary extends Table {
+  public static void ValidateVersion() { Constants.FLATBUFFERS_1_12_0(); }
   public static RiskSummary getRootAsRiskSummary(ByteBuffer _bb) { return getRootAsRiskSummary(_bb, new RiskSummary()); }
   public static RiskSummary getRootAsRiskSummary(ByteBuffer _bb, RiskSummary obj) { _bb.order(ByteOrder.LITTLE_ENDIAN); return (obj.__assign(_bb.getInt(_bb.position()) + _bb.position(), _bb)); }
-  public void __init(int _i, ByteBuffer _bb) { bb_pos = _i; bb = _bb; vtable_start = bb_pos - bb.getInt(bb_pos); vtable_size = bb.getShort(vtable_start); }
+  public void __init(int _i, ByteBuffer _bb) { __reset(_i, _bb); }
   public RiskSummary __assign(int _i, ByteBuffer _bb) { __init(_i, _bb); return this; }
 
   public long timestamp() { int o = __offset(4); return o != 0 ? bb.getLong(o + bb_pos) : 0L; }
-  public Position positions(int j) { return positions(new Position(), j); }
-  public Position positions(Position obj, int j) { int o = __offset(6); return o != 0 ? obj.__assign(__vector(o) + j * 16, bb) : null; }
+  public krypto.serialization.Position positions(int j) { return positions(new krypto.serialization.Position(), j); }
+  public krypto.serialization.Position positions(krypto.serialization.Position obj, int j) { int o = __offset(6); return o != 0 ? obj.__assign(__vector(o) + j * 16, bb) : null; }
   public int positionsLength() { int o = __offset(6); return o != 0 ? __vector_len(o) : 0; }
+  public krypto.serialization.Position.Vector positionsVector() { return positionsVector(new krypto.serialization.Position.Vector()); }
+  public krypto.serialization.Position.Vector positionsVector(krypto.serialization.Position.Vector obj) { int o = __offset(6); return o != 0 ? obj.__assign(__vector(o), 16, bb) : null; }
   public double pnl() { int o = __offset(8); return o != 0 ? bb.getDouble(o + bb_pos) : 0.0; }
 
   public static int createRiskSummary(FlatBufferBuilder builder,
       long timestamp,
       int positionsOffset,
       double pnl) {
-    builder.startObject(3);
+    builder.startTable(3);
     RiskSummary.addPnl(builder, pnl);
     RiskSummary.addTimestamp(builder, timestamp);
     RiskSummary.addPositions(builder, positionsOffset);
     return RiskSummary.endRiskSummary(builder);
   }
 
-  public static void startRiskSummary(FlatBufferBuilder builder) { builder.startObject(3); }
+  public static void startRiskSummary(FlatBufferBuilder builder) { builder.startTable(3); }
   public static void addTimestamp(FlatBufferBuilder builder, long timestamp) { builder.addLong(0, timestamp, 0L); }
   public static void addPositions(FlatBufferBuilder builder, int positionsOffset) { builder.addOffset(1, positionsOffset, 0); }
   public static void startPositionsVector(FlatBufferBuilder builder, int numElems) { builder.startVector(16, numElems, 8); }
   public static void addPnl(FlatBufferBuilder builder, double pnl) { builder.addDouble(2, pnl, 0.0); }
   public static int endRiskSummary(FlatBufferBuilder builder) {
-    int o = builder.endObject();
+    int o = builder.endTable();
     return o;
+  }
+
+  public static final class Vector extends BaseVector {
+    public Vector __assign(int _vector, int _element_size, ByteBuffer _bb) { __reset(_vector, _element_size, _bb); return this; }
+
+    public RiskSummary get(int j) { return get(new RiskSummary(), j); }
+    public RiskSummary get(RiskSummary obj, int j) {  return obj.__assign(__indirect(__element(j), bb), bb); }
   }
 }
 

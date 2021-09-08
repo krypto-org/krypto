@@ -9,9 +9,10 @@ import com.google.flatbuffers.*;
 
 @SuppressWarnings("unused")
 public final class Quote extends Table {
+  public static void ValidateVersion() { Constants.FLATBUFFERS_1_12_0(); }
   public static Quote getRootAsQuote(ByteBuffer _bb) { return getRootAsQuote(_bb, new Quote()); }
   public static Quote getRootAsQuote(ByteBuffer _bb, Quote obj) { _bb.order(ByteOrder.LITTLE_ENDIAN); return (obj.__assign(_bb.getInt(_bb.position()) + _bb.position(), _bb)); }
-  public void __init(int _i, ByteBuffer _bb) { bb_pos = _i; bb = _bb; vtable_start = bb_pos - bb.getInt(bb_pos); vtable_size = bb.getShort(vtable_start); }
+  public void __init(int _i, ByteBuffer _bb) { __reset(_i, _bb); }
   public Quote __assign(int _i, ByteBuffer _bb) { __init(_i, _bb); return this; }
 
   public long timestamp() { int o = __offset(4); return o != 0 ? bb.getLong(o + bb_pos) : 0L; }
@@ -32,7 +33,7 @@ public final class Quote extends Table {
       long bid_quantity,
       long ask_quantity,
       long last_quantity) {
-    builder.startObject(8);
+    builder.startTable(8);
     Quote.addLastQuantity(builder, last_quantity);
     Quote.addAskQuantity(builder, ask_quantity);
     Quote.addBidQuantity(builder, bid_quantity);
@@ -44,7 +45,7 @@ public final class Quote extends Table {
     return Quote.endQuote(builder);
   }
 
-  public static void startQuote(FlatBufferBuilder builder) { builder.startObject(8); }
+  public static void startQuote(FlatBufferBuilder builder) { builder.startTable(8); }
   public static void addTimestamp(FlatBufferBuilder builder, long timestamp) { builder.addLong(0, timestamp, 0L); }
   public static void addSecurityId(FlatBufferBuilder builder, long securityId) { builder.addLong(1, securityId, 0L); }
   public static void addBid(FlatBufferBuilder builder, long bid) { builder.addLong(2, bid, 0L); }
@@ -54,8 +55,15 @@ public final class Quote extends Table {
   public static void addAskQuantity(FlatBufferBuilder builder, long askQuantity) { builder.addLong(6, askQuantity, 0L); }
   public static void addLastQuantity(FlatBufferBuilder builder, long lastQuantity) { builder.addLong(7, lastQuantity, 0L); }
   public static int endQuote(FlatBufferBuilder builder) {
-    int o = builder.endObject();
+    int o = builder.endTable();
     return o;
+  }
+
+  public static final class Vector extends BaseVector {
+    public Vector __assign(int _vector, int _element_size, ByteBuffer _bb) { __reset(_vector, _element_size, _bb); return this; }
+
+    public Quote get(int j) { return get(new Quote(), j); }
+    public Quote get(Quote obj, int j) {  return obj.__assign(__indirect(__element(j), bb), bb); }
   }
 }
 

@@ -9,9 +9,10 @@ import com.google.flatbuffers.*;
 
 @SuppressWarnings("unused")
 public final class TheoreticalSnapshot extends Table {
+  public static void ValidateVersion() { Constants.FLATBUFFERS_1_12_0(); }
   public static TheoreticalSnapshot getRootAsTheoreticalSnapshot(ByteBuffer _bb) { return getRootAsTheoreticalSnapshot(_bb, new TheoreticalSnapshot()); }
   public static TheoreticalSnapshot getRootAsTheoreticalSnapshot(ByteBuffer _bb, TheoreticalSnapshot obj) { _bb.order(ByteOrder.LITTLE_ENDIAN); return (obj.__assign(_bb.getInt(_bb.position()) + _bb.position(), _bb)); }
-  public void __init(int _i, ByteBuffer _bb) { bb_pos = _i; bb = _bb; vtable_start = bb_pos - bb.getInt(bb_pos); vtable_size = bb.getShort(vtable_start); }
+  public void __init(int _i, ByteBuffer _bb) { __reset(_i, _bb); }
   public TheoreticalSnapshot __assign(int _i, ByteBuffer _bb) { __init(_i, _bb); return this; }
 
   public long timestamp() { int o = __offset(4); return o != 0 ? bb.getLong(o + bb_pos) : 0L; }
@@ -36,7 +37,7 @@ public final class TheoreticalSnapshot extends Table {
       double mm_base_spread,
       double bid_liquidity,
       double ask_liquidity) {
-    builder.startObject(10);
+    builder.startTable(10);
     TheoreticalSnapshot.addAskLiquidity(builder, ask_liquidity);
     TheoreticalSnapshot.addBidLiquidity(builder, bid_liquidity);
     TheoreticalSnapshot.addMmBaseSpread(builder, mm_base_spread);
@@ -50,7 +51,7 @@ public final class TheoreticalSnapshot extends Table {
     return TheoreticalSnapshot.endTheoreticalSnapshot(builder);
   }
 
-  public static void startTheoreticalSnapshot(FlatBufferBuilder builder) { builder.startObject(10); }
+  public static void startTheoreticalSnapshot(FlatBufferBuilder builder) { builder.startTable(10); }
   public static void addTimestamp(FlatBufferBuilder builder, long timestamp) { builder.addLong(0, timestamp, 0L); }
   public static void addSecurityId(FlatBufferBuilder builder, long securityId) { builder.addLong(1, securityId, 0L); }
   public static void addPrice(FlatBufferBuilder builder, double price) { builder.addDouble(2, price, 0.0); }
@@ -62,8 +63,15 @@ public final class TheoreticalSnapshot extends Table {
   public static void addBidLiquidity(FlatBufferBuilder builder, double bidLiquidity) { builder.addDouble(8, bidLiquidity, 0.0); }
   public static void addAskLiquidity(FlatBufferBuilder builder, double askLiquidity) { builder.addDouble(9, askLiquidity, 0.0); }
   public static int endTheoreticalSnapshot(FlatBufferBuilder builder) {
-    int o = builder.endObject();
+    int o = builder.endTable();
     return o;
+  }
+
+  public static final class Vector extends BaseVector {
+    public Vector __assign(int _vector, int _element_size, ByteBuffer _bb) { __reset(_vector, _element_size, _bb); return this; }
+
+    public TheoreticalSnapshot get(int j) { return get(new TheoreticalSnapshot(), j); }
+    public TheoreticalSnapshot get(TheoreticalSnapshot obj, int j) {  return obj.__assign(__indirect(__element(j), bb), bb); }
   }
 }
 

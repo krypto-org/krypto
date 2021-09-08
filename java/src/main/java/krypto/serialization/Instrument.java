@@ -9,9 +9,10 @@ import com.google.flatbuffers.*;
 
 @SuppressWarnings("unused")
 public final class Instrument extends Table {
+  public static void ValidateVersion() { Constants.FLATBUFFERS_1_12_0(); }
   public static Instrument getRootAsInstrument(ByteBuffer _bb) { return getRootAsInstrument(_bb, new Instrument()); }
   public static Instrument getRootAsInstrument(ByteBuffer _bb, Instrument obj) { _bb.order(ByteOrder.LITTLE_ENDIAN); return (obj.__assign(_bb.getInt(_bb.position()) + _bb.position(), _bb)); }
-  public void __init(int _i, ByteBuffer _bb) { bb_pos = _i; bb = _bb; vtable_start = bb_pos - bb.getInt(bb_pos); vtable_size = bb.getShort(vtable_start); }
+  public void __init(int _i, ByteBuffer _bb) { __reset(_i, _bb); }
   public Instrument __assign(int _i, ByteBuffer _bb) { __init(_i, _bb); return this; }
 
   public long id() { int o = __offset(4); return o != 0 ? bb.getLong(o + bb_pos) : 0L; }
@@ -44,7 +45,7 @@ public final class Instrument extends Table {
       byte crypto_quote,
       boolean active,
       boolean sandbox_enabled) {
-    builder.startObject(12);
+    builder.startTable(12);
     Instrument.addMaxSize(builder, max_size);
     Instrument.addMinSize(builder, min_size);
     Instrument.addTickSize(builder, tick_size);
@@ -60,7 +61,7 @@ public final class Instrument extends Table {
     return Instrument.endInstrument(builder);
   }
 
-  public static void startInstrument(FlatBufferBuilder builder) { builder.startObject(12); }
+  public static void startInstrument(FlatBufferBuilder builder) { builder.startTable(12); }
   public static void addId(FlatBufferBuilder builder, long id) { builder.addLong(0, id, 0L); }
   public static void addType(FlatBufferBuilder builder, byte type) { builder.addByte(1, type, 0); }
   public static void addSymbol(FlatBufferBuilder builder, int symbolOffset) { builder.addOffset(2, symbolOffset, 0); }
@@ -74,8 +75,15 @@ public final class Instrument extends Table {
   public static void addActive(FlatBufferBuilder builder, boolean active) { builder.addBoolean(10, active, false); }
   public static void addSandboxEnabled(FlatBufferBuilder builder, boolean sandboxEnabled) { builder.addBoolean(11, sandboxEnabled, false); }
   public static int endInstrument(FlatBufferBuilder builder) {
-    int o = builder.endObject();
+    int o = builder.endTable();
     return o;
+  }
+
+  public static final class Vector extends BaseVector {
+    public Vector __assign(int _vector, int _element_size, ByteBuffer _bb) { __reset(_vector, _element_size, _bb); return this; }
+
+    public Instrument get(int j) { return get(new Instrument(), j); }
+    public Instrument get(Instrument obj, int j) {  return obj.__assign(__indirect(__element(j), bb), bb); }
   }
 }
 

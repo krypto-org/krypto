@@ -9,9 +9,10 @@ import com.google.flatbuffers.*;
 
 @SuppressWarnings("unused")
 public final class OrderReplaceRequest extends Table {
+  public static void ValidateVersion() { Constants.FLATBUFFERS_1_12_0(); }
   public static OrderReplaceRequest getRootAsOrderReplaceRequest(ByteBuffer _bb) { return getRootAsOrderReplaceRequest(_bb, new OrderReplaceRequest()); }
   public static OrderReplaceRequest getRootAsOrderReplaceRequest(ByteBuffer _bb, OrderReplaceRequest obj) { _bb.order(ByteOrder.LITTLE_ENDIAN); return (obj.__assign(_bb.getInt(_bb.position()) + _bb.position(), _bb)); }
-  public void __init(int _i, ByteBuffer _bb) { bb_pos = _i; bb = _bb; vtable_start = bb_pos - bb.getInt(bb_pos); vtable_size = bb.getShort(vtable_start); }
+  public void __init(int _i, ByteBuffer _bb) { __reset(_i, _bb); }
   public OrderReplaceRequest __assign(int _i, ByteBuffer _bb) { __init(_i, _bb); return this; }
 
   public long timestamp() { int o = __offset(4); return o != 0 ? bb.getLong(o + bb_pos) : 0L; }
@@ -28,7 +29,7 @@ public final class OrderReplaceRequest extends Table {
       long price,
       long quantity,
       byte side) {
-    builder.startObject(5);
+    builder.startTable(5);
     OrderReplaceRequest.addQuantity(builder, quantity);
     OrderReplaceRequest.addPrice(builder, price);
     OrderReplaceRequest.addTimestamp(builder, timestamp);
@@ -37,15 +38,22 @@ public final class OrderReplaceRequest extends Table {
     return OrderReplaceRequest.endOrderReplaceRequest(builder);
   }
 
-  public static void startOrderReplaceRequest(FlatBufferBuilder builder) { builder.startObject(5); }
+  public static void startOrderReplaceRequest(FlatBufferBuilder builder) { builder.startTable(5); }
   public static void addTimestamp(FlatBufferBuilder builder, long timestamp) { builder.addLong(0, timestamp, 0L); }
   public static void addOrderId(FlatBufferBuilder builder, int orderIdOffset) { builder.addOffset(1, orderIdOffset, 0); }
   public static void addPrice(FlatBufferBuilder builder, long price) { builder.addLong(2, price, 0L); }
   public static void addQuantity(FlatBufferBuilder builder, long quantity) { builder.addLong(3, quantity, 0L); }
   public static void addSide(FlatBufferBuilder builder, byte side) { builder.addByte(4, side, 0); }
   public static int endOrderReplaceRequest(FlatBufferBuilder builder) {
-    int o = builder.endObject();
+    int o = builder.endTable();
     return o;
+  }
+
+  public static final class Vector extends BaseVector {
+    public Vector __assign(int _vector, int _element_size, ByteBuffer _bb) { __reset(_vector, _element_size, _bb); return this; }
+
+    public OrderReplaceRequest get(int j) { return get(new OrderReplaceRequest(), j); }
+    public OrderReplaceRequest get(OrderReplaceRequest obj, int j) {  return obj.__assign(__indirect(__element(j), bb), bb); }
   }
 }
 

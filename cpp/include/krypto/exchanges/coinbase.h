@@ -37,13 +37,22 @@ namespace krypto::exchanges {
         if (insts.has_value()) {
             nlohmann::json insts_json = nlohmann::json::parse(insts.value());
 
-            for (auto &&product : insts_json) {
+            for (auto &&product: insts_json) {
                 krypto::utils::Instrument inst{};
-
-                KRYP_LOG(info, product.dump());
 
                 auto base_currency = product.at("base_currency").get<std::string>();
                 auto quote_currency = product.at("quote_currency").get<std::string>();
+
+                if (names_to_currency_reference_.find(base_currency) == names_to_currency_reference_.end()) {
+                    KRYP_LOG(warn, "{} not found in currency reference", base_currency);
+                    continue;
+                }
+
+                if (names_to_currency_reference_.find(quote_currency) == names_to_currency_reference_.end()) {
+                    KRYP_LOG(warn, "{} not found in currency reference", quote_currency);
+                    continue;
+                }
+
                 auto symbol = krypto::utils::instrument_symbol(base_currency, quote_currency);
                 auto exch_symbol = product.at("id").get<std::string>();
                 auto tick_size = std::stod(product.at("base_increment").get<std::string>());

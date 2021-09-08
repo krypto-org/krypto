@@ -9,9 +9,10 @@ import com.google.flatbuffers.*;
 
 @SuppressWarnings("unused")
 public final class Heartbeat extends Table {
+  public static void ValidateVersion() { Constants.FLATBUFFERS_1_12_0(); }
   public static Heartbeat getRootAsHeartbeat(ByteBuffer _bb) { return getRootAsHeartbeat(_bb, new Heartbeat()); }
   public static Heartbeat getRootAsHeartbeat(ByteBuffer _bb, Heartbeat obj) { _bb.order(ByteOrder.LITTLE_ENDIAN); return (obj.__assign(_bb.getInt(_bb.position()) + _bb.position(), _bb)); }
-  public void __init(int _i, ByteBuffer _bb) { bb_pos = _i; bb = _bb; vtable_start = bb_pos - bb.getInt(bb_pos); vtable_size = bb.getShort(vtable_start); }
+  public void __init(int _i, ByteBuffer _bb) { __reset(_i, _bb); }
   public Heartbeat __assign(int _i, ByteBuffer _bb) { __init(_i, _bb); return this; }
 
   public long securityId() { int o = __offset(4); return o != 0 ? bb.getLong(o + bb_pos) : 0L; }
@@ -20,18 +21,25 @@ public final class Heartbeat extends Table {
   public static int createHeartbeat(FlatBufferBuilder builder,
       long security_id,
       long timestamp) {
-    builder.startObject(2);
+    builder.startTable(2);
     Heartbeat.addTimestamp(builder, timestamp);
     Heartbeat.addSecurityId(builder, security_id);
     return Heartbeat.endHeartbeat(builder);
   }
 
-  public static void startHeartbeat(FlatBufferBuilder builder) { builder.startObject(2); }
+  public static void startHeartbeat(FlatBufferBuilder builder) { builder.startTable(2); }
   public static void addSecurityId(FlatBufferBuilder builder, long securityId) { builder.addLong(0, securityId, 0L); }
   public static void addTimestamp(FlatBufferBuilder builder, long timestamp) { builder.addLong(1, timestamp, 0L); }
   public static int endHeartbeat(FlatBufferBuilder builder) {
-    int o = builder.endObject();
+    int o = builder.endTable();
     return o;
+  }
+
+  public static final class Vector extends BaseVector {
+    public Vector __assign(int _vector, int _element_size, ByteBuffer _bb) { __reset(_vector, _element_size, _bb); return this; }
+
+    public Heartbeat get(int j) { return get(new Heartbeat(), j); }
+    public Heartbeat get(Heartbeat obj, int j) {  return obj.__assign(__indirect(__element(j), bb), bb); }
   }
 }
 

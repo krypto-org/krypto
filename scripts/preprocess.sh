@@ -13,11 +13,10 @@ SCRIPT_PATH=$(realpath $0)
 SCRIPT_DIR=$(dirname "${SCRIPT_PATH}")
 
 KRYPTO_DIR=$(realpath "${SCRIPT_DIR}"/..)
+RESOURCES_DIR="${KRYPTO_DIR}"/resources
 
 # shellcheck disable=SC2034
 GCC_VERSION=10.2
-FLAT_BUFFERS_VERSION=1.11.0
-FLAT_BUFFERS_BINARY_PACKAGE=flatbuffers/${FLAT_BUFFERS_VERSION}@kapilsh/release
 
 echo -e "${BLUE}KRYPTO_DIR: ${KRYPTO_DIR}${NC}"
 
@@ -25,23 +24,14 @@ echo -e "${BLUE}"==================="${NC}"
 echo -e "${BLUE}"--- FLATBUFFERS ---"${NC}"
 echo -e "${BLUE}"==================="${NC}"
 
-echo -e "${BLUE}FLATBUFFERS CONAN PACKAGE: ${FLAT_BUFFERS_BINARY_PACKAGE}${NC}"
-
-export PATH=${KRYPTO_DIR}/resources/bin/:${PATH}
-
-cd "${KRYPTO_DIR}"/resources || exit
-
-mkdir build && cd build || exit
-conan install ${FLAT_BUFFERS_BINARY_PACKAGE} -g virtualenv -scompiler.version=${GCC_VERSION}
-source activate.sh
+rm -rf "${SCRIPT_DIR}"/build && mkdir "${SCRIPT_DIR}"/build && cd "${SCRIPT_DIR}"/build || exit
+conan install "${SCRIPT_DIR}" -g virtualenv -g cmake -s compiler=gcc  -s compiler.version=${GCC_VERSION} -s build_type=Release --profile "${SCRIPT_DIR}"/build.profile --build=missing
+source activate.sh && echo -e "${BLUE}Using $(flatc --version)${NC}" || exit
 cd ..
 
-echo -e "${BLUE}Using $(flatc --version)${NC}" || exit
-
 echo -e "${BLUE}"--- COMPILE C++ FLATBUFFERS SOURCES ---"${NC}"
-flatc --cpp -o "${KRYPTO_DIR}"/cpp/include/krypto/serialization serialization.fbs || exit
+flatc --cpp -o "${KRYPTO_DIR}"/cpp/include/krypto/serialization "${RESOURCES_DIR}"/serialization.fbs || exit
 echo -e "${BLUE}"--- COMPILE JAVA FLATBUFFERS SOURCES ---"${NC}"
-flatc --java -o "${KRYPTO_DIR}"/java/src/main/java serialization.fbs || exit
-# flatc --js -o "${KRYPTO_DIR}"/ui/src/krypto serialization.fbs || exit
+flatc --java -o "${KRYPTO_DIR}"/java/src/main/java "${RESOURCES_DIR}"/serialization.fbs || exit
 
-rm -r build
+rm -r "${SCRIPT_DIR}"/build

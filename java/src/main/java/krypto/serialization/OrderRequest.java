@@ -9,9 +9,10 @@ import com.google.flatbuffers.*;
 
 @SuppressWarnings("unused")
 public final class OrderRequest extends Table {
+  public static void ValidateVersion() { Constants.FLATBUFFERS_1_12_0(); }
   public static OrderRequest getRootAsOrderRequest(ByteBuffer _bb) { return getRootAsOrderRequest(_bb, new OrderRequest()); }
   public static OrderRequest getRootAsOrderRequest(ByteBuffer _bb, OrderRequest obj) { _bb.order(ByteOrder.LITTLE_ENDIAN); return (obj.__assign(_bb.getInt(_bb.position()) + _bb.position(), _bb)); }
-  public void __init(int _i, ByteBuffer _bb) { bb_pos = _i; bb = _bb; vtable_start = bb_pos - bb.getInt(bb_pos); vtable_size = bb.getShort(vtable_start); }
+  public void __init(int _i, ByteBuffer _bb) { __reset(_i, _bb); }
   public OrderRequest __assign(int _i, ByteBuffer _bb) { __init(_i, _bb); return this; }
 
   public long timestamp() { int o = __offset(4); return o != 0 ? bb.getLong(o + bb_pos) : 0L; }
@@ -32,7 +33,7 @@ public final class OrderRequest extends Table {
       byte side,
       int order_idOffset,
       byte tif) {
-    builder.startObject(7);
+    builder.startTable(7);
     OrderRequest.addQuantity(builder, quantity);
     OrderRequest.addPrice(builder, price);
     OrderRequest.addSecurityId(builder, security_id);
@@ -43,7 +44,7 @@ public final class OrderRequest extends Table {
     return OrderRequest.endOrderRequest(builder);
   }
 
-  public static void startOrderRequest(FlatBufferBuilder builder) { builder.startObject(7); }
+  public static void startOrderRequest(FlatBufferBuilder builder) { builder.startTable(7); }
   public static void addTimestamp(FlatBufferBuilder builder, long timestamp) { builder.addLong(0, timestamp, 0L); }
   public static void addSecurityId(FlatBufferBuilder builder, long securityId) { builder.addLong(1, securityId, 0L); }
   public static void addPrice(FlatBufferBuilder builder, long price) { builder.addLong(2, price, 0L); }
@@ -52,8 +53,15 @@ public final class OrderRequest extends Table {
   public static void addOrderId(FlatBufferBuilder builder, int orderIdOffset) { builder.addOffset(5, orderIdOffset, 0); }
   public static void addTif(FlatBufferBuilder builder, byte tif) { builder.addByte(6, tif, 0); }
   public static int endOrderRequest(FlatBufferBuilder builder) {
-    int o = builder.endObject();
+    int o = builder.endTable();
     return o;
+  }
+
+  public static final class Vector extends BaseVector {
+    public Vector __assign(int _vector, int _element_size, ByteBuffer _bb) { __reset(_vector, _element_size, _bb); return this; }
+
+    public OrderRequest get(int j) { return get(new OrderRequest(), j); }
+    public OrderRequest get(OrderRequest obj, int j) {  return obj.__assign(__indirect(__element(j), bb), bb); }
   }
 }
 
