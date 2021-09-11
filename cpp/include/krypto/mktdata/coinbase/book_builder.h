@@ -50,15 +50,15 @@ namespace krypto::mktdata::coinbase {
 
         void handle_trade(nlohmann::json trade);
 
-        void handle_order_received(nlohmann::json order_update);
+        void handle_order_received(nlohmann::json received);
 
-        void handle_order_open(nlohmann::json order_update);
+        void handle_order_open(nlohmann::json open_order);
 
-        void handle_order_done(nlohmann::json order_update);
+        void handle_order_done(nlohmann::json done);
 
-        void handle_order_match(nlohmann::json order_update);
+        void handle_order_match(nlohmann::json match);
 
-        void handle_order_change(nlohmann::json order_update);
+        void handle_order_change(nlohmann::json change);
 
         void handle_heartbeat(nlohmann::json hb);
     };

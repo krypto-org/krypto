@@ -23,14 +23,14 @@ namespace krypto {
 
         ~Config() = default;
 
-        const nlohmann::json &get() const;
+        [[nodiscard]] const nlohmann::json &get() const;
 
         template<typename T>
-        const T at(std::string &&) const;
+        T at(std::string &&) const;
     };
 
     template<typename T>
-    const T Config::at(std::string &&path) const {
+    T Config::at(std::string &&path) const {
         return root_.at(path).get<T>();
     }
 

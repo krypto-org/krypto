@@ -25,7 +25,6 @@ namespace krypto::mktdata::coinbase {
     public:
         using ws_client_t = websocketpp::client<websocketpp::config::asio_tls_client>;
         using channel_t = boost::fibers::buffered_channel<nlohmann::json>;
-        using ptr = websocketpp::lib::shared_ptr<WsConnection>;
 
         WsConnection(
                 zmq::context_t &context,
