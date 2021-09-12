@@ -18,7 +18,7 @@ std::function<void(int)> shutdown_handler;
 void signal_handler(int signal) { shutdown_handler(signal); }
 
 int main(int argc, char **argv) {
-    po::options_description desc("Coinbase market data server");
+    po::options_description desc("CoinbaseInstruments market data server");
     bool orders_pnly = false;
     bool run_sandbox = false;
     desc.add_options()

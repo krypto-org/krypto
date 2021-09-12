@@ -105,7 +105,7 @@ target_link_libraries(sim-order-client krypto)
 add_executable(theo-client src/examples/theo_printer_main.cpp)
 target_link_libraries(theo-client krypto)
 
-add_executable(coinbase-api-test src/examples/coinbase_api_main.cpp)
+add_executable(coinbase-api-test src/examples/coinbase_api_main.cpp include/krypto/instruments/exchanges/parser.h)
 target_link_libraries(coinbase-api-test krypto)
 
 add_executable(timer-test src/examples/timer_test_main.cpp)

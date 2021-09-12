@@ -14,7 +14,7 @@ int main(int argc, char **argv) {
     KRYP_LOG(info, "{}", key_file);
     krypto::exchanges::coinbase::Authenticator authenticator =
             krypto::exchanges::coinbase::Authenticator::from_file(key_file);
-    krypto::exchanges::coinbase::Api api{config, "sandbox", authenticator};
+    krypto::exchanges::coinbase::AuthenticatedApi api{config, "sandbox", authenticator};
     KRYP_LOG(info, "Time: {}", api.get_time().value().dump());
     std::string acct = "72acfba5-a3be-40f9-94e6-881732525ccc";
     KRYP_LOG(info, "Products: {}", api.get_products().value().dump());

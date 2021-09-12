@@ -1,6 +1,6 @@
 #include <krypto/instruments/loader.h>
 #include <krypto/config.h>
-#include <krypto/exchanges/factory.h>
+#include <krypto/instruments/instrument_factory.h>
 #include <krypto/utils/types.h>
 
 krypto::instruments::InstrumentLoader::InstrumentLoader(const krypto::Config &config) :
@@ -13,8 +13,8 @@ std::vector<krypto::utils::Instrument> krypto::instruments::InstrumentLoader::lo
         if (et == krypto::serialization::Exchange::Exchange_SIM) {
             continue;
         }
-        auto exchange = krypto::exchanges::ExchangeFactory::make(
-                et, config_, "/production");
+        auto exchange = krypto::instruments::ExchangeInstrumentsFactory::make(
+                et, config_, "production");
         auto instruments = exchange.instruments();
 
         result.insert(result.end(), std::begin(instruments), std::end(instruments));
