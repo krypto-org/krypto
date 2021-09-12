@@ -3,19 +3,16 @@
 #include <utility>
 
 namespace krypto::exchanges::coinbase {
-    Api::Api(const krypto::Config &config, const std::string &environment,
-             krypto::exchanges::coinbase::Authenticator authenticator) :
-            http_client_{
-                    config.at<std::string>("/exchanges/coinbase/rest/base_url/" + environment)},
-            inst_endpoint_{"/" + config.at<std::string>(
-                    "/exchanges/coinbase/rest/channels/instruments")},
+    AuthenticatedApi::AuthenticatedApi(const krypto::Config &config, const std::string &environment,
+                                       krypto::exchanges::coinbase::Authenticator authenticator) :
+            PublicApi{config, environment},
             acct_endpoint_{"/" + config.at<std::string>(
-                    "/exchanges/coinbase/rest/channels/accounts")},
+                    "/exchanges/coinba  se/rest/channels/accounts")},
             orders_endpoint_{"/" + config.at<std::string>(
                     "/exchanges/coinbase/rest/channels/orders")},
             authenticator_(std::move(authenticator)) {}
 
-    std::string Api::create_order_message(const Order &order) {
+    std::string AuthenticatedApi::create_order_message(const Order &order) {
         nlohmann::json order_json;
         order_json["product_id"] = order.product_id;
         order_json["side"] = order.side;
@@ -43,7 +40,7 @@ namespace krypto::exchanges::coinbase {
     }
 
     std::optional<std::string>
-    Api::send_authenticated_request(
+    AuthenticatedApi::send_authenticated_request(
             const std::string &request_type,
             const std::string &endpoint,
             const std::string &data) {
@@ -68,25 +65,11 @@ namespace krypto::exchanges::coinbase {
         return std::nullopt;
     }
 
-    std::optional<nlohmann::json> Api::get_time() {
-        auto result = http_client_.get("/time", {});
-        if (result.has_value())
-            return nlohmann::json::parse(result.value());
-        return std::nullopt;
-    }
-
-    std::optional<nlohmann::json> Api::get_products() {
-        auto result = http_client_.get(inst_endpoint_, {});
-        if (result.has_value())
-            return nlohmann::json::parse(result.value());
-        return std::nullopt;
-    }
-
-    std::optional<nlohmann::json> Api::get_accounts() {
+    std::optional<nlohmann::json> AuthenticatedApi::get_accounts() {
         return get_account("");
     }
 
-    std::optional<nlohmann::json> Api::get_account(const std::string &account) {
+    std::optional<nlohmann::json> AuthenticatedApi::get_account(const std::string &account) {
         std::string endpoint = "/accounts" + (account.empty() ? "" : "/" + account);
         auto result = send_authenticated_request("GET", endpoint, "");
         if (result.has_value())
@@ -94,11 +77,11 @@ namespace krypto::exchanges::coinbase {
         return std::nullopt;
     }
 
-    std::optional<nlohmann::json> Api::get_account_history(const std::string &account) {
+    std::optional<nlohmann::json> AuthenticatedApi::get_account_history(const std::string &account) {
         return get_account(account + "/ledger");
     }
 
-    std::optional<nlohmann::json> Api::place_order(const Order &order) {
+    std::optional<nlohmann::json> AuthenticatedApi::place_order(const Order &order) {
         auto order_str = create_order_message(order);
         auto result = send_authenticated_request("POST", orders_endpoint_, order_str);
         if (result.has_value())
@@ -106,11 +89,11 @@ namespace krypto::exchanges::coinbase {
         return std::nullopt;
     }
 
-    std::optional<nlohmann::json> Api::get_account_holds(const std::string &account) {
+    std::optional<nlohmann::json> AuthenticatedApi::get_account_holds(const std::string &account) {
         return get_account(account + "/holds");
     }
 
-    std::optional<nlohmann::json> Api::cancel_order(const std::string &order_id) {
+    std::optional<nlohmann::json> AuthenticatedApi::cancel_order(const std::string &order_id) {
         std::string endpoint = orders_endpoint_ + "/" + order_id;
         auto result = send_authenticated_request("DELETE", orders_endpoint_, "");
         if (result.has_value())
@@ -118,7 +101,7 @@ namespace krypto::exchanges::coinbase {
         return std::nullopt;
     }
 
-    std::optional<nlohmann::json> Api::cancel_all(std::optional<std::string> product_id) {
+    std::optional<nlohmann::json> AuthenticatedApi::cancel_all(std::optional<std::string> product_id) {
         std::stringstream ss;
         ss << orders_endpoint_;
         if (product_id.has_value()) {
@@ -132,7 +115,7 @@ namespace krypto::exchanges::coinbase {
     }
 
     std::optional<nlohmann::json>
-    Api::get_order(const std::optional<std::string> &status) {
+    AuthenticatedApi::get_order(const std::optional<std::string> &status) {
         std::stringstream ss;
         ss << orders_endpoint_;
         if (status.has_value()) {
@@ -145,8 +128,8 @@ namespace krypto::exchanges::coinbase {
         return std::nullopt;
     }
 
-    std::optional<nlohmann::json> Api::get_order(const std::string &product_id,
-                                                 const std::optional<std::string> &status) {
+    std::optional<nlohmann::json> AuthenticatedApi::get_order(const std::string &product_id,
+                                                              const std::optional<std::string> &status) {
         std::stringstream ss;
         ss << orders_endpoint_;
         ss << "?product_id=";
@@ -161,7 +144,7 @@ namespace krypto::exchanges::coinbase {
         return std::nullopt;
     }
 
-    std::optional<nlohmann::json> Api::get_fills_for_order(const std::string &order_id) {
+    std::optional<nlohmann::json> AuthenticatedApi::get_fills_for_order(const std::string &order_id) {
         std::string endpoint = "/fills?order_id=" + order_id;
         auto result = send_authenticated_request("GET", endpoint, "");
         if (result.has_value())
@@ -169,7 +152,7 @@ namespace krypto::exchanges::coinbase {
         return std::nullopt;
     }
 
-    std::optional<nlohmann::json> Api::get_fills_for_product(const std::string &product_id) {
+    std::optional<nlohmann::json> AuthenticatedApi::get_fills_for_product(const std::string &product_id) {
         std::string endpoint = "/fills?product_id=" + product_id;
         auto result = send_authenticated_request("GET", endpoint, "");
         if (result.has_value())
@@ -177,5 +160,25 @@ namespace krypto::exchanges::coinbase {
         return std::nullopt;
     }
 
+    PublicApi::PublicApi(const Config &config, const std::string &environment) :
+            http_client_{
+                    config.at<std::string>("/exchanges/coinbase/rest/base_url/" + environment)},
+            inst_endpoint_{
+                    "/" + config.at<std::string>(
+                            "/exchanges/coinbase/rest/channels/instruments")} {
+    }
 
+    std::optional<nlohmann::json> PublicApi::get_time() {
+        auto result = http_client_.get("/time", {});
+        if (result.has_value())
+            return nlohmann::json::parse(result.value());
+        return std::nullopt;
+    }
+
+    std::optional<nlohmann::json> PublicApi::get_products() {
+        auto result = http_client_.get(inst_endpoint_, {});
+        if (result.has_value())
+            return nlohmann::json::parse(result.value());
+        return std::nullopt;
+    }
 }

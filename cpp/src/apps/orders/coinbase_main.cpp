@@ -31,7 +31,7 @@ int main(int argc, char **argv) {
     std::string key_file{std::getenv("CB_KEY_FILE")};
     krypto::exchanges::coinbase::Authenticator authenticator =
             krypto::exchanges::coinbase::Authenticator::from_file(key_file);
-    krypto::exchanges::coinbase::Api api{config, "sandbox", authenticator};
+    krypto::exchanges::coinbase::AuthenticatedApi api{config, "sandbox", authenticator};
 
     using order_server_t = krypto::orders::coinbase::OrderServer<true>;
     order_server_t orders_server{context, api, config, true};

@@ -18,7 +18,7 @@ namespace krypto::utils {
     }
 
 
-    std::unordered_map<std::string, krypto::serialization::Currency> name_to_currency() {
+    std::unordered_map<std::string, krypto::serialization::Currency> name_to_currency() noexcept {
         auto values = krypto::serialization::EnumValuesCurrency();
         std::unordered_map<std::string, krypto::serialization::Currency> result;
         for (int i = 0; i <= static_cast<int>(krypto::serialization::Currency::Currency_MAX); ++i) {

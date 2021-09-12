@@ -2,17 +2,29 @@
 
 #include <krypto/exchanges/coinbase/auth.h>
 #include <krypto/utils/common.h>
-#include <krypto/exchanges/base.h>
+#include <krypto/instruments/exchanges/instrument.h>
 #include <krypto/utils/http.h>
 #include <nlohmann/json.hpp>
 #include <krypto/config.h>
 #include <krypto/exchanges/coinbase/types.h>
 
 namespace krypto::exchanges::coinbase {
-    class Api final {
-    private:
+
+    class PublicApi {
+    protected:
         krypto::utils::HttpClient http_client_;
         std::string inst_endpoint_;
+    public:
+        PublicApi(const krypto::Config &config, const std::string &environment);
+
+        std::optional<nlohmann::json> get_time();
+
+        std::optional<nlohmann::json> get_products();
+
+    };
+
+    class AuthenticatedApi final : public PublicApi {
+    private:
         std::string acct_endpoint_;
         std::string orders_endpoint_;
         Authenticator authenticator_;
@@ -23,12 +35,8 @@ namespace krypto::exchanges::coinbase {
                 const std::string &request_type, const std::string &endpoint, const std::string &data);
 
     public:
-        Api(const krypto::Config &config, const std::string &environment,
-            Authenticator authenticator);
-
-        std::optional<nlohmann::json> get_time();
-
-        std::optional<nlohmann::json> get_products();
+        AuthenticatedApi(const krypto::Config &config, const std::string &environment,
+                         Authenticator authenticator);
 
         std::optional<nlohmann::json> get_accounts();
 

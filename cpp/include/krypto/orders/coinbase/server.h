@@ -23,7 +23,7 @@ namespace krypto::orders::coinbase {
         std::unique_ptr<zmq::socket_t> mktdata_subscriber_;
         std::string order_gateway_endpoint_;
         std::string mktdata_gateway_endpoint_;
-        krypto::exchanges::coinbase::Api api_;
+        krypto::exchanges::coinbase::AuthenticatedApi api_;
         std::atomic_bool running_;
         bool is_sandbox_;
         std::unordered_map<std::string, krypto::utils::MsgType> msg_type_ref_;
@@ -43,7 +43,7 @@ namespace krypto::orders::coinbase {
 
     public:
         OrderServer(zmq::context_t &,
-                    krypto::exchanges::coinbase::Api api,
+                    krypto::exchanges::coinbase::AuthenticatedApi api,
                     const krypto::Config &, bool is_sandbox);
 
         void process(const krypto::serialization::OrderRequest *, const std::string &client_identity);
@@ -64,7 +64,7 @@ namespace krypto::orders::coinbase {
 
     template<bool Verbose>
     OrderServer<Verbose>::OrderServer(zmq::context_t &context,
-                                      krypto::exchanges::coinbase::Api api,
+                                      krypto::exchanges::coinbase::AuthenticatedApi api,
                                       const Config &config, const bool is_sandbox):
             receiver_{std::make_unique<zmq::socket_t>(context, ZMQ_DEALER)},
             mktdata_subscriber_{std::make_unique<zmq::socket_t>(context, ZMQ_SUB)},
