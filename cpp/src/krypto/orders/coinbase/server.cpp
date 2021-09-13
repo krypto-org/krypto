@@ -204,7 +204,7 @@ namespace krypto::orders::coinbase {
         running_ = false;
     }
 
-    void OrderServer::send(const utils::OrderUpdate &order_update, const std::string &client_identity) {
+    void OrderServer::send(const krypto::utils::OrderUpdate &order_update, const std::string &client_identity) {
         KRYP_LOG(info, "{} :: {} || {}",
                  krypto::serialization::EnumNameOrderStatus(
                          order_update.status),

@@ -4,7 +4,6 @@
 #include <krypto/utils/common.h>
 #include <krypto/mktdata/protocol.h>
 #include <krypto/utils/types.h>
-#include <krypto/utils/message_types.h>
 
 
 namespace krypto::mktdata {
@@ -26,5 +25,4 @@ namespace krypto::mktdata {
 
         void serialize(const krypto::utils::Heartbeat& hb);
     };
-
 }

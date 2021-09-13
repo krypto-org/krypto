@@ -2,7 +2,7 @@
 #include <csignal>
 #include <future>
 
-#include <krypto/utils/id_gen.h>
+#include <krypto/utils/order_id.h>
 
 #include <krypto/utils/common.h>
 #include <krypto/orders/client.h>

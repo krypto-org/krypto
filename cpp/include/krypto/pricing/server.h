@@ -5,7 +5,7 @@
 
 #include <krypto/mktdata/convert.h>
 #include <krypto/network/helper.h>
-#include <krypto/utils/message_types.h>
+#include <krypto/utils/types.h>
 #include <krypto/pricing/pub.h>
 #include <krypto/pricing/ewma.h>
 #include <krypto/logger.h>

@@ -1,5 +1,7 @@
 #pragma once
 
+#include <utility>
+
 #include <krypto/instruments/client.h>
 #include <krypto/orders/protocol.h>
 #include <krypto/mktdata/protocol.h>
@@ -9,11 +11,8 @@
 #include <krypto/exchanges/coinbase/api.h>
 #include <krypto/utils/types.h>
 #include <krypto/utils/date_time.h>
-#include <krypto/utils/message_types.h>
 #include <krypto/serialization/helper.h>
 #include <krypto/mktdata/convert.h>
-
-#include <utility>
 
 namespace krypto::orders::coinbase {
     class OrderServer final {

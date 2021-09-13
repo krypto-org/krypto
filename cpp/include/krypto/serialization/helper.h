@@ -1,6 +1,6 @@
 #pragma once
 
-#include <krypto/utils/message_types.h>
+#include <krypto/utils/types.h>
 
 namespace krypto::serialization {
     void serialize(flatbuffers::FlatBufferBuilder& buffer_builder,

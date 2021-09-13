@@ -3,7 +3,7 @@
 #include <variant>
 #include <zmq.hpp>
 
-#include <krypto/utils/message_types.h>
+#include <krypto/utils/types.h>
 #include <krypto/serialization/serialization_generated.h>
 #include <krypto/network/subscriber.h>
 

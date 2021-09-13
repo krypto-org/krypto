@@ -4,9 +4,8 @@
 
 #include <krypto/network/subscriber.h>
 #include <krypto/network/rpc/client.h>
-#include <krypto/utils/id_gen.h>
+#include <krypto/utils/order_id.h>
 #include <krypto/utils/date_time.h>
-#include <krypto/utils/message_types.h>
 #include <krypto/orders/protocol.h>
 #include <bits/unordered_set.h>
 

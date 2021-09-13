@@ -10,8 +10,6 @@
 #include <krypto/serialization/helper.h>
 #include <krypto/utils/types.h>
 #include <krypto/utils/date_time.h>
-#include <krypto/utils/message_types.h>
-
 
 namespace krypto::orders::sim {
     template<krypto::serialization::Exchange Exchange>

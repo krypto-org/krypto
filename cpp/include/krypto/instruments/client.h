@@ -5,7 +5,6 @@
 #include <krypto/network/rpc/client.h>
 #include <krypto/serialization/serialization_generated.h>
 #include <krypto/utils/common.h>
-#include <krypto/utils/message_types.h>
 #include <krypto/utils/types.h>
 #include <krypto/network/helper.h>
 
