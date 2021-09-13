@@ -25,7 +25,7 @@ namespace krypto::exchanges::coinbase {
 
     class AuthenticatedApi final : public PublicApi {
     private:
-        std::string acct_endpoint_;
+        std::string account_endpoint_;
         std::string orders_endpoint_;
         Authenticator authenticator_;
 

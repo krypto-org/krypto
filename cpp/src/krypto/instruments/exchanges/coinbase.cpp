@@ -1,10 +1,19 @@
-#pragma once
-
-#include <krypto/utils/types.h>
+#include <krypto/instruments/exchanges/coinbase.h>
 
 namespace krypto::instruments::exchanges {
-    std::vector<krypto::utils::Instrument> parse(nlohmann::json insts_json,
-                                                 const std::unordered_map<std::string, krypto::serialization::Currency> &currency_reference);
+
+    CoinbaseInstruments::CoinbaseInstruments(const Config &config, const std::string &environment) :
+            CoinbaseInstruments::ExchangeInstruments(),
+            api_{config, environment} {}
+
+    std::vector<krypto::utils::Instrument> CoinbaseInstruments::read_instruments() {
+        auto insts = api_.get_products();
+        if (!insts.has_value()) {
+            return {};
+        }
+
+        return krypto::instruments::exchanges::parse(insts.value(), CoinbaseInstruments::currency_reference);
+    }
 
     std::vector<krypto::utils::Instrument> parse(nlohmann::json insts_json,
                                                  const std::unordered_map<std::string, krypto::serialization::Currency> &currency_reference) {
@@ -56,4 +65,5 @@ namespace krypto::instruments::exchanges {
 
         return result;
     }
+
 }

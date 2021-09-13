@@ -6,7 +6,7 @@ namespace krypto::exchanges::coinbase {
     AuthenticatedApi::AuthenticatedApi(const krypto::Config &config, const std::string &environment,
                                        krypto::exchanges::coinbase::Authenticator authenticator) :
             PublicApi{config, environment},
-            acct_endpoint_{"/" + config.at<std::string>(
+            account_endpoint_{"/" + config.at<std::string>(
                     "/exchanges/coinba  se/rest/channels/accounts")},
             orders_endpoint_{"/" + config.at<std::string>(
                     "/exchanges/coinbase/rest/channels/orders")},
