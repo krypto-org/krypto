@@ -23,7 +23,7 @@ int main(int argc, char ** argv) {
     zmq::context_t context{1};
     const krypto::Config config(argv[1]);
 
-    krypto::orders::OrderGateway<true> order_gateway{context, config};
+    krypto::orders::OrderGateway order_gateway{context, config};
     auto done = std::async(std::launch::async, [&order_gateway] () {order_gateway.start();});
 
     shutdown_handler = [&order_gateway](int signal) {

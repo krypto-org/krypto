@@ -32,7 +32,7 @@ using websocketpp::lib::condition_variable;
 namespace krypto::mktdata {
     typedef websocketpp::server<websocketpp::config::asio> server_t;
 
-    class WebsocketServer final : public krypto::network::Subscriber<WebsocketServer, Parser , false> {
+    class WebsocketServer final : public krypto::network::Subscriber<WebsocketServer, Parser> {
     public:
         explicit WebsocketServer(zmq::context_t& context, const krypto::Config& config);
         void ioc_run();

@@ -33,7 +33,7 @@ int main(int argc, char **argv) {
             krypto::exchanges::coinbase::Authenticator::from_file(key_file);
     krypto::exchanges::coinbase::AuthenticatedApi api{config, "sandbox", authenticator};
 
-    using order_server_t = krypto::orders::coinbase::OrderServer<true>;
+    using order_server_t = krypto::orders::coinbase::OrderServer;
     order_server_t orders_server{context, api, config, true};
 
     std::thread server_thread(

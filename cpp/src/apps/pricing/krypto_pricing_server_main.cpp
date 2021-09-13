@@ -23,7 +23,7 @@ int main(int argc, char **argv) {
 
     zmq::context_t context{1};
 
-    krypto::pricing::PricingServer<true> server{context, config};
+    krypto::pricing::PricingServer server{context, config};
 
     shutdown_handler = [&server](int signal) {
         SIGNAL_STATUS = signal;

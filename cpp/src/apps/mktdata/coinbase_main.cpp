@@ -56,7 +56,7 @@ int main(int argc, char **argv) {
 
     const krypto::Config config(std::move(config_path));
 
-    krypto::mktdata::coinbase::Server<true> server{context, config, env, !orders_pnly};
+    krypto::mktdata::coinbase::Server server{context, config, env, !orders_pnly};
 
     shutdown_handler = [&server](int signal) {
         SIGNAL_STATUS = signal;

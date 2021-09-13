@@ -1,7 +1,7 @@
 #pragma once
 
 #include <krypto/network/publisher.h>
-#include <krypto/utils/message_types.h>
+#include <krypto/utils/types.h>
 
 namespace krypto::pricing {
     class Publisher final : public krypto::network::PublisherBase<Publisher> {

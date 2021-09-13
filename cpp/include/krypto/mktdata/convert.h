@@ -22,7 +22,6 @@ namespace krypto::mktdata {
     constexpr double_t extract_quantity(const int64_t quantity) {
         return static_cast<double_t >(quantity) / QUANTITY_CONVERSION;
     }
-
 }
 
 

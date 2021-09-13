@@ -15,7 +15,7 @@
 
 namespace krypto::network {
 
-    template<typename Derived, typename Parser, bool Verbose = false>
+    template<typename Derived, typename Parser>
     class Subscriber {
     private:
         std::unique_ptr<zmq::socket_t> socket_;
@@ -33,13 +33,13 @@ namespace krypto::network {
     public:
         Subscriber(zmq::context_t &context, std::string);
 
-        Subscriber(const Subscriber<Derived, Parser, Verbose> &other) = delete;
+        Subscriber(const Subscriber<Derived, Parser> &other) = delete;
 
-        Subscriber(Subscriber<Derived, Parser, Verbose> &&other) = delete;
+        Subscriber(Subscriber<Derived, Parser> &&other) = delete;
 
-        Subscriber<Derived, Parser, Verbose> &operator=(const Subscriber<Derived, Parser, Verbose> &) = delete;
+        Subscriber<Derived, Parser> &operator=(const Subscriber<Derived, Parser> &) = delete;
 
-        Subscriber<Derived, Parser, Verbose> &operator=(Subscriber<Derived, Parser, Verbose> &&) = delete;
+        Subscriber<Derived, Parser> &operator=(Subscriber<Derived, Parser> &&) = delete;
 
         ~Subscriber();
 
@@ -58,8 +58,8 @@ namespace krypto::network {
         Derived const &derived_instance() const { return static_cast<Derived const &>(*this); }
     };
 
-    template<typename Consumer, typename Parser, bool Verbose>
-    Subscriber<Consumer, Parser, Verbose>::Subscriber(zmq::context_t &context, std::string endpoint) :
+    template<typename Consumer, typename Parser>
+    Subscriber<Consumer, Parser>::Subscriber(zmq::context_t &context, std::string endpoint) :
             socket_{std::make_unique<zmq::socket_t>(context, ZMQ_SUB)},
             endpoint_(std::move(endpoint)),
             connected_(false),
@@ -69,32 +69,32 @@ namespace krypto::network {
         connect();
     }
 
-    template<typename Consumer, typename Parser, bool Verbose>
-    Subscriber<Consumer, Parser, Verbose>::~Subscriber() {
+    template<typename Consumer, typename Parser>
+    Subscriber<Consumer, Parser>::~Subscriber() {
         disconnect();
     }
 
-    template<typename Consumer, typename Parser, bool Verbose>
-    void Subscriber<Consumer, Parser, Verbose>::subscribe(const std::string &topic) {
+    template<typename Consumer, typename Parser>
+    void Subscriber<Consumer, Parser>::subscribe(const std::string &topic) {
         KRYP_LOG(info, "Subscribing to topic: {}", topic);
         socket_->set(zmq::sockopt::subscribe, topic);
     }
 
-    template<typename Consumer, typename Parser, bool Verbose>
-    void Subscriber<Consumer, Parser, Verbose>::subscribe(const std::vector<std::string> &topics) {
+    template<typename Consumer, typename Parser>
+    void Subscriber<Consumer, Parser>::subscribe(const std::vector<std::string> &topics) {
         std::for_each(topics.begin(), topics.end(), [this](auto &&topic) {
             subscribe(topic);
         });
     }
 
-    template<typename Consumer, typename Parser, bool Verbose>
-    void Subscriber<Consumer, Parser, Verbose>::subscribe(const krypto::utils::MsgType msg_type) {
+    template<typename Consumer, typename Parser>
+    void Subscriber<Consumer, Parser>::subscribe(const krypto::utils::MsgType msg_type) {
         auto topic = krypto::utils::MsgTypeNames[static_cast<uint8_t>(msg_type)];
         subscribe(topic);
     }
 
-    template<typename Consumer, typename Parser, bool Verbose>
-    void Subscriber<Consumer, Parser, Verbose>::connect() {
+    template<typename Consumer, typename Parser>
+    void Subscriber<Consumer, Parser>::connect() {
         if (!connected_) {
             KRYP_LOG(info, "Connecting to {} ... ", endpoint_);
             socket_->connect(endpoint_);
@@ -103,8 +103,8 @@ namespace krypto::network {
         }
     }
 
-    template<typename Consumer, typename Parser, bool Verbose>
-    void Subscriber<Consumer, Parser, Verbose>::disconnect() {
+    template<typename Consumer, typename Parser>
+    void Subscriber<Consumer, Parser>::disconnect() {
         if (connected_) {
             connected_ = false;
             KRYP_LOG(info, "Disconnecting from {} ... ", endpoint_);
@@ -115,8 +115,8 @@ namespace krypto::network {
     }
 
 
-    template<typename Consumer, typename Parser, bool Verbose>
-    void Subscriber<Consumer, Parser, Verbose>::recv() {
+    template<typename Consumer, typename Parser>
+    void Subscriber<Consumer, Parser>::recv() {
 
         zmq::message_t topic_msg;
         auto topic_size = socket_->recv(topic_msg);
@@ -144,8 +144,8 @@ namespace krypto::network {
         }
     }
 
-    template<typename Consumer, typename Parser, bool Verbose>
-    void Subscriber<Consumer, Parser, Verbose>::start() {
+    template<typename Consumer, typename Parser>
+    void Subscriber<Consumer, Parser>::start() {
         KRYP_LOG(info, "Starting subscriber thread");
         running_ = true;
         while (running_) {
@@ -153,8 +153,8 @@ namespace krypto::network {
         }
     }
 
-    template<typename Consumer, typename Parser, bool Verbose>
-    void Subscriber<Consumer, Parser, Verbose>::stop() {
+    template<typename Consumer, typename Parser>
+    void Subscriber<Consumer, Parser>::stop() {
         KRYP_LOG(info, "Stopping subscriber thread");
         running_ = false;
     }

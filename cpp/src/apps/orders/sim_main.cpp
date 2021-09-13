@@ -29,11 +29,11 @@ int main(int argc, char **argv) {
     zmq::context_t context{1};
 
     using order_server_t = krypto::orders::sim::OrderServer<
-            krypto::serialization::Exchange::Exchange_SIM, true>;
+            krypto::serialization::Exchange::Exchange_SIM>;
     order_server_t orders_server{context, config};
 
     std::thread server_thread(
-            std::bind(&order_server_t::start, &orders_server));
+            [order_server_ptr = &orders_server] { order_server_ptr->start(); });
 
     shutdown_handler = [&](int signal) {
         SIGNAL_STATUS = signal;

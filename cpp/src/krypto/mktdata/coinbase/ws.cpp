@@ -22,20 +22,21 @@ krypto::mktdata::coinbase::WsConnection::WsConnection(
     instruments_.insert(instruments_.end(), std::begin(query), std::end(query));
 
     client_.init_asio();
-    client_.set_open_handler(std::bind(&WsConnection::on_open, this, std::placeholders::_1));
-    client_.set_close_handler(std::bind(&WsConnection::on_close, this, std::placeholders::_1));
-    client_.set_close_handler(std::bind(&WsConnection::on_close, this, std::placeholders::_1));
-    client_.set_fail_handler(std::bind(&WsConnection::on_fail, this, std::placeholders::_1));
+    client_.set_open_handler([this](auto &&connection) { on_open(std::forward<decltype(connection)>(connection)); });
+    client_.set_close_handler([this](auto &&connection) { on_close(std::forward<decltype(connection)>(connection)); });
+    client_.set_fail_handler([this](auto &&connection) { on_fail(std::forward<decltype(connection)>(connection)); });
     client_.set_message_handler(
-            std::bind(&WsConnection::on_message, this, std::placeholders::_1, std::placeholders::_2));
-    client_.set_tls_init_handler([](websocketpp::connection_hdl) {
+            [this](auto &&connection, auto &&message) {
+                on_message(std::forward<decltype(connection)>(connection), std::forward<decltype(message)>(message));
+            });
+    client_.set_tls_init_handler([](const websocketpp::connection_hdl &) {
         return websocketpp::lib::make_shared<boost::asio::ssl::context>(boost::asio::ssl::context::tlsv12);
     });
 
 }
 
 
-void krypto::mktdata::coinbase::WsConnection::on_open(wpp::connection_hdl hdl) {
+void krypto::mktdata::coinbase::WsConnection::on_open(const wpp::connection_hdl &hdl) {
     KRYP_LOG(info, "Opened websocket connection to {}", uri_);
     std::lock_guard<std::mutex> guard(connection_lock_);
     status_ = WsConnectionStatus::OPEN;
@@ -57,7 +58,8 @@ void krypto::mktdata::coinbase::WsConnection::on_fail(const wpp::connection_hdl 
     status_ = WsConnectionStatus::FAILED;
 }
 
-void krypto::mktdata::coinbase::WsConnection::on_message(const wpp::connection_hdl &, ws_client_t::message_ptr msg) {
+void
+krypto::mktdata::coinbase::WsConnection::on_message(const wpp::connection_hdl &, const ws_client_t::message_ptr &msg) {
     if (msg->get_opcode() == wpp::frame::opcode::text) {
         auto payload = nlohmann::json::parse(msg->get_payload());
         update_channel_.push(payload);
