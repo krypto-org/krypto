@@ -14,7 +14,7 @@
 
 
 namespace krypto::orders::sim {
-    template<krypto::serialization::Exchange Exchange, bool Verbose = false>
+    template<krypto::serialization::Exchange Exchange>
     class OrderServer final {
     private:
 
@@ -67,8 +67,8 @@ namespace krypto::orders::sim {
         void stop();
     };
 
-    template<krypto::serialization::Exchange Exchange, bool Verbose>
-    OrderServer<Exchange, Verbose>::OrderServer(
+    template<krypto::serialization::Exchange Exchange>
+    OrderServer<Exchange>::OrderServer(
             zmq::context_t &context, const krypto::Config &config) :
             receiver_{std::make_unique<zmq::socket_t>(context, ZMQ_DEALER)},
             mktdata_subscriber_{std::make_unique<zmq::socket_t>(context, ZMQ_SUB)},
@@ -80,13 +80,13 @@ namespace krypto::orders::sim {
             msg_type_ref_{krypto::utils::name_to_msg_type()} {
     }
 
-    template<krypto::serialization::Exchange Exchange, bool Verbose>
-    void OrderServer<Exchange, Verbose>::serialize(const krypto::utils::OrderUpdate &order_update) {
+    template<krypto::serialization::Exchange Exchange>
+    void OrderServer<Exchange>::serialize(const krypto::utils::OrderUpdate &order_update) {
         krypto::serialization::serialize(fb_builder_, order_update);
     }
 
-    template<krypto::serialization::Exchange Exchange, bool Verbose>
-    void OrderServer<Exchange, Verbose>::fill_price(
+    template<krypto::serialization::Exchange Exchange>
+    void OrderServer<Exchange>::fill_price(
             int64_t security_id, const krypto::serialization::Side &side,
             int64_t price) {
 
@@ -139,8 +139,8 @@ namespace krypto::orders::sim {
         }
     }
 
-    template<krypto::serialization::Exchange Exchange, bool Verbose>
-    void OrderServer<Exchange, Verbose>::process(const krypto::serialization::Quote *quote) {
+    template<krypto::serialization::Exchange Exchange>
+    void OrderServer<Exchange>::process(const krypto::serialization::Quote *quote) {
         quotes_[quote->security_id()] = krypto::utils::Quote{
                 static_cast<int64_t >(quote->timestamp()),
                 static_cast<int64_t >(quote->security_id()),
@@ -153,8 +153,8 @@ namespace krypto::orders::sim {
         };
     }
 
-    template<krypto::serialization::Exchange Exchange, bool Verbose>
-    void OrderServer<Exchange, Verbose>::process(const krypto::serialization::OrderRequest *request,
+    template<krypto::serialization::Exchange Exchange>
+    void OrderServer<Exchange>::process(const krypto::serialization::OrderRequest *request,
                                                  const std::string &client_identity) {
         KRYP_LOG(info, "Processing new order request : {}", request->order_id()->str());
         const krypto::utils::OrderUpdate in_flight{
@@ -238,8 +238,8 @@ namespace krypto::orders::sim {
                 request->order_id()->str(), client_identity);
     }
 
-    template<krypto::serialization::Exchange Exchange, bool Verbose>
-    void OrderServer<Exchange, Verbose>::process(
+    template<krypto::serialization::Exchange Exchange>
+    void OrderServer<Exchange>::process(
             const krypto::serialization::OrderCancelRequest *request,
             const std::string &client_identity) {
         KRYP_LOG(info, "Processing cancel order request : {}", request->order_id()->str());
@@ -271,8 +271,8 @@ namespace krypto::orders::sim {
         send(cancelled, client_identity);
     }
 
-    template<krypto::serialization::Exchange Exchange, bool Verbose>
-    void OrderServer<Exchange, Verbose>::process(
+    template<krypto::serialization::Exchange Exchange>
+    void OrderServer<Exchange>::process(
             const krypto::serialization::OrderReplaceRequest *request,
             const std::string &client_identity) {
         KRYP_LOG(info, "Processing replace order request : {}", request->order_id()->str());
@@ -307,32 +307,28 @@ namespace krypto::orders::sim {
         send(replaced, client_identity);
     }
 
-    template<krypto::serialization::Exchange Exchange, bool Verbose>
-    void OrderServer<Exchange, Verbose>::process(const krypto::serialization::Trade *trade) {
+    template<krypto::serialization::Exchange Exchange>
+    void OrderServer<Exchange>::process(const krypto::serialization::Trade *trade) {
         fill_price(trade->security_id(), trade->side(), trade->price());
     }
 
-    template<krypto::serialization::Exchange Exchange, bool Verbose>
-    void OrderServer<Exchange, Verbose>::process(const krypto::serialization::Heartbeat *hb) {
+    template<krypto::serialization::Exchange Exchange>
+    void OrderServer<Exchange>::process(const krypto::serialization::Heartbeat *hb) {
         last_hb_[hb->security_id()] = hb->timestamp();
     }
 
-    template<krypto::serialization::Exchange Exchange, bool Verbose>
-    void OrderServer<Exchange, Verbose>::start() {
+    template<krypto::serialization::Exchange Exchange>
+    void OrderServer<Exchange>::start() {
         auto identity = krypto::serialization::EnumNameExchange(Exchange);
         krypto::network::connect(*receiver_, order_gateway_endpoint_, identity);
         KRYP_LOG(info, "Connecting to market data gateway @ {}", mktdata_gateway_endpoint_);
         mktdata_subscriber_->connect(mktdata_gateway_endpoint_);
 
-        if constexpr (Verbose) {
-            KRYP_LOG(info, "Connected to gateway backend @ {}", order_gateway_endpoint_);
-        }
+        KRYP_LOG(info, "Connected to gateway backend @ {}", order_gateway_endpoint_);
 
         send_ready(identity);
 
-        if constexpr (Verbose) {
-            KRYP_LOG(info, "Sent ready status to broker @ {}", order_gateway_endpoint_);
-        }
+        KRYP_LOG(info, "Sent ready status to broker @ {}", order_gateway_endpoint_);
 
         zmq::pollitem_t items[] = {
                 {*mktdata_subscriber_, 0, ZMQ_POLLIN, 0},
@@ -392,10 +388,8 @@ namespace krypto::orders::sim {
                     KRYP_LOG(error, "Payload has 0 size");
                 }
 
-                if constexpr (Verbose) {
-                    KRYP_LOG(info, "Received request with payload size {} from {}",
-                             payload_msg.size(), address);
-                }
+                KRYP_LOG(info, "Received request with payload size {} from {}",
+                         payload_msg.size(), address);
 
                 switch (msg_type) {
                     case krypto::utils::MsgType::ORDER_REQUEST: {
@@ -423,13 +417,13 @@ namespace krypto::orders::sim {
         send_disconnect(identity);
     }
 
-    template<krypto::serialization::Exchange Exchange, bool Verbose>
-    void OrderServer<Exchange, Verbose>::stop() {
+    template<krypto::serialization::Exchange Exchange>
+    void OrderServer<Exchange>::stop() {
         running_ = false;
     }
 
-    template<krypto::serialization::Exchange Exchange, bool Verbose>
-    void OrderServer<Exchange, Verbose>::send_reject(
+    template<krypto::serialization::Exchange Exchange>
+    void OrderServer<Exchange>::send_reject(
             const krypto::serialization::OrderStatus order_status,
             const std::string &order_id,
             const std::string &client_identity) {
@@ -443,14 +437,13 @@ namespace krypto::orders::sim {
         send(rejected, client_identity);
     }
 
-    template<krypto::serialization::Exchange Exchange, bool Verbose>
-    void OrderServer<Exchange, Verbose>::send(const krypto::utils::OrderUpdate &order_update,
+    template<krypto::serialization::Exchange Exchange>
+    void OrderServer<Exchange>::send(const krypto::utils::OrderUpdate &order_update,
                                               const std::string &client_identity) {
-        if constexpr (Verbose) {
-            KRYP_LOG(info, "{} :: {}",
-                     krypto::serialization::EnumNameOrderStatus(
-                             order_update.status), order_update.order_id);
-        }
+        KRYP_LOG(info, "{} :: {}",
+                 krypto::serialization::EnumNameOrderStatus(
+                         order_update.status), order_update.order_id);
+
         krypto::network::send_empty_frame(*receiver_, zmq::send_flags::sndmore);
         krypto::network::send_status(*receiver_, krypto::network::SocketStatus::REPLY, zmq::send_flags::sndmore);
         krypto::network::send_string(*receiver_, client_identity, zmq::send_flags::sndmore);
@@ -459,22 +452,16 @@ namespace krypto::orders::sim {
         krypto::network::send_fb_buffer(*receiver_, fb_builder_);
     }
 
-    template<krypto::serialization::Exchange Exchange, bool Verbose>
-    void OrderServer<Exchange, Verbose>::send_ready(const std::string &identity) {
-        if constexpr (Verbose) {
-            KRYP_LOG(info, "Sending ready status");
-        }
-
+    template<krypto::serialization::Exchange Exchange>
+    void OrderServer<Exchange>::send_ready(const std::string &identity) {
+        KRYP_LOG(info, "Sending ready status");
         krypto::network::send_empty_frame(*receiver_, zmq::send_flags::sndmore);
         krypto::network::send_status(*receiver_, krypto::network::SocketStatus::READY);
     }
 
-    template<krypto::serialization::Exchange Exchange, bool Verbose>
-    void OrderServer<Exchange, Verbose>::send_disconnect(const std::string &identity) {
-        if constexpr (Verbose) {
-            KRYP_LOG(info, "Sending disconnect status");
-        }
-
+    template<krypto::serialization::Exchange Exchange>
+    void OrderServer<Exchange>::send_disconnect(const std::string &identity) {
+        KRYP_LOG(info, "Sending disconnect status");
         krypto::network::send_empty_frame(*receiver_, zmq::send_flags::sndmore);
         krypto::network::send_status(*receiver_, krypto::network::SocketStatus::DISCONNECT);
     }

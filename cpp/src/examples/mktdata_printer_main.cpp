@@ -10,8 +10,8 @@
 #include <krypto/utils/types.h>
 
 namespace {
-    struct MktdataPrinter : public krypto::network::Subscriber<MktdataPrinter, krypto::mktdata::Parser, true> {
-        using krypto::network::Subscriber<MktdataPrinter, krypto::mktdata::Parser, true>::Subscriber;
+    struct MktdataPrinter : public krypto::network::Subscriber<MktdataPrinter, krypto::mktdata::Parser> {
+        using krypto::network::Subscriber<MktdataPrinter, krypto::mktdata::Parser>::Subscriber;
 
         void process(const krypto::serialization::Quote *quote) {
             std::cout << "QUOTE: " << quote->security_id() << '\n';

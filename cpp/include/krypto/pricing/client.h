@@ -16,10 +16,10 @@ namespace krypto::pricing {
                                                       krypto::utils::MsgType msg_type);
     };
 
-    class PricingClient final : public krypto::network::Subscriber<PricingClient, Parser, true> {
+    class PricingClient final : public krypto::network::Subscriber<PricingClient, Parser> {
     public:
         using theo_func_t = std::function<void(const krypto::serialization::TheoreticalSnapshot *)>;
-        using krypto::network::Subscriber<PricingClient, Parser, true>::Subscriber;
+        using krypto::network::Subscriber<PricingClient, Parser>::Subscriber;
     private:
         std::vector<theo_func_t> callbacks_;
     public:
