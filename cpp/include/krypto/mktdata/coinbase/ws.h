@@ -32,13 +32,13 @@ namespace krypto::mktdata::coinbase {
                 const std::string&,
                 channel_t &update_channel);
 
-        void on_open(websocketpp::connection_hdl hdl);
+        void on_open(const websocketpp::connection_hdl& hdl);
 
         void on_close(const websocketpp::connection_hdl &hdl);
 
         void on_fail(const websocketpp::connection_hdl &hdl);
 
-        void on_message(const websocketpp::connection_hdl &, ws_client_t::message_ptr msg);
+        void on_message(const websocketpp::connection_hdl &, const ws_client_t::message_ptr& msg);
 
         void start();
 
