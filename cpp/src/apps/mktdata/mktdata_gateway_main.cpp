@@ -23,7 +23,7 @@ int main(int argc, char ** argv) {
     zmq::context_t context{1};
     const krypto::Config config(argv[1]);
 
-    krypto::mktdata::MktdataGateway<true> mktdata_gateway{context, config};
+    krypto::mktdata::MktdataGateway mktdata_gateway{context, config};
     auto done = std::async(std::launch::async, [&mktdata_gateway] () {mktdata_gateway.start();});
 
     shutdown_handler = [&mktdata_gateway](int signal) {
