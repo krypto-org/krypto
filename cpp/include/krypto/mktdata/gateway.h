@@ -7,7 +7,6 @@
 #include <krypto/config.h>
 
 namespace krypto::mktdata {
-    // TODO: Convert to last value cache based gateway
 
     class MktdataGateway final {
     private:
@@ -16,6 +15,7 @@ namespace krypto::mktdata {
         std::unique_ptr<zmq::socket_t> frontend_;
         std::unique_ptr<zmq::socket_t> backend_;
         std::atomic_bool running_;
+
     public:
         MktdataGateway(zmq::context_t &context, const krypto::Config &config);
 

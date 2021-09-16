@@ -142,4 +142,9 @@ namespace krypto::utils {
         }
     };
 
+    class MessageTypeData {
+    public:
+        static const std::unordered_map<std::string, krypto::utils::MsgType> msg_type_reference;
+    };
+
 }

@@ -91,5 +91,5 @@ namespace krypto::utils {
 
     std::unordered_map<std::string, krypto::serialization::Currency> name_to_currency() noexcept;
 
-    std::unordered_map<std::string, MsgType> name_to_msg_type();
+    std::unordered_map<std::string, MsgType> name_to_msg_type() noexcept;
 }

@@ -13,6 +13,7 @@ zeromq/4.3.3
 cppzmq/4.7.1
 cryptopp/8.2.0
 catch2/2.13.3
+redis-plus-plus/1.2.3
 
 [generators]
 cmake
@@ -25,3 +26,4 @@ websocketpp:asio=standalone
 spdlog:shared=False
 spdlog:header_only=True
 cryptopp:shared=False
+redis-plus-plus:shared=False

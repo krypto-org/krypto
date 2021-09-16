@@ -27,7 +27,7 @@ namespace krypto::utils {
         return result;
     }
 
-    std::unordered_map<std::string, krypto::utils::MsgType > name_to_msg_type() {
+    std::unordered_map<std::string, krypto::utils::MsgType > name_to_msg_type() noexcept {
         auto values = krypto::utils::MsgTypes;
         std::unordered_map<std::string, krypto::utils::MsgType > result;
         for (int i = 0; i < enum_size<MsgType>(); ++i) {
