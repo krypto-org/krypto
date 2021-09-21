@@ -108,8 +108,11 @@ public final class Currency {
   public static final byte SHIB = 101;
   public static final byte XYO = 102;
   public static final byte RGT = 103;
+  public static final byte BTRST = 104;
+  public static final byte AGLD = 105;
+  public static final byte ZEN = 106;
 
-  public static final String[] names = { "UNKNOWN", "BAT", "BCH", "BTC", "CVC", "DAI", "DNT", "EOS", "ETC", "ETH", "EUR", "GBP", "GNT", "LINK", "LOOM", "LTC", "MANA", "REP", "USD", "USDC", "XLM", "XRP", "ZEC", "ZRX", "XTZ", "ALGO", "DASH", "OXT", "ATOM", "KNC", "OMG", "MKR", "WBTC", "NU", "YFI", "BAND", "UMA", "NMR", "FIL", "CGLD", "LRC", "COMP", "UNI", "REN", "BAL", "GRT", "BNT", "AAVE", "SNX", "WLUNA", "DOGE", "RAD", "GTC", "TRU", "SUSHI", "SKL", "COTI", "REQ", "FORTH", "ENJ", "USDT", "DOT", "CHZ", "UST", "MASK", "DDX", "SOL", "RLY", "AXS", "ADA", "STORJ", "ICP", "IOTX", "CRV", "FET", "POLY", "MKN", "MIR", "PAX", "MATIC", "ANKR", "OGN", "RLC", "TRB", "ORN", "CTSI", "YFII", "BOND", "CLV", "TRIBE", "ACH", "PLA", "QUICK", "MLN", "QNT", "LPT", "KEEP", "RAI", "NKN", "AMP", "FARM", "SHIB", "XYO", "RGT", };
+  public static final String[] names = { "UNKNOWN", "BAT", "BCH", "BTC", "CVC", "DAI", "DNT", "EOS", "ETC", "ETH", "EUR", "GBP", "GNT", "LINK", "LOOM", "LTC", "MANA", "REP", "USD", "USDC", "XLM", "XRP", "ZEC", "ZRX", "XTZ", "ALGO", "DASH", "OXT", "ATOM", "KNC", "OMG", "MKR", "WBTC", "NU", "YFI", "BAND", "UMA", "NMR", "FIL", "CGLD", "LRC", "COMP", "UNI", "REN", "BAL", "GRT", "BNT", "AAVE", "SNX", "WLUNA", "DOGE", "RAD", "GTC", "TRU", "SUSHI", "SKL", "COTI", "REQ", "FORTH", "ENJ", "USDT", "DOT", "CHZ", "UST", "MASK", "DDX", "SOL", "RLY", "AXS", "ADA", "STORJ", "ICP", "IOTX", "CRV", "FET", "POLY", "MKN", "MIR", "PAX", "MATIC", "ANKR", "OGN", "RLC", "TRB", "ORN", "CTSI", "YFII", "BOND", "CLV", "TRIBE", "ACH", "PLA", "QUICK", "MLN", "QNT", "LPT", "KEEP", "RAI", "NKN", "AMP", "FARM", "SHIB", "XYO", "RGT", "BTRST", "AGLD", "ZEN", };
 
   public static String name(int e) { return names[e]; }
 }

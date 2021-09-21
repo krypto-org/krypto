@@ -58,7 +58,9 @@ file(GLOB_RECURSE KRYPTO_INCLUDES CONFIGURE_DEPENDS "include/*.h")
 file(GLOB_RECURSE KRYPTO_SOURCES CONFIGURE_DEPENDS "src/krypto/*.cpp")
 
 add_library(krypto STATIC ${KRYPTO_INCLUDES} ${KRYPTO_SOURCES})
-target_link_libraries(krypto CONAN_PKG::openssl CONAN_PKG::bzip2 CONAN_PKG::zlib CONAN_PKG::boost CONAN_PKG::tbb CONAN_PKG::zeromq CONAN_PKG::cppzmq CONAN_PKG::cryptopp CONAN_PKG::redis-plus-plus Threads::Threads)
+target_link_libraries(krypto CONAN_PKG::openssl CONAN_PKG::bzip2 CONAN_PKG::zlib CONAN_PKG::boost
+        CONAN_PKG::tbb CONAN_PKG::zeromq CONAN_PKG::cppzmq CONAN_PKG::cryptopp
+        CONAN_PKG::redis-plus-plus Threads::Threads)
 
 add_executable(krypto-coinbase-mktdata src/apps/mktdata/coinbase_main.cpp)
 target_link_libraries(krypto-coinbase-mktdata krypto)

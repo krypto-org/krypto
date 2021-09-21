@@ -54,7 +54,7 @@ int main(int argc, char **argv) {
 
     zmq::context_t context{1};
 
-    const krypto::Config config(std::move(config_path));
+    const krypto::Config config(config_path);
 
     krypto::mktdata::coinbase::Server server{context, config, env, !orders_pnly};
 

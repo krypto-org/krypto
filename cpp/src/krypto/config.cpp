@@ -1,6 +1,6 @@
 #include <krypto/config.h>
 
-krypto::Config::Config(std::string &&file_path) : root_{} {
+krypto::Config::Config(const std::string &file_path) : root_{} {
     std::ifstream file(file_path);
     root_ = nlohmann::json::parse(file);
     root_ = root_.flatten();

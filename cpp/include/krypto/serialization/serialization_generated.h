@@ -420,11 +420,14 @@ enum Currency {
   Currency_SHIB = 101,
   Currency_XYO = 102,
   Currency_RGT = 103,
+  Currency_BTRST = 104,
+  Currency_AGLD = 105,
+  Currency_ZEN = 106,
   Currency_MIN = Currency_UNKNOWN,
-  Currency_MAX = Currency_RGT
+  Currency_MAX = Currency_ZEN
 };
 
-inline const Currency (&EnumValuesCurrency())[104] {
+inline const Currency (&EnumValuesCurrency())[107] {
   static const Currency values[] = {
     Currency_UNKNOWN,
     Currency_BAT,
@@ -529,13 +532,16 @@ inline const Currency (&EnumValuesCurrency())[104] {
     Currency_FARM,
     Currency_SHIB,
     Currency_XYO,
-    Currency_RGT
+    Currency_RGT,
+    Currency_BTRST,
+    Currency_AGLD,
+    Currency_ZEN
   };
   return values;
 }
 
 inline const char * const *EnumNamesCurrency() {
-  static const char * const names[105] = {
+  static const char * const names[108] = {
     "UNKNOWN",
     "BAT",
     "BCH",
@@ -640,13 +646,16 @@ inline const char * const *EnumNamesCurrency() {
     "SHIB",
     "XYO",
     "RGT",
+    "BTRST",
+    "AGLD",
+    "ZEN",
     nullptr
   };
   return names;
 }
 
 inline const char *EnumNameCurrency(Currency e) {
-  if (flatbuffers::IsOutRange(e, Currency_UNKNOWN, Currency_RGT)) return "";
+  if (flatbuffers::IsOutRange(e, Currency_UNKNOWN, Currency_ZEN)) return "";
   const size_t index = static_cast<size_t>(e);
   return EnumNamesCurrency()[index];
 }

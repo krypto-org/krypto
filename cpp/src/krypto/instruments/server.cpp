@@ -8,7 +8,6 @@ namespace krypto::instruments {
             polling_millis_{config.at<uint32_t>("/services/instruments/polling_millis")},
             running_{false} {
         cache_ = store_.load();
-        KRYP_LOG(info, "{}", config.get().dump());
         auto active = config.at<std::string>("/services/instruments/active_symbols");
         auto sandbox_symbols = config.at<std::string>("/services/instruments/sandbox_symbols");
         for (auto &&symbol: parse_symbols(active)) {
@@ -46,7 +45,7 @@ namespace krypto::instruments {
         };
 
         while (running_) {
-            zmq::poll(&items[0], 1, 0);
+            zmq::poll(&items[0], 1, 100);
 
             if (items[0].revents && ZMQ_POLLIN) {
                 auto address = krypto::network::recv_string(*socket_);

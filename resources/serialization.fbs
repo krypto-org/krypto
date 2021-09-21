@@ -132,7 +132,10 @@ enum Currency : byte {
     FARM,
     SHIB,
     XYO,
-    RGT
+    RGT,
+    BTRST,
+    AGLD,
+    ZEN
 }
 
 enum RequestType: byte {INVALID, ALL, ID, EXCHANGE, PRODUCT}

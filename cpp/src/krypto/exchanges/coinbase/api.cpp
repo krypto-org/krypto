@@ -160,7 +160,7 @@ namespace krypto::exchanges::coinbase {
         return std::nullopt;
     }
 
-    PublicApi::PublicApi(const Config &config, const std::string &environment) :
+    PublicApi::PublicApi(const krypto::Config &config, const std::string &environment) :
             http_client_{
                     config.at<std::string>("/exchanges/coinbase/rest/base_url/" + environment)},
             inst_endpoint_{

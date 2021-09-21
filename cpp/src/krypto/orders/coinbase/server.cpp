@@ -5,7 +5,7 @@ namespace krypto::orders::coinbase {
 
     OrderServer::OrderServer(zmq::context_t &context,
                              krypto::exchanges::coinbase::AuthenticatedApi api,
-                             const Config &config, const bool is_sandbox) :
+                             const krypto::Config &config, const bool is_sandbox) :
             receiver_{std::make_unique<zmq::socket_t>(context, ZMQ_DEALER)},
             mktdata_subscriber_{std::make_unique<zmq::socket_t>(context, ZMQ_SUB)},
             order_gateway_endpoint_{config.at<std::string>(
@@ -128,7 +128,7 @@ namespace krypto::orders::coinbase {
         mktdata_subscriber_->set(zmq::sockopt::subscribe, subscription);
 
         while (running_) {
-            zmq::poll(&items[0], 2, 0);
+            zmq::poll(&items[0], 2, 100);
             if (items[0].revents && ZMQ_POLLIN) {
 
                 auto topic = krypto::network::recv_string(*mktdata_subscriber_);
