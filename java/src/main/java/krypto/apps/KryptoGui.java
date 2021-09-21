@@ -13,7 +13,6 @@ import krypto.ui.UIDataCache;
 import org.zeromq.ZMQ;
 
 import java.awt.*;
-import java.io.File;
 import java.io.IOException;
 import java.util.Collections;
 

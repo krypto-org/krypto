@@ -96,6 +96,11 @@
         "server":"tcp://*:12010",
         "port":12010,
         "client":"tcp://localhost:12010"
+      },
+      "broadcast":{
+        "server":"tcp://*:12012",
+        "port":12012,
+        "client":"tcp://localhost:12012"
       }
     },
     "pricing":{

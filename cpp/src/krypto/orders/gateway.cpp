@@ -5,8 +5,10 @@ namespace krypto::orders {
     OrderGateway::OrderGateway(zmq::context_t &context, const krypto::Config &config) :
             frontend_address_{config.at<std::string>("/services/order_gateway/frontend/server")},
             backend_address_{config.at<std::string>("/services/order_gateway/backend/server")},
+            broadcast_address_{config.at<std::string>("/services/order_gateway/broadcast/server")},
             frontend_{std::make_unique<zmq::socket_t>(context, ZMQ_ROUTER)},
             backend_{std::make_unique<zmq::socket_t>(context, ZMQ_ROUTER)},
+            broadcast_{std::make_unique<zmq::socket_t>(context, ZMQ_PUB)},
             running_{false} {}
 
     bool OrderGateway::bind() {
@@ -28,7 +30,19 @@ namespace krypto::orders {
             KRYP_LOG(error, "Binding failed with {}", e.what());
         }
         if (!bound) {
-            KRYP_LOG(warn, "Failed starting proxy - binding problems");
+            KRYP_LOG(warn, "Failed starting gateway - binding problems");
+        }
+
+        KRYP_LOG(info, "Binding broadcast to {}", broadcast_address_);
+        try {
+            broadcast_->bind(broadcast_address_);
+            bound = true;
+        }
+        catch (zmq::error_t &e) {
+            KRYP_LOG(error, "Binding failed with {}", e.what());
+        }
+        if (!bound) {
+            KRYP_LOG(warn, "Failed starting gateway - binding problems");
         }
         return bound;
     }
@@ -86,10 +100,13 @@ namespace krypto::orders {
                         KRYP_LOG(error, "Payload had 0 size");
                         break;
                     }
+                    zmq::message_t payload_copy;
+                    payload_copy.copy(payload);
                     KRYP_LOG(info, "{} <= * <= {} :: {} + Payload Size: {}",
                              client_addr, exchange,
                              krypto::utils::MsgTypeNames[static_cast<int>(msg_type)], payload.size());
                     frontend_->send(payload, zmq::send_flags::none);
+                    publish(msg_type, client_addr, payload_copy);
                 }
             }
 
@@ -112,6 +129,9 @@ namespace krypto::orders {
                     break;
                 }
 
+                zmq::message_t payload_copy;
+                payload_copy.copy(request_payload);
+
                 if (workers_.find(exchange) != std::end(workers_)) {
                     auto worker_addr = workers_.at(exchange);
                     krypto::network::send_string(*backend_, worker_addr, zmq::send_flags::sndmore);
@@ -125,6 +145,7 @@ namespace krypto::orders {
                              request_payload.size());
                     krypto::network::send_msg_type(*backend_, msg_type, zmq::send_flags::sndmore);
                     backend_->send(request_payload, zmq::send_flags::none);
+                    publish(msg_type, client_addr, payload_copy);
                 } else {
                     KRYP_LOG(info, "Service not available");
                     krypto::network::send_string(*frontend_, client_addr, zmq::send_flags::sndmore);
@@ -141,6 +162,12 @@ namespace krypto::orders {
 
     void OrderGateway::stop() {
         running_ = false;
+    }
+
+    void OrderGateway::publish(const utils::MsgType &msg_type, const std::string &client, zmq::message_t &message) {
+        krypto::network::send_string(*broadcast_, client, zmq::send_flags::sndmore);
+        krypto::network::send_msg_type(*broadcast_, msg_type, zmq::send_flags::sndmore);
+        broadcast_->send(message, zmq::send_flags::none);
     }
 
 }
