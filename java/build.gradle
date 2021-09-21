@@ -17,8 +17,6 @@ plugins {
 group 'com.sharmakapil'
 version '0.0.1'
 
-sourceCompatibility = 1.11
-
 repositories {
     mavenCentral()
     mavenLocal()
@@ -41,11 +39,11 @@ dependencies {
     compile group: 'com.miglayout', name: 'miglayout', version: '3.7.4'
     compile group: 'com.typesafe', name: 'config', version: '1.4.0'
 
-    implementation("com.github.weisj:darklaf-core:[2.1.1,)")
-    implementation("com.github.weisj:darklaf-theme:[2.1.1,)") // For the themes
-    implementation 'io.grpc:grpc-netty-shaded:1.25.0'
-    implementation 'io.grpc:grpc-protobuf:1.25.0'
-    implementation 'io.grpc:grpc-stub:1.25.0'
+    implementation('com.github.weisj:darklaf-core:2.7.3')
+    implementation('com.github.weisj:darklaf-theme:2.7.3') // For the themes
+    implementation 'io.grpc:grpc-netty-shaded:1.40.1'
+    implementation 'io.grpc:grpc-protobuf:1.40.1'
+    implementation 'io.grpc:grpc-stub:1.40.1'
 }
 
 mainClassName = 'krypto.apps.KryptoGui'

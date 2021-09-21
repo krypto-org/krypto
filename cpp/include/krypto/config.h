@@ -11,7 +11,7 @@ namespace krypto {
     private:
         nlohmann::json root_;
     public:
-        explicit Config(std::string &&);
+        explicit Config(const std::string &);
 
         Config(const Config &) = default;
 
@@ -26,11 +26,11 @@ namespace krypto {
         [[nodiscard]] const nlohmann::json &get() const;
 
         template<typename T>
-        T at(std::string &&) const;
+        T at(const std::string &) const;
     };
 
     template<typename T>
-    T Config::at(std::string &&path) const {
+    T Config::at(const std::string & path) const {
         return root_.at(path).get<T>();
     }
 

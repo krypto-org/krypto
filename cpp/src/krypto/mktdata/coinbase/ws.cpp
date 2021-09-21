@@ -79,7 +79,7 @@ void krypto::mktdata::coinbase::WsConnection::start() {
     client_.connect(con);
     client_.run();
 
-    KRYP_LOG(info, "Websocket IO loop stooped");
+    KRYP_LOG(info, "Websocket IO loop stopped");
 }
 
 void krypto::mktdata::coinbase::WsConnection::send(std::string &&message) {

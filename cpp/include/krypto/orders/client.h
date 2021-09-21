@@ -36,7 +36,7 @@ namespace krypto::orders {
         void poll_sockets();
 
     public:
-        OrderClient(zmq::context_t &context, const Config &config);
+        OrderClient(zmq::context_t &context, const krypto::Config &config);
 
         std::string new_order(const std::string &,
                               int64_t, int64_t, int64_t,

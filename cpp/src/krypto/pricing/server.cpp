@@ -11,7 +11,6 @@ namespace krypto::pricing {
                     "/services/mktdata_gateway/backend/client")},
             calculator_{config.at<double_t>(
                     "/services/pricing/half_life")},
-            msg_type_ref_{krypto::utils::name_to_msg_type()},
             running_{false} {}
 
 
@@ -128,7 +127,7 @@ namespace krypto::pricing {
 
                 auto topic = krypto::network::recv_string(*mktdata_subscriber_);
                 auto topic_prefix = topic.substr(0, 2);
-                auto msg_type = msg_type_ref_.at(topic_prefix);
+                auto msg_type = krypto::utils::MessageTypeData::msg_type_reference.at(topic_prefix);
 
                 zmq::message_t payload_msg;
                 const auto payload_size = mktdata_subscriber_->recv(payload_msg);

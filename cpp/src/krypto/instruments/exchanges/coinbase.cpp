@@ -2,7 +2,7 @@
 
 namespace krypto::instruments::exchanges {
 
-    CoinbaseInstruments::CoinbaseInstruments(const Config &config, const std::string &environment) :
+    CoinbaseInstruments::CoinbaseInstruments(const krypto::Config &config, const std::string &environment) :
             CoinbaseInstruments::ExchangeInstruments(),
             api_{config, environment} {}
 

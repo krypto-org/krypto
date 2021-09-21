@@ -17,7 +17,6 @@ namespace krypto::pricing {
         Publisher publisher_;
         std::string mktdata_gateway_endpoint_;
         EWMACalculator calculator_;
-        std::unordered_map<std::string, krypto::utils::MsgType> msg_type_ref_;
         std::atomic_bool running_;
         std::unordered_map<int64_t, krypto::utils::TheoreticalSnapshot> theo_snapshots_;
 

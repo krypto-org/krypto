@@ -18,7 +18,7 @@ namespace krypto::instruments::exchanges {
     private:
         krypto::exchanges::coinbase::PublicApi api_;
     public:
-        explicit CoinbaseInstruments(const Config &config, const std::string &environment);
+        explicit CoinbaseInstruments(const krypto::Config &config, const std::string &environment);
 
         std::vector<krypto::utils::Instrument> read_instruments();
 

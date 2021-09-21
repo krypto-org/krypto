@@ -1,7 +1,7 @@
 #include <krypto/orders/client.h>
 
 namespace krypto::orders {
-    OrderClient::OrderClient(zmq::context_t &context, const Config &config) :
+    OrderClient::OrderClient(zmq::context_t &context, const krypto::Config &config) :
             sender_{std::make_unique<zmq::socket_t>(context, ZMQ_DEALER)},
             queue_push_{std::make_unique<zmq::socket_t>(context, ZMQ_PUSH)},
             queue_pull_{std::make_unique<zmq::socket_t>(context, ZMQ_PULL)},
@@ -31,7 +31,7 @@ namespace krypto::orders {
         running_ = true;
 
         while (running_) {
-            zmq::poll(&items[0], 2, 0);
+            zmq::poll(&items[0], 2, 100);
 
             if (items[0].revents && ZMQ_POLLIN) {
                 /*
