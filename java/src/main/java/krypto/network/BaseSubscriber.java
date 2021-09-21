@@ -30,7 +30,7 @@ public abstract class BaseSubscriber implements SocketMonitor.Sniffer {
                           final boolean monitor) {
         this.context = context;
         this.addresses = addresses;
-        this.socket = context.socket(ZMQ.SUB);
+        this.socket = context.socket(SocketType.SUB);
         this.monitor = monitor;
     }
 
