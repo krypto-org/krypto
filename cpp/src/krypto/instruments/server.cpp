@@ -5,7 +5,6 @@ namespace krypto::instruments {
             store_{config}, cache_{},
             socket_{std::make_unique<zmq::socket_t>(context, ZMQ_ROUTER)},
             endpoint_{config.at<std::string>("/services/instruments/server")},
-            polling_millis_{config.at<uint32_t>("/services/instruments/polling_millis")},
             running_{false} {
         cache_ = store_.load();
         auto active = config.at<std::string>("/services/instruments/active_symbols");
@@ -45,7 +44,7 @@ namespace krypto::instruments {
         };
 
         while (running_) {
-            zmq::poll(&items[0], 1, 100);
+            zmq::poll(&items[0], 1, -1);
 
             if (items[0].revents && ZMQ_POLLIN) {
                 auto address = krypto::network::recv_string(*socket_);

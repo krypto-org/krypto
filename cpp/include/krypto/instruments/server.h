@@ -19,7 +19,6 @@ namespace krypto::instruments {
         std::vector<krypto::utils::Instrument> cache_;
         std::unique_ptr<zmq::socket_t> socket_;
         std::string endpoint_;
-        uint32_t polling_millis_;
         std::atomic_bool running_;
         flatbuffers::FlatBufferBuilder fb_builder_;
         std::unordered_set<std::string> active_instruments_;
