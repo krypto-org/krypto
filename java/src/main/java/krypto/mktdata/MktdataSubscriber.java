@@ -15,8 +15,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-public class Subscriber extends BaseSubscriber {
-    private static final Logger LOGGER = LogManager.getLogger(Subscriber.class);
+public class MktdataSubscriber extends BaseSubscriber {
+    private static final Logger LOGGER = LogManager.getLogger(MktdataSubscriber.class);
 
     public interface Listener {
         void onHeartbeat(final Heartbeat hb);
@@ -28,11 +28,11 @@ public class Subscriber extends BaseSubscriber {
         void onOrderUpdate(final OrderUpdate ou);
     }
 
-    private Set<Listener> listeners = new HashSet<>();
+    private final Set<Listener> listeners = new HashSet<>();
 
-    public Subscriber(ZMQ.Context context,
-                      List<String> addresses,
-                      boolean monitor) {
+    public MktdataSubscriber(ZMQ.Context context,
+                             List<String> addresses,
+                             boolean monitor) {
         super(context, addresses, monitor);
     }
 
@@ -43,7 +43,7 @@ public class Subscriber extends BaseSubscriber {
 
         try {
             while (!super.terminated) {
-                final String topic = super.socket.recvStr();
+                final String topic = this.socket.recvStr();
 
                 final byte messageType = MessageType.MsgTypeNames.get(topic.substring(0, 2));
 

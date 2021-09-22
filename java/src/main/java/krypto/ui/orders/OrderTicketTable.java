@@ -14,68 +14,68 @@ import java.util.EventObject;
 
 public class OrderTicketTable extends JTable {
 
-    private static final NumberFormat PRICE_FORMAT = new DecimalFormat("0.0000");
-    private static final NumberFormat QUANTITY_FORMAT = new DecimalFormat("0.000000");
+  private static final NumberFormat PRICE_FORMAT = new DecimalFormat("0.0000");
+  private static final NumberFormat QUANTITY_FORMAT = new DecimalFormat("0.000000");
 
-    public OrderTicketTable(final OrderTicketTableModel model) {
-        super(model);
+  public OrderTicketTable(final OrderTicketTableModel model) {
+    super(model);
 
-        final CenterAlignedTableCellRenderer centerAlignedTableCellRenderer =
-                new CenterAlignedTableCellRenderer();
+    final CenterAlignedTableCellRenderer centerAlignedTableCellRenderer =
+        new CenterAlignedTableCellRenderer();
 
-        this.getColumnModel()
-                .getColumn(Column.TIF.ordinal())
-                .setCellEditor(new ComboBoxTableCellEditor<>(TimeInForce.values()));
-        this.getColumnModel()
-                .getColumn(Column.TIF.ordinal())
-                .setCellRenderer(centerAlignedTableCellRenderer);
+    this.getColumnModel()
+        .getColumn(Column.TIF.ordinal())
+        .setCellEditor(new ComboBoxTableCellEditor<>(TimeInForce.values()));
+    this.getColumnModel()
+        .getColumn(Column.TIF.ordinal())
+        .setCellRenderer(centerAlignedTableCellRenderer);
 
-        this.getColumnModel()
-                .getColumn(Column.Side.ordinal())
-                .setCellEditor(new BuySellComboBoxCellEditor(Side.values()));
-        this.getColumnModel()
-                .getColumn(Column.Side.ordinal())
-                .setCellRenderer(new BuySellTableCellRenderer());
-        this.getColumnModel()
-                .getColumn(Column.Product.ordinal())
-                .setCellRenderer(centerAlignedTableCellRenderer);
-        this.getColumnModel()
-                .getColumn(Column.Price.ordinal())
-                .setCellRenderer(new EditableCellRenderer(PRICE_FORMAT));
-        this.getColumnModel()
-                .getColumn(Column.Size.ordinal())
-                .setCellRenderer(new EditableCellRenderer(QUANTITY_FORMAT));
+    this.getColumnModel()
+        .getColumn(Column.Side.ordinal())
+        .setCellEditor(new BuySellComboBoxCellEditor(Side.values()));
+    this.getColumnModel()
+        .getColumn(Column.Side.ordinal())
+        .setCellRenderer(new BuySellTableCellRenderer());
+    this.getColumnModel()
+        .getColumn(Column.Product.ordinal())
+        .setCellRenderer(centerAlignedTableCellRenderer);
+    this.getColumnModel()
+        .getColumn(Column.Price.ordinal())
+        .setCellRenderer(new EditableCellRenderer(PRICE_FORMAT));
+    this.getColumnModel()
+        .getColumn(Column.Size.ordinal())
+        .setCellRenderer(new EditableCellRenderer(QUANTITY_FORMAT));
 
-        this.getColumnModel()
-                .getColumn(Column.EXCHANGE.ordinal())
-                .setCellEditor(new ComboBoxTableCellEditor<>(Exchange.values()));
-        this.getColumnModel()
-                .getColumn(Column.EXCHANGE.ordinal())
-                .setCellRenderer(centerAlignedTableCellRenderer);
-        this.setRowSelectionAllowed(false);
-        this.setColumnSelectionAllowed(false);
-        this.setCellSelectionEnabled(true);
+    this.getColumnModel()
+        .getColumn(Column.EXCHANGE.ordinal())
+        .setCellEditor(new ComboBoxTableCellEditor<>(Exchange.values()));
+    this.getColumnModel()
+        .getColumn(Column.EXCHANGE.ordinal())
+        .setCellRenderer(centerAlignedTableCellRenderer);
+    this.setRowSelectionAllowed(false);
+    this.setColumnSelectionAllowed(false);
+    this.setCellSelectionEnabled(true);
+  }
+
+  @Override
+  public boolean editCellAt(int row, int column, EventObject e) {
+    boolean result = super.editCellAt(row, column, e);
+    final Component editor = getEditorComponent();
+    if (!(editor instanceof JTextComponent)) {
+      return result;
     }
-
-    @Override
-    public boolean editCellAt(int row, int column, EventObject e) {
-        boolean result = super.editCellAt(row, column, e);
-        final Component editor = getEditorComponent();
-        if (!(editor instanceof JTextComponent)) {
-            return result;
-        }
-        if (e != null) {
-            ((JTextComponent) editor).selectAll();
-        }
-        return result;
+    if (e != null) {
+      ((JTextComponent) editor).selectAll();
     }
+    return result;
+  }
 
-    public enum Column {
-        Product,
-        Price,
-        Size,
-        Side,
-        TIF,
-        EXCHANGE
-    }
+  public enum Column {
+    Product,
+    Price,
+    Size,
+    Side,
+    TIF,
+    EXCHANGE
+  }
 }

@@ -5,31 +5,25 @@ import javax.swing.table.DefaultTableCellRenderer;
 import java.awt.*;
 
 public class TotalTableTableCellRenderer extends DefaultTableCellRenderer {
-    private boolean centered = true;
+  private boolean centered = true;
 
-    public TotalTableTableCellRenderer(boolean centered) {
-        super();
-        this.centered = centered;
+  public TotalTableTableCellRenderer(boolean centered) {
+    this.centered = centered;
+  }
+
+  @Override
+  public Component getTableCellRendererComponent(
+      JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+
+    Component renderer =
+        super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+
+    if (centered) {
+      ((DefaultTableCellRenderer) renderer).setHorizontalAlignment(SwingConstants.CENTER);
     }
 
-    public TotalTableTableCellRenderer() {
-        super();
-    }
+    renderer.setBackground(ColorConstants.TOTAL_COLOR);
 
-    @Override
-    public Component getTableCellRendererComponent(JTable table, Object value,
-                                                   boolean isSelected, boolean hasFocus, int row, int column) {
-
-        Component renderer = super.getTableCellRendererComponent(table, value,
-                isSelected, hasFocus, row, column);
-
-        if (centered) {
-            ((DefaultTableCellRenderer) renderer)
-                    .setHorizontalAlignment(SwingConstants.CENTER);
-        }
-
-        renderer.setBackground(ColorConstants.TOTAL_COLOR);
-
-        return renderer;
-    }
+    return renderer;
+  }
 }

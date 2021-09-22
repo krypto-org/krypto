@@ -12,38 +12,42 @@ import java.util.Map;
 
 public class TheoreticalSnapshotTable extends JTable {
 
-    private static final Map<Column, Color> COLUMN_COLORS;
+  private static final Map<Column, Color> COLUMN_COLORS;
 
-    static {
-        COLUMN_COLORS = new HashMap<>();
-        COLUMN_COLORS.put(Column.MM_BID, ColorConstants.THEO_BID_BACKGROUND_COLOR);
-        COLUMN_COLORS.put(Column.MM_ASK, ColorConstants.THEO_ASK_BACKGROUND_COLOR);
-        COLUMN_COLORS.put(Column.BID_LIQUIDITY, ColorConstants.THEO_BID_BACKGROUND_COLOR);
-        COLUMN_COLORS.put(Column.ASK_LIQUIDITY, ColorConstants.THEO_ASK_BACKGROUND_COLOR);
-        COLUMN_COLORS.put(Column.ERROR, ColorConstants.TOTAL_COLOR);
-        COLUMN_COLORS.put(Column.WIDTH_MULT, ColorConstants.TOTAL_COLOR);
+  static {
+    COLUMN_COLORS = new HashMap<>();
+    COLUMN_COLORS.put(Column.MM_BID, ColorConstants.THEO_BID_BACKGROUND_COLOR);
+    COLUMN_COLORS.put(Column.MM_ASK, ColorConstants.THEO_ASK_BACKGROUND_COLOR);
+    COLUMN_COLORS.put(Column.BID_LIQUIDITY, ColorConstants.THEO_BID_BACKGROUND_COLOR);
+    COLUMN_COLORS.put(Column.ASK_LIQUIDITY, ColorConstants.THEO_ASK_BACKGROUND_COLOR);
+    COLUMN_COLORS.put(Column.ERROR, ColorConstants.TOTAL_COLOR);
+    COLUMN_COLORS.put(Column.WIDTH_MULT, ColorConstants.TOTAL_COLOR);
+  }
 
-    }
-
-    public TheoreticalSnapshotTable(final TableModel dm, final TableCellRenderer theoCellRenderer) {
-        super(dm);
-        COLUMN_COLORS.forEach((column, color) -> {
-            this.getColumnModel().getColumn(column.ordinal()).setCellRenderer(
-                    new ColoredColumnTableCellRenderer(color, Color.WHITE, column.ordinal(), true));
+  public TheoreticalSnapshotTable(final TableModel dm, final TableCellRenderer theoCellRenderer) {
+    super(dm);
+    COLUMN_COLORS.forEach(
+        (column, color) -> {
+          this.getColumnModel()
+              .getColumn(column.ordinal())
+              .setCellRenderer(
+                  new ColoredColumnTableCellRenderer(color, Color.WHITE, column.ordinal(), true));
         });
-        this.getColumnModel().getColumn(Column.THEO.ordinal()).setCellRenderer(theoCellRenderer);
-        this.getColumnModel().getColumn(Column.ADJUSTED_THEO.ordinal()).setCellRenderer(theoCellRenderer);
-    }
+    this.getColumnModel().getColumn(Column.THEO.ordinal()).setCellRenderer(theoCellRenderer);
+    this.getColumnModel()
+        .getColumn(Column.ADJUSTED_THEO.ordinal())
+        .setCellRenderer(theoCellRenderer);
+  }
 
-    public enum Column {
-        INSTRUMENT,
-        BID_LIQUIDITY,
-        MM_BID,
-        THEO,
-        ADJUSTED_THEO,
-        MM_ASK,
-        ASK_LIQUIDITY,
-        ERROR,
-        WIDTH_MULT
-    }
+  public enum Column {
+    INSTRUMENT,
+    BID_LIQUIDITY,
+    MM_BID,
+    THEO,
+    ADJUSTED_THEO,
+    MM_ASK,
+    ASK_LIQUIDITY,
+    ERROR,
+    WIDTH_MULT
+  }
 }
