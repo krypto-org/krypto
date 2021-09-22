@@ -3,28 +3,23 @@ package krypto.ui.components;
 import javax.swing.*;
 import java.util.List;
 
-public class ListBasedComboboxModel extends DefaultComboBoxModel<String>
-{
+public class ListBasedComboboxModel extends DefaultComboBoxModel<String> {
 
-	private final List<String> comboboxItems;
+  private final List<String> comboboxItems;
 
-	public ListBasedComboboxModel(List<String> items)
-	{
-		comboboxItems = items;
-	}
+  public ListBasedComboboxModel(List<String> items) {
+    comboboxItems = items;
+  }
 
-	@Override
-	public String getElementAt(int index)
-	{
-		return comboboxItems.get(index);
-	}
+  @Override
+  public String getElementAt(int index) {
+    return comboboxItems.get(index);
+  }
 
-	@Override
-	public void addElement(String item)
-	{
-		if (!comboboxItems.contains(item))
-		{
-			comboboxItems.add(item);
-		}
-	}
+  @Override
+  public void addElement(String item) {
+    if (!comboboxItems.contains(item)) {
+      comboboxItems.add(item);
+    }
+  }
 }

@@ -20,11 +20,11 @@ public class OrderSubscriber extends BaseSubscriber {
   private static final Logger LOGGER = LogManager.getLogger(OrderSubscriber.class);
 
   public interface Listener {
-    void onNewOrder(final String client, final OrderRequest orderRequest);
+    void onOrderRequest(final String client, final OrderRequest orderRequest);
 
-    void onOrderCancel(final String client, final OrderCancelRequest orderCancelRequest);
+    void onOrderCancelRequest(final String client, final OrderCancelRequest orderCancelRequest);
 
-    void onOrderReplace(final String client, final OrderReplaceRequest orderReplaceRequest);
+    void onOrderReplaceRequest(final String client, final OrderReplaceRequest orderReplaceRequest);
 
     void onOrderUpdate(final String client, final OrderUpdate ou);
   }
@@ -38,7 +38,7 @@ public class OrderSubscriber extends BaseSubscriber {
   @Override
   protected void process() {
     super.addresses.forEach(
-        x -> LOGGER.info(String.format("Connecting to mktdata gateway @ %s", x)));
+        x -> LOGGER.info(String.format("Connecting to order gateway @ %s", x)));
     while (!terminated) {
       final String client = this.socket.recvStr();
       final byte messageType = SocketUtils.receiveMessageType(this.socket);
@@ -48,20 +48,20 @@ public class OrderSubscriber extends BaseSubscriber {
         case MessageType.ORDER_REQUEST:
           this.listeners.forEach(
               listener ->
-                  listener.onNewOrder(
+                  listener.onOrderRequest(
                       client, OrderRequest.getRootAsOrderRequest(ByteBuffer.wrap(payload))));
           break;
         case MessageType.ORDER_CANCEL_REQUEST:
           this.listeners.forEach(
               listener ->
-                  listener.onOrderCancel(
+                  listener.onOrderCancelRequest(
                       client,
                       OrderCancelRequest.getRootAsOrderCancelRequest(ByteBuffer.wrap(payload))));
           break;
         case MessageType.ORDER_REPLACE_REQUEST:
           this.listeners.forEach(
               listener ->
-                  listener.onOrderReplace(
+                  listener.onOrderReplaceRequest(
                       client,
                       OrderReplaceRequest.getRootAsOrderReplaceRequest(ByteBuffer.wrap(payload))));
           break;

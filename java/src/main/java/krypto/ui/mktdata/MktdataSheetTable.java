@@ -11,35 +11,38 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class MktdataSheetTable extends JTable {
-    private static final Map<Column, Color> COLUMN_COLORS;
+  private static final Map<Column, Color> COLUMN_COLORS;
 
-    static {
-        COLUMN_COLORS = new HashMap<>();
-        COLUMN_COLORS.put(Column.BID, ColorConstants.BID_BACKGROUND_COLOR);
-        COLUMN_COLORS.put(Column.ASK, ColorConstants.ASK_BACKGROUND_COLOR);
-        COLUMN_COLORS.put(Column.BID_QUANTITY, ColorConstants.BID_BACKGROUND_COLOR);
-        COLUMN_COLORS.put(Column.ASK_QUANTITY, ColorConstants.ASK_BACKGROUND_COLOR);
-        COLUMN_COLORS.put(Column.LAST, ColorConstants.TOTAL_COLOR);
-        COLUMN_COLORS.put(Column.LAST_QUANTITY, ColorConstants.TOTAL_COLOR);
-    }
+  static {
+    COLUMN_COLORS = new HashMap<>();
+    COLUMN_COLORS.put(Column.BID, ColorConstants.BID_BACKGROUND_COLOR);
+    COLUMN_COLORS.put(Column.ASK, ColorConstants.ASK_BACKGROUND_COLOR);
+    COLUMN_COLORS.put(Column.BID_QUANTITY, ColorConstants.BID_BACKGROUND_COLOR);
+    COLUMN_COLORS.put(Column.ASK_QUANTITY, ColorConstants.ASK_BACKGROUND_COLOR);
+    COLUMN_COLORS.put(Column.LAST, ColorConstants.TOTAL_COLOR);
+    COLUMN_COLORS.put(Column.LAST_QUANTITY, ColorConstants.TOTAL_COLOR);
+  }
 
-    public MktdataSheetTable(TableModel dm, TableCellRenderer theoCellRenderer) {
-        super(dm);
-        COLUMN_COLORS.forEach((column, color) -> {
-            this.getColumnModel().getColumn(column.ordinal()).setCellRenderer(
-                    new ColoredColumnTableCellRenderer(color, Color.WHITE, column.ordinal(), true));
+  public MktdataSheetTable(TableModel dm, TableCellRenderer theoCellRenderer) {
+    super(dm);
+    COLUMN_COLORS.forEach(
+        (column, color) -> {
+          this.getColumnModel()
+              .getColumn(column.ordinal())
+              .setCellRenderer(
+                  new ColoredColumnTableCellRenderer(color, Color.WHITE, column.ordinal(), true));
         });
-        this.getColumnModel().getColumn(Column.THEO.ordinal()).setCellRenderer(theoCellRenderer);
-    }
+    this.getColumnModel().getColumn(Column.THEO.ordinal()).setCellRenderer(theoCellRenderer);
+  }
 
-    public enum Column {
-        INSTRUMENT,
-        BID_QUANTITY,
-        BID,
-        THEO,
-        ASK,
-        ASK_QUANTITY,
-        LAST,
-        LAST_QUANTITY
-    }
+  public enum Column {
+    INSTRUMENT,
+    BID_QUANTITY,
+    BID,
+    THEO,
+    ASK,
+    ASK_QUANTITY,
+    LAST,
+    LAST_QUANTITY
+  }
 }

@@ -2,12 +2,11 @@ package krypto.apps;
 
 import com.github.weisj.darklaf.LafManager;
 import com.github.weisj.darklaf.theme.DarculaTheme;
-import com.typesafe.config.ConfigFactory;
 import krypto.Config;
 import krypto.instruments.InstrumentsClient;
-import krypto.mktdata.Subscriber;
+import krypto.mktdata.MktdataSubscriber;
 import krypto.orders.OrderClient;
-import krypto.pricing.PricingClient;
+import krypto.orders.OrderSubscriber;
 import krypto.ui.StartScreen;
 import krypto.ui.UIDataCache;
 import org.zeromq.ZMQ;
@@ -25,32 +24,33 @@ public class KryptoGui {
     final var instrumentsClient =
         new InstrumentsClient(context, config.getStringNode("/services/instruments/client"));
 
-    final var subscriber =
-        new Subscriber(
+    final var mktdataSubscriber =
+        new MktdataSubscriber(
             context,
             Collections.singletonList(
                 config.getStringNode("/services/mktdata_gateway/backend/client")),
             true);
-    subscriber.subscribe("");
+    mktdataSubscriber.subscribe("");
 
-    final var pricingClient =
-        new PricingClient(
-            context,
-            Collections.singletonList(config.getStringNode("/services/pricing/client")),
-            true);
-    pricingClient.subscribe("");
+
+    final var orderSubscriber =
+            new OrderSubscriber(
+                    context,
+                    Collections.singletonList(
+                            config.getStringNode("/services/order_gateway/broadcast/client")));
+    orderSubscriber.subscribe("");
 
     final var uiDataCache = new UIDataCache(instrumentsClient);
-    subscriber.registerListener(uiDataCache);
-    pricingClient.registerListener(uiDataCache);
-
-    subscriber.start();
-    pricingClient.start();
+    mktdataSubscriber.registerListener(uiDataCache);
+    orderSubscriber.registerListener(uiDataCache);
 
     final OrderClient orderClient =
         new OrderClient(
             context, config.getStringNode("/services/order_gateway/frontend/client"), 100);
+
+    mktdataSubscriber.start();
     orderClient.start();
+    orderSubscriber.start();
 
     EventQueue.invokeLater(
         () -> {

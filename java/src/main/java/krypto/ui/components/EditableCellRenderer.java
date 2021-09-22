@@ -5,14 +5,14 @@ import java.awt.*;
 import java.text.NumberFormat;
 
 public class EditableCellRenderer extends CenterAlignedTableCellRenderer {
-    private final NumberFormat formatter;
+  private final NumberFormat formatter;
 
-    public EditableCellRenderer(NumberFormat formatter) {
-        this.formatter = formatter;
-    }
+  public EditableCellRenderer(NumberFormat formatter) {
+    this.formatter = formatter;
+  }
 
-    @Override
-    public void setValue(Object value) {
-        setText((value == null) ? "" : formatter.format(value));
-    }
+  @Override
+  public void setValue(Object value) {
+    setText((value == null) ? "" : formatter.format(value));
+  }
 }

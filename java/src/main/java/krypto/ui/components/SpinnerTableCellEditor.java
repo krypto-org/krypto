@@ -5,29 +5,28 @@ import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableModel;
 import java.awt.*;
 
-public class SpinnerTableCellEditor extends AbstractCellEditor implements
-        TableCellEditor {
-    private final JSpinner spinner;
+public class SpinnerTableCellEditor extends AbstractCellEditor implements TableCellEditor {
+  private final JSpinner spinner;
 
-    public SpinnerTableCellEditor(SpinnerNumberModel model) {
-        spinner = new JSpinner(model);
+  public SpinnerTableCellEditor(SpinnerNumberModel model) {
+    spinner = new JSpinner(model);
+  }
+
+  @Override
+  public Component getTableCellEditorComponent(
+      JTable table, Object value, boolean isSelected, int row, int column) {
+
+    if (isSelected) {
+      spinner.setValue(value);
+      TableModel model = table.getModel();
+      model.setValueAt(value, row, column);
     }
 
-    @Override
-    public Component getTableCellEditorComponent(JTable table, Object value,
-                                                 boolean isSelected, int row, int column) {
+    return spinner;
+  }
 
-        if (isSelected) {
-            spinner.setValue(value);
-            TableModel model = table.getModel();
-            model.setValueAt(value, row, column);
-        }
-
-        return spinner;
-    }
-
-    @Override
-    public Object getCellEditorValue() {
-        return spinner.getValue();
-    }
+  @Override
+  public Object getCellEditorValue() {
+    return spinner.getValue();
+  }
 }
