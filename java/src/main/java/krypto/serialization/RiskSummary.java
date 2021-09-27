@@ -17,28 +17,38 @@ public final class RiskSummary extends Table {
 
   public long timestamp() { int o = __offset(4); return o != 0 ? bb.getLong(o + bb_pos) : 0L; }
   public krypto.serialization.Position positions(int j) { return positions(new krypto.serialization.Position(), j); }
-  public krypto.serialization.Position positions(krypto.serialization.Position obj, int j) { int o = __offset(6); return o != 0 ? obj.__assign(__vector(o) + j * 16, bb) : null; }
+  public krypto.serialization.Position positions(krypto.serialization.Position obj, int j) { int o = __offset(6); return o != 0 ? obj.__assign(__vector(o) + j * 32, bb) : null; }
   public int positionsLength() { int o = __offset(6); return o != 0 ? __vector_len(o) : 0; }
   public krypto.serialization.Position.Vector positionsVector() { return positionsVector(new krypto.serialization.Position.Vector()); }
-  public krypto.serialization.Position.Vector positionsVector(krypto.serialization.Position.Vector obj) { int o = __offset(6); return o != 0 ? obj.__assign(__vector(o), 16, bb) : null; }
-  public double pnl() { int o = __offset(8); return o != 0 ? bb.getDouble(o + bb_pos) : 0.0; }
+  public krypto.serialization.Position.Vector positionsVector(krypto.serialization.Position.Vector obj) { int o = __offset(6); return o != 0 ? obj.__assign(__vector(o), 32, bb) : null; }
+  public krypto.serialization.PositionByTrader traderPositions() { return traderPositions(new krypto.serialization.PositionByTrader()); }
+  public krypto.serialization.PositionByTrader traderPositions(krypto.serialization.PositionByTrader obj) { int o = __offset(8); return o != 0 ? obj.__assign(__indirect(o + bb_pos), bb) : null; }
+  public krypto.serialization.PositionByBook bookPositions() { return bookPositions(new krypto.serialization.PositionByBook()); }
+  public krypto.serialization.PositionByBook bookPositions(krypto.serialization.PositionByBook obj) { int o = __offset(10); return o != 0 ? obj.__assign(__indirect(o + bb_pos), bb) : null; }
+  public double pnl() { int o = __offset(12); return o != 0 ? bb.getDouble(o + bb_pos) : 0.0; }
 
   public static int createRiskSummary(FlatBufferBuilder builder,
       long timestamp,
       int positionsOffset,
+      int trader_positionsOffset,
+      int book_positionsOffset,
       double pnl) {
-    builder.startTable(3);
+    builder.startTable(5);
     RiskSummary.addPnl(builder, pnl);
     RiskSummary.addTimestamp(builder, timestamp);
+    RiskSummary.addBookPositions(builder, book_positionsOffset);
+    RiskSummary.addTraderPositions(builder, trader_positionsOffset);
     RiskSummary.addPositions(builder, positionsOffset);
     return RiskSummary.endRiskSummary(builder);
   }
 
-  public static void startRiskSummary(FlatBufferBuilder builder) { builder.startTable(3); }
+  public static void startRiskSummary(FlatBufferBuilder builder) { builder.startTable(5); }
   public static void addTimestamp(FlatBufferBuilder builder, long timestamp) { builder.addLong(0, timestamp, 0L); }
   public static void addPositions(FlatBufferBuilder builder, int positionsOffset) { builder.addOffset(1, positionsOffset, 0); }
-  public static void startPositionsVector(FlatBufferBuilder builder, int numElems) { builder.startVector(16, numElems, 8); }
-  public static void addPnl(FlatBufferBuilder builder, double pnl) { builder.addDouble(2, pnl, 0.0); }
+  public static void startPositionsVector(FlatBufferBuilder builder, int numElems) { builder.startVector(32, numElems, 8); }
+  public static void addTraderPositions(FlatBufferBuilder builder, int traderPositionsOffset) { builder.addOffset(2, traderPositionsOffset, 0); }
+  public static void addBookPositions(FlatBufferBuilder builder, int bookPositionsOffset) { builder.addOffset(3, bookPositionsOffset, 0); }
+  public static void addPnl(FlatBufferBuilder builder, double pnl) { builder.addDouble(4, pnl, 0.0); }
   public static int endRiskSummary(FlatBufferBuilder builder) {
     int o = builder.endTable();
     return o;

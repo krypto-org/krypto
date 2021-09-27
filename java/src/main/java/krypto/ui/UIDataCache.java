@@ -29,9 +29,14 @@ public class UIDataCache
   private final SortedMap<Long, Instrument> instruments;
   private final Map<String, Long> symbolToInstrumentIdMapping;
   private final Set<Long> activeInstruments;
+  private final String defaultTrader;
+  private final String defaultBook;
 
-  public UIDataCache(final InstrumentsClient instrumentsClient) {
+  public UIDataCache(
+      final InstrumentsClient instrumentsClient, String defaultTrader, String defaultBook) {
     this.instrumentsClient = instrumentsClient;
+    this.defaultTrader = defaultTrader;
+    this.defaultBook = defaultBook;
     this.instruments = new TreeMap<>();
     this.quotes = new ConcurrentHashMap<>();
     this.theos = new ConcurrentHashMap<>();
@@ -106,6 +111,14 @@ public class UIDataCache
 
   public List<Fill> getFills() {
     return fills;
+  }
+
+  public String getDefaultTrader() {
+    return defaultTrader;
+  }
+
+  public String getDefaultBook() {
+    return defaultBook;
   }
 
   @Override

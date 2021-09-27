@@ -25,7 +25,7 @@ namespace krypto::utils {
         ORDER_CANCEL_REQUEST,
         ORDER_REPLACE_REQUEST,
         ORDER_UPDATE,
-        POSITION,
+        RISK_SUMMARY_REQUEST,
         RISK_SUMMARY,
         THEO,
         SIZE
@@ -45,9 +45,9 @@ namespace krypto::utils {
             "OC",
             "OR",
             "OU",
-            "PP",
-            "PR",
-            "PT"
+            "RR",
+            "RS",
+            "TH"
     };
 
     static constexpr const MsgType MsgTypes[enum_size<MsgType>()] = {
@@ -64,7 +64,7 @@ namespace krypto::utils {
             MsgType::ORDER_CANCEL_REQUEST,
             MsgType::ORDER_REPLACE_REQUEST,
             MsgType::ORDER_UPDATE,
-            MsgType::POSITION,
+            MsgType::RISK_SUMMARY_REQUEST,
             MsgType::RISK_SUMMARY,
             MsgType::THEO
     };

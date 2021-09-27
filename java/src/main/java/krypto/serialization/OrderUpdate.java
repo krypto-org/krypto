@@ -24,14 +24,17 @@ public final class OrderUpdate extends Table {
   public ByteBuffer exchangeOrderIdInByteBuffer(ByteBuffer _bb) { return __vector_in_bytebuffer(_bb, 8, 1); }
   public byte status() { int o = __offset(10); return o != 0 ? bb.get(o + bb_pos) : 0; }
   public long filledQuantity() { int o = __offset(12); return o != 0 ? bb.getLong(o + bb_pos) : 0L; }
+  public long filledPrice() { int o = __offset(14); return o != 0 ? bb.getLong(o + bb_pos) : 0L; }
 
   public static int createOrderUpdate(FlatBufferBuilder builder,
       long timestamp,
       int order_idOffset,
       int exchange_order_idOffset,
       byte status,
-      long filled_quantity) {
-    builder.startTable(5);
+      long filled_quantity,
+      long filled_price) {
+    builder.startTable(6);
+    OrderUpdate.addFilledPrice(builder, filled_price);
     OrderUpdate.addFilledQuantity(builder, filled_quantity);
     OrderUpdate.addTimestamp(builder, timestamp);
     OrderUpdate.addExchangeOrderId(builder, exchange_order_idOffset);
@@ -40,12 +43,13 @@ public final class OrderUpdate extends Table {
     return OrderUpdate.endOrderUpdate(builder);
   }
 
-  public static void startOrderUpdate(FlatBufferBuilder builder) { builder.startTable(5); }
+  public static void startOrderUpdate(FlatBufferBuilder builder) { builder.startTable(6); }
   public static void addTimestamp(FlatBufferBuilder builder, long timestamp) { builder.addLong(0, timestamp, 0L); }
   public static void addOrderId(FlatBufferBuilder builder, int orderIdOffset) { builder.addOffset(1, orderIdOffset, 0); }
   public static void addExchangeOrderId(FlatBufferBuilder builder, int exchangeOrderIdOffset) { builder.addOffset(2, exchangeOrderIdOffset, 0); }
   public static void addStatus(FlatBufferBuilder builder, byte status) { builder.addByte(3, status, 0); }
   public static void addFilledQuantity(FlatBufferBuilder builder, long filledQuantity) { builder.addLong(4, filledQuantity, 0L); }
+  public static void addFilledPrice(FlatBufferBuilder builder, long filledPrice) { builder.addLong(5, filledPrice, 0L); }
   public static int endOrderUpdate(FlatBufferBuilder builder) {
     int o = builder.endTable();
     return o;

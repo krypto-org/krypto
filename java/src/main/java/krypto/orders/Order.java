@@ -8,6 +8,8 @@ public class Order {
   private final double size;
   private final byte side;
   private final byte tif;
+  private final String trader;
+  private final String book;
 
   private String orderId;
   private long lastUpdatedTimestamp;
@@ -16,13 +18,13 @@ public class Order {
   private double fees;
 
   public Order(
-      final String clOrderId,
-      final long securityId,
-      final String symbol,
-      final double price,
-      final double size,
-      final byte side,
-      final byte tif) {
+          final String clOrderId,
+          final long securityId,
+          final String symbol,
+          final double price,
+          final double size,
+          final byte side,
+          final byte tif, String trader, String book) {
     this.clOrderId = clOrderId;
     this.securityId = securityId;
     this.symbol = symbol;
@@ -30,6 +32,8 @@ public class Order {
     this.size = size;
     this.side = side;
     this.tif = tif;
+    this.trader = trader;
+    this.book = book;
   }
 
   public void setOrderId(final String orderId) {

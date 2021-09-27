@@ -16,6 +16,13 @@ public class OrderTicketTableModel extends AbstractTableModel {
   private Side side = Side.BUY;
   private TimeInForce tif = TimeInForce.DAY;
   private Exchange exchange = Exchange.SIM;
+  private String trader;
+  private String book;
+
+  public OrderTicketTableModel(String trader, String book) {
+    this.trader = trader;
+    this.book = book;
+  }
 
   @Override
   public int getRowCount() {
@@ -34,7 +41,9 @@ public class OrderTicketTableModel extends AbstractTableModel {
 
   @Override
   public boolean isCellEditable(int rowIndex, int columnIndex) {
-    return columnIndex != OrderTicketTable.Column.Product.ordinal();
+    return columnIndex != OrderTicketTable.Column.Product.ordinal()
+        && columnIndex != OrderTicketTable.Column.Trader.ordinal()
+        && columnIndex != OrderTicketTable.Column.Book.ordinal();
   }
 
   @Override
@@ -51,8 +60,12 @@ public class OrderTicketTableModel extends AbstractTableModel {
         return side.toString();
       case TIF:
         return tif.toString();
-      case EXCHANGE:
+      case Exchange:
         return exchange.toString();
+      case Trader:
+        return trader;
+      case Book:
+        return book;
     }
     return null;
   }
@@ -67,7 +80,7 @@ public class OrderTicketTableModel extends AbstractTableModel {
       this.price = Double.parseDouble(value.toString());
     } else if (columnIndex == OrderTicketTable.Column.Size.ordinal()) {
       this.size = Double.parseDouble(value.toString());
-    } else if (columnIndex == OrderTicketTable.Column.EXCHANGE.ordinal()) {
+    } else if (columnIndex == OrderTicketTable.Column.Exchange.ordinal()) {
       this.exchange = Exchange.valueOf(value.toString());
     }
     super.setValueAt(value, rowIndex, columnIndex);
@@ -119,5 +132,13 @@ public class OrderTicketTableModel extends AbstractTableModel {
 
   public Exchange getExchange() {
     return exchange;
+  }
+
+  public String getTrader() {
+    return trader;
+  }
+
+  public String getBook() {
+    return book;
   }
 }

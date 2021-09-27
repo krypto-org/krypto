@@ -32,15 +32,18 @@ public class KryptoGui {
             true);
     mktdataSubscriber.subscribe("");
 
-
     final var orderSubscriber =
-            new OrderSubscriber(
-                    context,
-                    Collections.singletonList(
-                            config.getStringNode("/services/order_gateway/broadcast/client")));
+        new OrderSubscriber(
+            context,
+            Collections.singletonList(
+                config.getStringNode("/services/order_gateway/broadcast/client")));
     orderSubscriber.subscribe("");
 
-    final var uiDataCache = new UIDataCache(instrumentsClient);
+    final var uiDataCache =
+        new UIDataCache(
+            instrumentsClient,
+            config.getStringNode("/global/default_trader"),
+            config.getStringNode("/global/default_book"));
     mktdataSubscriber.registerListener(uiDataCache);
     orderSubscriber.registerListener(uiDataCache);
 

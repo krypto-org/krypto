@@ -26,7 +26,8 @@ public class OrderTicketPanel extends JPanel {
     this.client = client;
     this.uiDataCache = uiDataCache;
     this.setLayout(new MigLayout("", "[fill,grow][100,fill]", "[fill,grow]"));
-    this.tableModel = new OrderTicketTableModel();
+    this.tableModel =
+        new OrderTicketTableModel(uiDataCache.getDefaultTrader(), uiDataCache.getDefaultBook());
     OrderTicketTable orderTicketTable = new OrderTicketTable(this.tableModel);
     final JScrollPane scrollPane = new JScrollPane();
     scrollPane.setViewportView(orderTicketTable);
@@ -58,6 +59,8 @@ public class OrderTicketPanel extends JPanel {
     final byte side = this.tableModel.getSide().getValue();
     final byte tif = this.tableModel.getTif().getValue();
     final String exchange = this.tableModel.getExchange().toString();
+    final String trader = this.tableModel.getTrader();
+    final String book = this.tableModel.getBook();
     logger.info(
         "Sending order for symbol {} [{}] {} {}@{} | {}",
         symbol,
@@ -67,6 +70,7 @@ public class OrderTicketPanel extends JPanel {
         price,
         TimeInForce.name(tif));
     final var orderId = this.client.newOrder(exchange, id, price, qty, side, tif);
-    this.uiDataCache.registerOrder(new Order(orderId, id, symbol, price, qty, side, tif));
+    this.uiDataCache.registerOrder(
+        new Order(orderId, id, symbol, price, qty, side, tif, trader, book));
   }
 }

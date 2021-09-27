@@ -40,6 +40,12 @@ public class OrderTicketTable extends JTable {
         .getColumn(Column.Product.ordinal())
         .setCellRenderer(centerAlignedTableCellRenderer);
     this.getColumnModel()
+        .getColumn(Column.Trader.ordinal())
+        .setCellRenderer(centerAlignedTableCellRenderer);
+    this.getColumnModel()
+        .getColumn(Column.Book.ordinal())
+        .setCellRenderer(centerAlignedTableCellRenderer);
+    this.getColumnModel()
         .getColumn(Column.Price.ordinal())
         .setCellRenderer(new EditableCellRenderer(PRICE_FORMAT));
     this.getColumnModel()
@@ -47,10 +53,10 @@ public class OrderTicketTable extends JTable {
         .setCellRenderer(new EditableCellRenderer(QUANTITY_FORMAT));
 
     this.getColumnModel()
-        .getColumn(Column.EXCHANGE.ordinal())
+        .getColumn(Column.Exchange.ordinal())
         .setCellEditor(new ComboBoxTableCellEditor<>(Exchange.values()));
     this.getColumnModel()
-        .getColumn(Column.EXCHANGE.ordinal())
+        .getColumn(Column.Exchange.ordinal())
         .setCellRenderer(centerAlignedTableCellRenderer);
     this.setRowSelectionAllowed(false);
     this.setColumnSelectionAllowed(false);
@@ -76,6 +82,8 @@ public class OrderTicketTable extends JTable {
     Size,
     Side,
     TIF,
-    EXCHANGE
+    Exchange,
+    Trader,
+    Book
   }
 }
