@@ -92,4 +92,11 @@ namespace krypto::utils {
     std::unordered_map<std::string, krypto::serialization::Currency> name_to_currency() noexcept;
 
     std::unordered_map<std::string, MsgType> name_to_msg_type() noexcept;
+
+    template <typename T>
+    constexpr T ipow(T num, unsigned int pow)
+    {
+        return (pow >= sizeof(unsigned int)*8) ? 0 :
+        pow == 0 ? 1 : num * ipow(num, pow-1);
+    }
 }

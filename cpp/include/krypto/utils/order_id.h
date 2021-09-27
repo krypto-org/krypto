@@ -3,14 +3,14 @@
 #include <array>
 #include <cstddef>
 #include <chrono>
-
+#include <krypto/utils/common.h>
 #include <krypto/logger.h>
 
 namespace krypto::utils {
     template<size_t size>
     class OrderIdGenerator final {
     private:
-        static const constexpr int64_t MULTIPLIER = std::pow(10, size - 6);
+        static const constexpr int64_t MULTIPLIER = krypto::utils::ipow(10, size - 6);
         uint64_t base_id_;
         static uint64_t generate_base_id();
     public:

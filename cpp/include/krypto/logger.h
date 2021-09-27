@@ -14,8 +14,6 @@ namespace krypto {
 
         ~Logging();
 
-        static const char *makeLoc(const char *file, int line, const char *func);
-
         ::spdlog::logger &getLogger();
 
         void setLevelInfo();

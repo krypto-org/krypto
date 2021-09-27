@@ -18,12 +18,6 @@ struct krypto::Logging::Impl {
         return *::spdlog::get(LOGGER_NAME);
     }
 
-    static const char *makeLoc(const char *file, int line, const char *func) {
-        static thread_local char buf[128];
-        sprintf(buf, "(%s:%d %s)", basename(file), line, func);
-        return buf;
-    }
-
     void setLevel(::spdlog::level::level_enum newLevel) {
         getLogger().set_level(newLevel);
     }
@@ -68,10 +62,6 @@ krypto::Logging::~Logging() {
 ::spdlog::logger &
 krypto::Logging::getLogger() {
     return pImpl_->getLogger();
-}
-
-const char *krypto::Logging::makeLoc(const char *file, int line, const char *func) {
-    return Impl::makeLoc(file, line, func);
 }
 
 void krypto::Logging::setLevelInfo() {

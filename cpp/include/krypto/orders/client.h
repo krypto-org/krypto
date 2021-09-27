@@ -7,7 +7,6 @@
 #include <krypto/utils/order_id.h>
 #include <krypto/utils/date_time.h>
 #include <krypto/orders/protocol.h>
-#include <bits/unordered_set.h>
 
 namespace krypto::orders {
     class OrderClient final {
