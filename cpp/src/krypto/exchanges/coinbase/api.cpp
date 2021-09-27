@@ -145,7 +145,7 @@ namespace krypto::exchanges::coinbase {
     }
 
     std::optional<nlohmann::json> AuthenticatedApi::get_fills_for_order(const std::string &order_id) {
-        std::string endpoint = "/Fills?order_id=" + order_id;
+        std::string endpoint = "/fills?order_id=" + order_id;
         auto result = send_authenticated_request("GET", endpoint, "");
         if (result.has_value())
             return nlohmann::json::parse(result.value());
@@ -153,7 +153,7 @@ namespace krypto::exchanges::coinbase {
     }
 
     std::optional<nlohmann::json> AuthenticatedApi::get_fills_for_product(const std::string &product_id) {
-        std::string endpoint = "/Fills?product_id=" + product_id;
+        std::string endpoint = "/fills?product_id=" + product_id;
         auto result = send_authenticated_request("GET", endpoint, "");
         if (result.has_value())
             return nlohmann::json::parse(result.value());
