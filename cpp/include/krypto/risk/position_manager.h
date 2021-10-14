@@ -10,9 +10,7 @@ namespace krypto::risk {
         std::unordered_map<int64_t, krypto::utils::Instrument> instruments_;
         std::unordered_map<int64_t, double_t> mark_price_{};
         std::vector<krypto::utils::Fill> fills_;
-        position_map position_by_security_id_;
-        std::unordered_map<std::string, position_map> position_by_trader_;
-        std::unordered_map<std::string, position_map> position_by_book_;
+        krypto::utils::RiskSummary risk_summary_;
         sw::redis::Redis redis_;
     public:
         PositionManager(krypto::instruments::InstrumentClient instrument_client, const std::string& redis_endpoint);
@@ -23,10 +21,7 @@ namespace krypto::risk {
 
         const std::vector<krypto::utils::Fill> &fills() const;
 
-        const position_map &position_by_security_id() const;
+        const utils::RiskSummary &risk_summary() const;
 
-        const std::unordered_map<std::string, position_map> &position_by_trader() const;
-
-        const std::unordered_map<std::string, position_map> &position_by_book() const;
     };
 }

@@ -14,13 +14,15 @@ public final class Position extends Struct {
 
   public long timestamp() { return bb.getLong(bb_pos + 0); }
   public long securityId() { return bb.getLong(bb_pos + 8); }
-  public long position() { return bb.getLong(bb_pos + 16); }
+  public double position() { return bb.getDouble(bb_pos + 16); }
   public double pnl() { return bb.getDouble(bb_pos + 24); }
+  public double markPrice() { return bb.getDouble(bb_pos + 32); }
 
-  public static int createPosition(FlatBufferBuilder builder, long timestamp, long securityId, long position, double pnl) {
-    builder.prep(8, 32);
+  public static int createPosition(FlatBufferBuilder builder, long timestamp, long securityId, double position, double pnl, double markPrice) {
+    builder.prep(8, 40);
+    builder.putDouble(markPrice);
     builder.putDouble(pnl);
-    builder.putLong(position);
+    builder.putDouble(position);
     builder.putLong(securityId);
     builder.putLong(timestamp);
     return builder.offset();

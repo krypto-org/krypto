@@ -193,6 +193,15 @@ namespace krypto::utils {
         double_t mark_price;
     };
 
+    struct RiskSummary final {
+        int64_t timestamp;
+        using position_map = std::unordered_map<int64_t, krypto::utils::Position>;
+        position_map position_by_security_id;
+        std::unordered_map<std::string, position_map> trader_positions;
+        std::unordered_map<std::string, position_map> book_positions;
+        double_t pnl;
+    };
+
     class MessageTypeData {
     public:
         static const std::unordered_map<std::string, krypto::utils::MsgType> msg_type_reference;

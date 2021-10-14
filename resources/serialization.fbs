@@ -261,17 +261,17 @@ enum RiskRequestType : byte {ALL, TRADER, SECURITY_ID, BOOK}
 struct Position {
   timestamp: long;
   security_id: long;
-  position: long;
+  position: double;
   pnl: double;
   mark_price: double;
 }
 
-table PositionByTrader {
+table TraderPosition {
   trader: string;
   positions: [Position];
 }
 
-table PositionByBook {
+table BookPosition {
   book: string;
   positions: [Position];
 }
@@ -279,8 +279,8 @@ table PositionByBook {
 table RiskSummary {
   timestamp: long;
   positions: [Position];
-  trader_positions: PositionByTrader;
-  book_positions: PositionByBook;
+  trader_positions: [TraderPosition];
+  book_positions: [BookPosition];
   pnl: double;
 }
 

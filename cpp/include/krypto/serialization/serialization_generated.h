@@ -63,11 +63,11 @@ struct OrderBuilder;
 
 struct Position;
 
-struct PositionByTrader;
-struct PositionByTraderBuilder;
+struct TraderPosition;
+struct TraderPositionBuilder;
 
-struct PositionByBook;
-struct PositionByBookBuilder;
+struct BookPosition;
+struct BookPositionBuilder;
 
 struct RiskSummary;
 struct RiskSummaryBuilder;
@@ -797,18 +797,20 @@ FLATBUFFERS_MANUALLY_ALIGNED_STRUCT(8) Position FLATBUFFERS_FINAL_CLASS {
  private:
   int64_t timestamp_;
   int64_t security_id_;
-  int64_t position_;
+  double position_;
   double pnl_;
+  double mark_price_;
 
  public:
   Position() {
     memset(static_cast<void *>(this), 0, sizeof(Position));
   }
-  Position(int64_t _timestamp, int64_t _security_id, int64_t _position, double _pnl)
+  Position(int64_t _timestamp, int64_t _security_id, double _position, double _pnl, double _mark_price)
       : timestamp_(flatbuffers::EndianScalar(_timestamp)),
         security_id_(flatbuffers::EndianScalar(_security_id)),
         position_(flatbuffers::EndianScalar(_position)),
-        pnl_(flatbuffers::EndianScalar(_pnl)) {
+        pnl_(flatbuffers::EndianScalar(_pnl)),
+        mark_price_(flatbuffers::EndianScalar(_mark_price)) {
   }
   int64_t timestamp() const {
     return flatbuffers::EndianScalar(timestamp_);
@@ -816,14 +818,17 @@ FLATBUFFERS_MANUALLY_ALIGNED_STRUCT(8) Position FLATBUFFERS_FINAL_CLASS {
   int64_t security_id() const {
     return flatbuffers::EndianScalar(security_id_);
   }
-  int64_t position() const {
+  double position() const {
     return flatbuffers::EndianScalar(position_);
   }
   double pnl() const {
     return flatbuffers::EndianScalar(pnl_);
   }
+  double mark_price() const {
+    return flatbuffers::EndianScalar(mark_price_);
+  }
 };
-FLATBUFFERS_STRUCT_END(Position, 32);
+FLATBUFFERS_STRUCT_END(Position, 40);
 
 struct Empty FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   typedef EmptyBuilder Builder;
@@ -2158,8 +2163,8 @@ inline flatbuffers::Offset<Order> CreateOrderDirect(
       fees);
 }
 
-struct PositionByTrader FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
-  typedef PositionByTraderBuilder Builder;
+struct TraderPosition FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+  typedef TraderPositionBuilder Builder;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
     VT_TRADER = 4,
     VT_POSITIONS = 6
@@ -2180,52 +2185,52 @@ struct PositionByTrader FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   }
 };
 
-struct PositionByTraderBuilder {
-  typedef PositionByTrader Table;
+struct TraderPositionBuilder {
+  typedef TraderPosition Table;
   flatbuffers::FlatBufferBuilder &fbb_;
   flatbuffers::uoffset_t start_;
   void add_trader(flatbuffers::Offset<flatbuffers::String> trader) {
-    fbb_.AddOffset(PositionByTrader::VT_TRADER, trader);
+    fbb_.AddOffset(TraderPosition::VT_TRADER, trader);
   }
   void add_positions(flatbuffers::Offset<flatbuffers::Vector<const krypto::serialization::Position *>> positions) {
-    fbb_.AddOffset(PositionByTrader::VT_POSITIONS, positions);
+    fbb_.AddOffset(TraderPosition::VT_POSITIONS, positions);
   }
-  explicit PositionByTraderBuilder(flatbuffers::FlatBufferBuilder &_fbb)
+  explicit TraderPositionBuilder(flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
   }
-  PositionByTraderBuilder &operator=(const PositionByTraderBuilder &);
-  flatbuffers::Offset<PositionByTrader> Finish() {
+  TraderPositionBuilder &operator=(const TraderPositionBuilder &);
+  flatbuffers::Offset<TraderPosition> Finish() {
     const auto end = fbb_.EndTable(start_);
-    auto o = flatbuffers::Offset<PositionByTrader>(end);
+    auto o = flatbuffers::Offset<TraderPosition>(end);
     return o;
   }
 };
 
-inline flatbuffers::Offset<PositionByTrader> CreatePositionByTrader(
+inline flatbuffers::Offset<TraderPosition> CreateTraderPosition(
     flatbuffers::FlatBufferBuilder &_fbb,
     flatbuffers::Offset<flatbuffers::String> trader = 0,
     flatbuffers::Offset<flatbuffers::Vector<const krypto::serialization::Position *>> positions = 0) {
-  PositionByTraderBuilder builder_(_fbb);
+  TraderPositionBuilder builder_(_fbb);
   builder_.add_positions(positions);
   builder_.add_trader(trader);
   return builder_.Finish();
 }
 
-inline flatbuffers::Offset<PositionByTrader> CreatePositionByTraderDirect(
+inline flatbuffers::Offset<TraderPosition> CreateTraderPositionDirect(
     flatbuffers::FlatBufferBuilder &_fbb,
     const char *trader = nullptr,
     const std::vector<krypto::serialization::Position> *positions = nullptr) {
   auto trader__ = trader ? _fbb.CreateString(trader) : 0;
   auto positions__ = positions ? _fbb.CreateVectorOfStructs<krypto::serialization::Position>(*positions) : 0;
-  return krypto::serialization::CreatePositionByTrader(
+  return krypto::serialization::CreateTraderPosition(
       _fbb,
       trader__,
       positions__);
 }
 
-struct PositionByBook FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
-  typedef PositionByBookBuilder Builder;
+struct BookPosition FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+  typedef BookPositionBuilder Builder;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
     VT_BOOK = 4,
     VT_POSITIONS = 6
@@ -2246,45 +2251,45 @@ struct PositionByBook FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   }
 };
 
-struct PositionByBookBuilder {
-  typedef PositionByBook Table;
+struct BookPositionBuilder {
+  typedef BookPosition Table;
   flatbuffers::FlatBufferBuilder &fbb_;
   flatbuffers::uoffset_t start_;
   void add_book(flatbuffers::Offset<flatbuffers::String> book) {
-    fbb_.AddOffset(PositionByBook::VT_BOOK, book);
+    fbb_.AddOffset(BookPosition::VT_BOOK, book);
   }
   void add_positions(flatbuffers::Offset<flatbuffers::Vector<const krypto::serialization::Position *>> positions) {
-    fbb_.AddOffset(PositionByBook::VT_POSITIONS, positions);
+    fbb_.AddOffset(BookPosition::VT_POSITIONS, positions);
   }
-  explicit PositionByBookBuilder(flatbuffers::FlatBufferBuilder &_fbb)
+  explicit BookPositionBuilder(flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
   }
-  PositionByBookBuilder &operator=(const PositionByBookBuilder &);
-  flatbuffers::Offset<PositionByBook> Finish() {
+  BookPositionBuilder &operator=(const BookPositionBuilder &);
+  flatbuffers::Offset<BookPosition> Finish() {
     const auto end = fbb_.EndTable(start_);
-    auto o = flatbuffers::Offset<PositionByBook>(end);
+    auto o = flatbuffers::Offset<BookPosition>(end);
     return o;
   }
 };
 
-inline flatbuffers::Offset<PositionByBook> CreatePositionByBook(
+inline flatbuffers::Offset<BookPosition> CreateBookPosition(
     flatbuffers::FlatBufferBuilder &_fbb,
     flatbuffers::Offset<flatbuffers::String> book = 0,
     flatbuffers::Offset<flatbuffers::Vector<const krypto::serialization::Position *>> positions = 0) {
-  PositionByBookBuilder builder_(_fbb);
+  BookPositionBuilder builder_(_fbb);
   builder_.add_positions(positions);
   builder_.add_book(book);
   return builder_.Finish();
 }
 
-inline flatbuffers::Offset<PositionByBook> CreatePositionByBookDirect(
+inline flatbuffers::Offset<BookPosition> CreateBookPositionDirect(
     flatbuffers::FlatBufferBuilder &_fbb,
     const char *book = nullptr,
     const std::vector<krypto::serialization::Position> *positions = nullptr) {
   auto book__ = book ? _fbb.CreateString(book) : 0;
   auto positions__ = positions ? _fbb.CreateVectorOfStructs<krypto::serialization::Position>(*positions) : 0;
-  return krypto::serialization::CreatePositionByBook(
+  return krypto::serialization::CreateBookPosition(
       _fbb,
       book__,
       positions__);
@@ -2305,11 +2310,11 @@ struct RiskSummary FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   const flatbuffers::Vector<const krypto::serialization::Position *> *positions() const {
     return GetPointer<const flatbuffers::Vector<const krypto::serialization::Position *> *>(VT_POSITIONS);
   }
-  const krypto::serialization::PositionByTrader *trader_positions() const {
-    return GetPointer<const krypto::serialization::PositionByTrader *>(VT_TRADER_POSITIONS);
+  const flatbuffers::Vector<flatbuffers::Offset<krypto::serialization::TraderPosition>> *trader_positions() const {
+    return GetPointer<const flatbuffers::Vector<flatbuffers::Offset<krypto::serialization::TraderPosition>> *>(VT_TRADER_POSITIONS);
   }
-  const krypto::serialization::PositionByBook *book_positions() const {
-    return GetPointer<const krypto::serialization::PositionByBook *>(VT_BOOK_POSITIONS);
+  const flatbuffers::Vector<flatbuffers::Offset<krypto::serialization::BookPosition>> *book_positions() const {
+    return GetPointer<const flatbuffers::Vector<flatbuffers::Offset<krypto::serialization::BookPosition>> *>(VT_BOOK_POSITIONS);
   }
   double pnl() const {
     return GetField<double>(VT_PNL, 0.0);
@@ -2320,9 +2325,11 @@ struct RiskSummary FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
            VerifyOffset(verifier, VT_POSITIONS) &&
            verifier.VerifyVector(positions()) &&
            VerifyOffset(verifier, VT_TRADER_POSITIONS) &&
-           verifier.VerifyTable(trader_positions()) &&
+           verifier.VerifyVector(trader_positions()) &&
+           verifier.VerifyVectorOfTables(trader_positions()) &&
            VerifyOffset(verifier, VT_BOOK_POSITIONS) &&
-           verifier.VerifyTable(book_positions()) &&
+           verifier.VerifyVector(book_positions()) &&
+           verifier.VerifyVectorOfTables(book_positions()) &&
            VerifyField<double>(verifier, VT_PNL) &&
            verifier.EndTable();
   }
@@ -2338,10 +2345,10 @@ struct RiskSummaryBuilder {
   void add_positions(flatbuffers::Offset<flatbuffers::Vector<const krypto::serialization::Position *>> positions) {
     fbb_.AddOffset(RiskSummary::VT_POSITIONS, positions);
   }
-  void add_trader_positions(flatbuffers::Offset<krypto::serialization::PositionByTrader> trader_positions) {
+  void add_trader_positions(flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<krypto::serialization::TraderPosition>>> trader_positions) {
     fbb_.AddOffset(RiskSummary::VT_TRADER_POSITIONS, trader_positions);
   }
-  void add_book_positions(flatbuffers::Offset<krypto::serialization::PositionByBook> book_positions) {
+  void add_book_positions(flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<krypto::serialization::BookPosition>>> book_positions) {
     fbb_.AddOffset(RiskSummary::VT_BOOK_POSITIONS, book_positions);
   }
   void add_pnl(double pnl) {
@@ -2363,8 +2370,8 @@ inline flatbuffers::Offset<RiskSummary> CreateRiskSummary(
     flatbuffers::FlatBufferBuilder &_fbb,
     int64_t timestamp = 0,
     flatbuffers::Offset<flatbuffers::Vector<const krypto::serialization::Position *>> positions = 0,
-    flatbuffers::Offset<krypto::serialization::PositionByTrader> trader_positions = 0,
-    flatbuffers::Offset<krypto::serialization::PositionByBook> book_positions = 0,
+    flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<krypto::serialization::TraderPosition>>> trader_positions = 0,
+    flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<krypto::serialization::BookPosition>>> book_positions = 0,
     double pnl = 0.0) {
   RiskSummaryBuilder builder_(_fbb);
   builder_.add_pnl(pnl);
@@ -2379,16 +2386,18 @@ inline flatbuffers::Offset<RiskSummary> CreateRiskSummaryDirect(
     flatbuffers::FlatBufferBuilder &_fbb,
     int64_t timestamp = 0,
     const std::vector<krypto::serialization::Position> *positions = nullptr,
-    flatbuffers::Offset<krypto::serialization::PositionByTrader> trader_positions = 0,
-    flatbuffers::Offset<krypto::serialization::PositionByBook> book_positions = 0,
+    const std::vector<flatbuffers::Offset<krypto::serialization::TraderPosition>> *trader_positions = nullptr,
+    const std::vector<flatbuffers::Offset<krypto::serialization::BookPosition>> *book_positions = nullptr,
     double pnl = 0.0) {
   auto positions__ = positions ? _fbb.CreateVectorOfStructs<krypto::serialization::Position>(*positions) : 0;
+  auto trader_positions__ = trader_positions ? _fbb.CreateVector<flatbuffers::Offset<krypto::serialization::TraderPosition>>(*trader_positions) : 0;
+  auto book_positions__ = book_positions ? _fbb.CreateVector<flatbuffers::Offset<krypto::serialization::BookPosition>>(*book_positions) : 0;
   return krypto::serialization::CreateRiskSummary(
       _fbb,
       timestamp,
       positions__,
-      trader_positions,
-      book_positions,
+      trader_positions__,
+      book_positions__,
       pnl);
 }
 

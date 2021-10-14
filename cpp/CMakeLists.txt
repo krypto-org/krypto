@@ -15,6 +15,7 @@ execute_process(
         COMMAND conan install .
         -g cmake -g virtualenv
         -s build_type=Release
+        --profile=${CMAKE_CURRENT_BINARY_DIR}/../../resources/build.profile
         --build=missing
         RESULT_VARIABLE CONAN_EXIT_CODE)
 

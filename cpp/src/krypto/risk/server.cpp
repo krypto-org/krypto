@@ -1,6 +1,7 @@
 #include <krypto/risk/server.h>
 #include <krypto/network/helper.h>
 #include <krypto/instruments/client.h>
+#include <krypto/serialization/helper.h>
 
 namespace krypto::risk {
 
@@ -104,9 +105,9 @@ namespace krypto::risk {
     }
 
     bool Server::process(const zmq::message_t &msg, const krypto::utils::MsgType &msg_type) {
-        if (msg_type == utils::MsgType::RISK_SUMMARY_REQUEST) {
+        if (msg_type ==  krypto::utils::MsgType::RISK_SUMMARY_REQUEST) {
             position_manager_.update_pnl();
-            // TODO: Process Position Request
+            krypto::serialization::serialize(fb_builder_, position_manager_.risk_summary());
         }
         return fb_builder_.GetSize() > 0;
     }
