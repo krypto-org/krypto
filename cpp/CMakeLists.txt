@@ -74,6 +74,9 @@ target_link_libraries(krypto-mktdata-cache krypto)
 add_executable(krypto-test-auth src/tests/test_auth.cpp)
 target_link_libraries(krypto-test-auth krypto)
 
+add_executable(krypto-test-serialize src/tests/test_serialize.cpp)
+target_link_libraries(krypto-test-serialize krypto)
+
 # Examples
 
 add_executable(mktdata-printer src/examples/mktdata_printer_main.cpp)
