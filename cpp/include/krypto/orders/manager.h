@@ -1,6 +1,7 @@
 #pragma once
 
 #include <krypto/utils/types.h>
+#include <optional>
 
 
 namespace krypto::orders {
