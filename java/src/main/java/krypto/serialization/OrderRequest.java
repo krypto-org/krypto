@@ -24,6 +24,12 @@ public final class OrderRequest extends Table {
   public ByteBuffer orderIdAsByteBuffer() { return __vector_as_bytebuffer(14, 1); }
   public ByteBuffer orderIdInByteBuffer(ByteBuffer _bb) { return __vector_in_bytebuffer(_bb, 14, 1); }
   public byte tif() { int o = __offset(16); return o != 0 ? bb.get(o + bb_pos) : 0; }
+  public String trader() { int o = __offset(18); return o != 0 ? __string(o + bb_pos) : null; }
+  public ByteBuffer traderAsByteBuffer() { return __vector_as_bytebuffer(18, 1); }
+  public ByteBuffer traderInByteBuffer(ByteBuffer _bb) { return __vector_in_bytebuffer(_bb, 18, 1); }
+  public String book() { int o = __offset(20); return o != 0 ? __string(o + bb_pos) : null; }
+  public ByteBuffer bookAsByteBuffer() { return __vector_as_bytebuffer(20, 1); }
+  public ByteBuffer bookInByteBuffer(ByteBuffer _bb) { return __vector_in_bytebuffer(_bb, 20, 1); }
 
   public static int createOrderRequest(FlatBufferBuilder builder,
       long timestamp,
@@ -32,19 +38,23 @@ public final class OrderRequest extends Table {
       long quantity,
       byte side,
       int order_idOffset,
-      byte tif) {
-    builder.startTable(7);
+      byte tif,
+      int traderOffset,
+      int bookOffset) {
+    builder.startTable(9);
     OrderRequest.addQuantity(builder, quantity);
     OrderRequest.addPrice(builder, price);
     OrderRequest.addSecurityId(builder, security_id);
     OrderRequest.addTimestamp(builder, timestamp);
+    OrderRequest.addBook(builder, bookOffset);
+    OrderRequest.addTrader(builder, traderOffset);
     OrderRequest.addOrderId(builder, order_idOffset);
     OrderRequest.addTif(builder, tif);
     OrderRequest.addSide(builder, side);
     return OrderRequest.endOrderRequest(builder);
   }
 
-  public static void startOrderRequest(FlatBufferBuilder builder) { builder.startTable(7); }
+  public static void startOrderRequest(FlatBufferBuilder builder) { builder.startTable(9); }
   public static void addTimestamp(FlatBufferBuilder builder, long timestamp) { builder.addLong(0, timestamp, 0L); }
   public static void addSecurityId(FlatBufferBuilder builder, long securityId) { builder.addLong(1, securityId, 0L); }
   public static void addPrice(FlatBufferBuilder builder, long price) { builder.addLong(2, price, 0L); }
@@ -52,6 +62,8 @@ public final class OrderRequest extends Table {
   public static void addSide(FlatBufferBuilder builder, byte side) { builder.addByte(4, side, 0); }
   public static void addOrderId(FlatBufferBuilder builder, int orderIdOffset) { builder.addOffset(5, orderIdOffset, 0); }
   public static void addTif(FlatBufferBuilder builder, byte tif) { builder.addByte(6, tif, 0); }
+  public static void addTrader(FlatBufferBuilder builder, int traderOffset) { builder.addOffset(7, traderOffset, 0); }
+  public static void addBook(FlatBufferBuilder builder, int bookOffset) { builder.addOffset(8, bookOffset, 0); }
   public static int endOrderRequest(FlatBufferBuilder builder) {
     int o = builder.endTable();
     return o;

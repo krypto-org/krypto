@@ -36,13 +36,13 @@ namespace krypto::mktdata::coinbase {
 
         ~BookBuilder();
 
-        BookBuilder(const BookBuilder &other) = default;
+        BookBuilder(const BookBuilder &other) = delete;
 
-        BookBuilder(BookBuilder &&other) noexcept = default;
+        BookBuilder(BookBuilder &&other) noexcept = delete;
 
-        BookBuilder &operator=(const BookBuilder &other) = default;
+        BookBuilder &operator=(const BookBuilder &other) = delete;
 
-        BookBuilder &operator=(BookBuilder &&other) noexcept = default;
+        BookBuilder &operator=(BookBuilder &&other) noexcept = delete;
 
         void handle_incr(nlohmann::json incremental);
 

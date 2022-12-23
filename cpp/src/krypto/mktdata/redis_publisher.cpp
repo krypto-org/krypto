@@ -1,4 +1,5 @@
 #include <krypto/mktdata/redis_publisher.h>
+#include <krypto/mktdata/convert.h>
 #include <krypto/network/helper.h>
 
 namespace krypto::mktdata {
@@ -14,14 +15,14 @@ namespace krypto::mktdata {
 
     void RedisPublisher::process(const krypto::serialization::Quote *quote) {
 
-        std::unordered_map<std::string, int64_t> values = {
+        std::unordered_map<std::string, double_t> values = {
                 {"timestamp", quote->timestamp()},
-                {"bid", quote->bid()},
-                {"bid_quantity", quote->bid_quantity()},
-                {"ask", quote->ask()},
-                {"ask_quantity", quote->ask_quantity()},
-                {"last", quote->last()},
-                {"last_quantity", quote->last_quantity()},
+                {"bid", krypto::mktdata::extract_price(quote->bid())},
+                {"bid_quantity", krypto::mktdata::extract_quantity(quote->bid_quantity())},
+                {"ask", krypto::mktdata::extract_price(quote->ask())},
+                {"ask_quantity", krypto::mktdata::extract_quantity(quote->ask_quantity())},
+                {"last", krypto::mktdata::extract_price(quote->last())},
+                {"last_quantity", krypto::mktdata::extract_quantity(quote->last_quantity())},
         };
         std::string key = std::to_string(quote->security_id());
         redis_.hmset(key, values.begin(), values.end());

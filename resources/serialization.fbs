@@ -222,6 +222,8 @@ table OrderRequest {
   side: Side;
   order_id: string;
   tif: TimeInForce;
+  trader: string;
+  book: string;
 }
 
 table OrderCancelRequest {
@@ -243,6 +245,7 @@ table OrderUpdate {
   exchange_order_id: string;
   status: OrderStatus;
   filled_quantity: long;
+  filled_price: long;
 }
 
 table Order {
@@ -253,15 +256,39 @@ table Order {
 
 // Risk
 
+enum RiskRequestType : byte {ALL, TRADER, SECURITY_ID, BOOK}
+
 struct Position {
+  timestamp: long;
   security_id: long;
-  position: long;
+  position: double;
+  pnl: double;
+  mark_price: double;
+}
+
+table TraderPosition {
+  trader: string;
+  positions: [Position];
+}
+
+table BookPosition {
+  book: string;
+  positions: [Position];
 }
 
 table RiskSummary {
   timestamp: long;
   positions: [Position];
+  trader_positions: [TraderPosition];
+  book_positions: [BookPosition];
   pnl: double;
+}
+
+table RiskSummaryRequest {
+  type: RiskRequestType;
+  trader: string;
+  security_id: int64;
+  book: string;
 }
 
 // Model

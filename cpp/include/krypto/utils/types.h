@@ -81,6 +81,46 @@ namespace krypto::utils {
         Quote quote;
     };
 
+    struct Fill final {
+        int64_t security_id;
+        std::string order_id;
+        krypto::serialization::Side side;
+        double_t price;
+        double_t quantity;
+        double_t remaining_quantity;
+        std::string trader;
+        std::string book;
+
+        Fill(int64_t securityId, const std::string &orderId, serialization::Side side, double_t price,
+             double_t quantity, double_t remainingQuantity, const std::string &trader, const std::string &book);
+
+        friend std::ostream &operator<<(std::ostream &os, const Fill &fill);
+    };
+
+    struct Order final {
+        std::string cl_order_id;
+        int64_t security_id;
+        std::string symbol;
+        double_t price;
+        double_t size;
+        krypto::serialization::Side side;
+        krypto::serialization::TimeInForce tif;
+        std::string trader;
+        std::string book;
+        std::string order_id;
+        int64_t last_update_timestamp;
+        krypto::serialization::OrderStatus status;
+        double_t filled_quantity;
+        double_t fees;
+        std::vector<Fill> fills;
+
+        Order(std::string cl_order_id, int64_t security_id, const std::string &symbol, double_t price,
+              double_t size, serialization::Side side, serialization::TimeInForce tif, const std::string &trader,
+              const std::string &book);
+
+        friend std::ostream &operator<<(std::ostream &os, const Order &order);
+    };
+
     struct OrderUpdate final {
         static const constexpr krypto::utils::MsgType message_type =
                 krypto::utils::MsgType::ORDER_UPDATE;
@@ -90,6 +130,7 @@ namespace krypto::utils {
         krypto::serialization::OrderStatus status;
         int64_t filled_quantity;
     };
+
     struct OrderRequest final {
         static const constexpr krypto::utils::MsgType message_type =
                 krypto::utils::MsgType::ORDER_REQUEST;
@@ -101,12 +142,14 @@ namespace krypto::utils {
         std::string order_id;
         krypto::serialization::TimeInForce tif;
     };
+
     struct OrderCancelRequest final {
         static const constexpr krypto::utils::MsgType message_type =
                 krypto::utils::MsgType::ORDER_CANCEL_REQUEST;
         int64_t timestamp;
         std::string order_id;
     };
+
     struct OrderReplaceRequest final {
         static const constexpr krypto::utils::MsgType message_type =
                 krypto::utils::MsgType::ORDER_REPLACE_REQUEST;
@@ -140,6 +183,23 @@ namespace krypto::utils {
                << " valid: " << snapshot.valid;
             return os;
         }
+    };
+
+    struct Position final {
+        int64_t timestamp;
+        int64_t security_id;
+        double_t position;
+        double_t pnl;
+        double_t mark_price;
+    };
+
+    struct RiskSummary final {
+        int64_t timestamp;
+        using position_map = std::unordered_map<int64_t, krypto::utils::Position>;
+        position_map position_by_security_id;
+        std::unordered_map<std::string, position_map> trader_positions;
+        std::unordered_map<std::string, position_map> book_positions;
+        double_t pnl;
     };
 
     class MessageTypeData {

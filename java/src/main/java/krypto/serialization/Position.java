@@ -12,13 +12,19 @@ public final class Position extends Struct {
   public void __init(int _i, ByteBuffer _bb) { __reset(_i, _bb); }
   public Position __assign(int _i, ByteBuffer _bb) { __init(_i, _bb); return this; }
 
-  public long securityId() { return bb.getLong(bb_pos + 0); }
-  public long position() { return bb.getLong(bb_pos + 8); }
+  public long timestamp() { return bb.getLong(bb_pos + 0); }
+  public long securityId() { return bb.getLong(bb_pos + 8); }
+  public double position() { return bb.getDouble(bb_pos + 16); }
+  public double pnl() { return bb.getDouble(bb_pos + 24); }
+  public double markPrice() { return bb.getDouble(bb_pos + 32); }
 
-  public static int createPosition(FlatBufferBuilder builder, long securityId, long position) {
-    builder.prep(8, 16);
-    builder.putLong(position);
+  public static int createPosition(FlatBufferBuilder builder, long timestamp, long securityId, double position, double pnl, double markPrice) {
+    builder.prep(8, 40);
+    builder.putDouble(markPrice);
+    builder.putDouble(pnl);
+    builder.putDouble(position);
     builder.putLong(securityId);
+    builder.putLong(timestamp);
     return builder.offset();
   }
 

@@ -1,4 +1,6 @@
 #include <krypto/instruments/server.h>
+#include <krypto/risk/server.h>
+
 
 namespace krypto::instruments {
     Server::Server(zmq::context_t &context, const krypto::Config &config) :
@@ -120,4 +122,3 @@ namespace krypto::instruments {
 
 
 }
-

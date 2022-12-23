@@ -8,7 +8,6 @@
 #include <boost/asio/ip/tcp.hpp>
 #include <boost/asio/ssl/error.hpp>
 #include <boost/asio/ssl/stream.hpp>
-#include <boost/lexical_cast.hpp>
 #include <string>
 
 using tcp = boost::asio::ip::tcp;

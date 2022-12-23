@@ -39,7 +39,9 @@
   },
   "global":{
     "tz":"US/Central",
-    "ip":"localhost"
+    "ip":"localhost",
+    "default_trader": "kapilsh",
+    "default_book": "SIMX"
   },
   "services":{
     "instruments":{

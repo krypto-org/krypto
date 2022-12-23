@@ -15,6 +15,7 @@ execute_process(
         COMMAND conan install .
         -g cmake -g virtualenv
         -s build_type=Release
+        --profile=${CMAKE_CURRENT_BINARY_DIR}/../../resources/build.profile
         --build=missing
         RESULT_VARIABLE CONAN_EXIT_CODE)
 
@@ -72,6 +73,9 @@ target_link_libraries(krypto-mktdata-cache krypto)
 # Unit tests
 add_executable(krypto-test-auth src/tests/test_auth.cpp)
 target_link_libraries(krypto-test-auth krypto)
+
+add_executable(krypto-test-serialize src/tests/test_serialize.cpp)
+target_link_libraries(krypto-test-serialize krypto)
 
 # Examples
 

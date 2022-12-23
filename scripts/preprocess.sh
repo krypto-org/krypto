@@ -15,9 +15,6 @@ SCRIPT_DIR=$(dirname "${SCRIPT_PATH}")
 KRYPTO_DIR=$(realpath "${SCRIPT_DIR}"/..)
 RESOURCES_DIR="${KRYPTO_DIR}"/resources
 
-# shellcheck disable=SC2034
-GCC_VERSION=10.2
-
 echo -e "${BLUE}KRYPTO_DIR: ${KRYPTO_DIR}${NC}"
 
 echo -e "${BLUE}"==================="${NC}"
@@ -25,7 +22,7 @@ echo -e "${BLUE}"--- FLATBUFFERS ---"${NC}"
 echo -e "${BLUE}"==================="${NC}"
 
 rm -rf "${SCRIPT_DIR}"/build && mkdir "${SCRIPT_DIR}"/build && cd "${SCRIPT_DIR}"/build || exit
-conan install "${SCRIPT_DIR}" -g virtualenv -g cmake -s compiler=gcc  -s compiler.version=${GCC_VERSION} -s build_type=Release --profile "${SCRIPT_DIR}"/build.profile --build=missing
+conan install "${SCRIPT_DIR}" -g virtualenv -g cmake -s build_type=Release --profile "${RESOURCES_DIR}"/build.profile --build=missing
 source activate.sh && echo -e "${BLUE}Using $(flatc --version)${NC}" || exit
 cd ..
 
